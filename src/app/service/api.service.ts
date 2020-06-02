@@ -339,5 +339,35 @@ getCandidateAssessmentDetails(username): Observable<any> {
   )
 }
 
+//getPartnerInterviewList
+getPartnerInterviewList(): Observable<any> {
+  let url = `${this.userResultUri}/getPartnerInterviewList`;
+  return this.http.get(url, {headers: this.headers}).pipe(
+        map((res: Response) => {
+          return res || {}
+        }),
+        catchError(this.errorMgmt)
+  )
+}
 
+//readPartnerInterviewDetails
+readPartnerInterviewDetails(userName): Observable<any> {
+  let url = `${this.userResultUri}/readPartnerInterviewDetails/${userName}`;
+  return this.http.get(url, {headers: this.headers}).pipe(
+        map((res: Response) => {
+          return res || {}
+        }),
+        catchError(this.errorMgmt)
+  )
+}
+
+//savePartnerFeedBack
+  savePartnerFeedBack(id,data): Observable<any> {
+  console.log('savePartnerFeedBack API update method',data);
+    let url = `${this.userResultUri}/updatePartnerDetails/${id}`;
+    return this.http.post(url, data)
+      .pipe(
+        catchError(this.errorMgmt)
+      )
+  }
 }

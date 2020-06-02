@@ -27,6 +27,8 @@ import { TestConfigEditComponent } from './components/test-config-edit/test-conf
 import { JrssCreateComponent } from './components/jrss-create/jrss-create.component';
 import { StreamCreateComponent } from './components/stream-create/stream-create.component';
 import {UserModule} from './components/view-testresults/user.module';
+import { PartnerInterviewComponent } from './components/partner-interview/partner-interview.component';
+import { PartnerInterviewInitiateComponent } from './components/partner-interview-initiate/partner-interview-initiate.component';
 
 export let browserRefresh = false;
 
@@ -49,7 +51,9 @@ export let browserRefresh = false;
     TestConfigAddComponent,
     TestConfigEditComponent,
     JrssCreateComponent,
-    StreamCreateComponent],
+    StreamCreateComponent,
+    PartnerInterviewComponent,
+    PartnerInterviewInitiateComponent],
   imports: [
     BrowserModule,
     NgxPaginationModule,

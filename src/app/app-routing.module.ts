@@ -20,6 +20,8 @@ import { DeactivateGuard } from './service/canDeactivate.candCreate';
 import { JrssCreateComponent } from './components/jrss-create/jrss-create.component';
 import { ViewTestresultsComponent } from './components/view-testresults/view-testresults.component';
 import { StreamCreateComponent } from './components/stream-create/stream-create.component';
+import { PartnerInterviewComponent } from './components/partner-interview/partner-interview.component';
+import { PartnerInterviewInitiateComponent } from './components/partner-interview-initiate/partner-interview-initiate.component';
 
 const routes: Routes = [
   { path: '', pathMatch: 'full', redirectTo: 'login-component' },
@@ -40,8 +42,10 @@ const routes: Routes = [
   { path: 'testconfig-add', component:TestConfigAddComponent},
   { path: 'testconfig-edit/:id', component:TestConfigEditComponent},
   { path: 'jrss-create', component: JrssCreateComponent },
-  {path: 'view-testresults', component:ViewTestresultsComponent},
-  { path: 'stream-create', component: StreamCreateComponent }
+  { path: 'view-testresults', component:ViewTestresultsComponent},
+  { path: 'stream-create', component: StreamCreateComponent },
+  { path: 'partner-list', component:PartnerInterviewComponent },
+  { path: 'initiate-partner-interview/:id', component:PartnerInterviewInitiateComponent }
 ];
 
 @NgModule({
