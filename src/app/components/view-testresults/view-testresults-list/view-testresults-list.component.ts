@@ -4,7 +4,7 @@ import { ActivatedRoute, Router } from '@angular/router';
 import { browserRefresh } from '../../../app.component';
 import { HttpClient, HttpHeaders, HttpErrorResponse } from '@angular/common/http';
 import { Observable } from 'rxjs';
-import { appConfig } from './../../model/appConfig';
+import { appConfig } from './../../../model/appConfig';
 
 @Component({
   selector: 'app-view-testresults-list',

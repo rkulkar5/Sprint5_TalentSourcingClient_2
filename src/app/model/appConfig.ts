@@ -5,6 +5,6 @@ export const appConfig = {
   noOfQuestions: 30,
   defaultPassword: 'welcome',
   defaultEncryptedPassword: 'tcIq8+z=rk=PHcxPzQAdpMUXA==',  
-  baseUri:string = 'http://localhost:4000'
+  baseUri:'http://localhost:4000'
 };
 
