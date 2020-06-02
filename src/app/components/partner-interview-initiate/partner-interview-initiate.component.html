@@ -1,0 +1,82 @@
+<div>
+  <div>
+    <h4 class="my-0 mr-md-auto font-weight-normal">Initiate Partner Interview </h4>
+  </div>
+  <br/>
+  <div class="col-sm-6"><i><b><font style="font-size:12px">View Candidate Details</font></b></i></div>
+  <div class="card">
+    <table>
+      <tbody>
+      <tr>
+        <td  width="25%"><label style="color: mediumpurple">Name:</label></td>
+        <td  width="25%">{{this.partnerInterviewDetails[0].result_users[0].employeeName}}</td>
+        <td  width="25%"><label style="color: mediumpurple">JRSS:</label></td>
+        <td  width="25%">{{this.partnerInterviewDetails[0].result_users[0].JRSS}}</td>
+      </tr>
+      <tr>
+        <td  width="25%"><label style="color: mediumpurple">Technology Stream:</label></td>
+        <td  width="25%">{{this.partnerInterviewDetails[0].result_users[0].technologyStream}}</td>
+        <td  width="25%"><label style="color: mediumpurple">Online Assessment Score:</label></td>
+        <td  width="25%">{{this.partnerInterviewDetails[0].userScore}}%</td>
+      </tr>
+      <tr>
+        <td  width="25%"><label style="color: mediumpurple">Technical Interview Score:</label></td>
+        <td  width="25%">{{this.partnerInterviewDetails[0].avgTechScore}}</td>
+        <td  width="25%"><label style="color: mediumpurple">Technical Interview Result:</label></td>
+        <td  width="25%">{{this.partnerInterviewDetails[0].smeResult}}</td>
+      </tr>
+      <tr>
+        <td  width="25%"><label style="color: mediumpurple">Technical Interview Feedback:</label></td>
+        <td  width="25%">{{this.partnerInterviewDetails[0].smeFeedback}}</td>
+        <td></td>
+        <td></td>
+      </tr>
+      <tr>
+        <td  width="25%"><label style="color: mediumpurple">You can download CV here:</label></td>
+        <td  width="25%"><a href="#" routerLinkActive="active">Click here</a></td>
+        <td  width="25%"><label style="color: mediumpurple">You can access the Pre-Technical-Interview form here:</label></td>
+        <td  width="25%"><a href="#" routerLinkActive="active">Click here</a></td>
+      </tr>
+      </tbody>
+    </table>
+  </div>
+  <br>
+  <div class="col-sm-6"><i><b><font style="font-size:12px">Please enter feedback here</font></b></i></div>
+  <div class="card">
+    <form [formGroup]="partnerFeedbackForm" (ngSubmit)="onSubmit(this.partnerInterviewDetails[0]._id)" >
+      <div class="form-group row">
+        <label for="inputFinalResult" class="col-sm-4 col-form-label" style="color: mediumpurple">Final Result:</label>
+        <div class="col-sm-4" style="size:50px">
+          <select class="custom-select form-control" (change)="updateFinalResult($event.target.value)"
+                  formControlName="finalResult" id="inputFinalResult" [ngClass]="{ 'is-invalid': submitted && myForm.finalResult.errors }">
+            <option value="">Choose...</option>
+            <option *ngFor="let finalResult of FinalResult" value="{{finalResult}}">{{finalResult}}
+            </option>
+          </select>
+          <div *ngIf="submitted && myForm.finalResult.errors" class="invalid-feedback">
+            <div *ngIf="myForm.finalResult.errors.required">Final Result is required</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="form-group row">
+        <label for="inputPartnerFeedback" class="col-sm-4 col-form-label" style="color: mediumpurple">Partner Feedback:</label>
+        <div class="col-sm-8">
+        <textarea class="form-control" id="inputPartnerFeedback" type="textarea" rows="5" cols="50"  maxlength="3000" formControlName="partnerFeedback" [ngClass]="{ 'is-invalid': submitted && myForm.partnerFeedback.errors }">
+        </textarea>
+          <div class="col-sm-6"><i><b><font style="font-size:12px">[Max 3000 Characters]</font></b></i></div>
+          <!-- error -->
+        <div *ngIf="submitted && myForm.partnerFeedback.errors" class="invalid-feedback">
+          <div *ngIf="myForm.partnerFeedback.errors.required">Enter your feedback</div>
+        </div>
+        </div>
+
+      </div>
+      <div class="text-center" style="width: 1000px">
+        <button type="submit">Submit</button>&nbsp;&nbsp;
+        <button type="button" (click)="resetForm()">Clear</button>&nbsp;&nbsp;
+        <button type="button" (click)="cancelForm()">Cancel</button>
+      </div>
+    </form>
+  </div>
+</div>
