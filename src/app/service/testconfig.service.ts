@@ -2,13 +2,14 @@ import { Injectable, OnInit } from '@angular/core';
 import { Observable, throwError } from 'rxjs';
 import { catchError, map } from 'rxjs/operators';
 import { HttpClient, HttpHeaders, HttpErrorResponse } from '@angular/common/http';
+import { appConfig } from './../model/appConfig';
 
 @Injectable({
   providedIn: 'root'
 })
 export class TestConfigService {
 
- baseUri:string = 'http://localhost:4000/api/testConfig';
+ baseUri:string = appConfig.baseUri + '/api/testConfig';
  headers = new HttpHeaders().set('Content-Type', 'application/json');
 
  constructor(private http: HttpClient) { }

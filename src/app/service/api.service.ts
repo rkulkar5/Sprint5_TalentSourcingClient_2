@@ -2,6 +2,9 @@ import { Injectable } from '@angular/core';
 import { Observable, throwError } from 'rxjs';
 import { catchError, map } from 'rxjs/operators';
 import { HttpClient, HttpHeaders, HttpErrorResponse } from '@angular/common/http';
+import { appConfig } from './../model/appConfig';
+
+
 //var passport = require('passport');
 @Injectable({
   providedIn: 'root'
@@ -9,11 +12,11 @@ import { HttpClient, HttpHeaders, HttpErrorResponse } from '@angular/common/http
 
 export class ApiService {
 
-  baseUri:string = 'http://localhost:4000/api';
-  userResultUri:string = 'http://localhost:4000/result';
-  baseloginUri:string = 'http://localhost:4000/api/login';
-  baseBandUri:string = 'http://localhost:4000/api/band';
-  baseJrssUri:string = 'http://localhost:4000/api/jrss';
+  baseUri:string = appConfig.baseUri + '/api';
+  userResultUri:string = appConfig.baseUri + '/result';
+  baseloginUri:string = appConfig.baseUri + '/api/login';
+  baseBandUri:string = appConfig.baseUri + '/api/band';
+  baseJrssUri:string = appConfig.baseUri + '/api/jrss';
   headers = new HttpHeaders().set('Content-Type', 'application/json');
 
   constructor(private http: HttpClient) { }
