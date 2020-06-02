@@ -4,7 +4,7 @@ import { ActivatedRoute, Router } from '@angular/router';
 import { browserRefresh } from '../../../app.component';
 import { HttpClient, HttpHeaders, HttpErrorResponse } from '@angular/common/http';
 import { Observable } from 'rxjs';
-
+import { appConfig } from './../../model/appConfig';
 
 @Component({
   selector: 'app-view-testresults-list',
@@ -19,7 +19,7 @@ export class ViewTestresultsListComponent implements OnChanges {
   searchText: string;
   filters: Object;
   filteredUsers: any[] = [];
-  userResultUri: string = 'http://localhost:4000/result';
+  userResultUri: string = appConfig.baseUri + '/result';
   public browserRefresh: boolean;
   Result: any = [];
   config: any;
