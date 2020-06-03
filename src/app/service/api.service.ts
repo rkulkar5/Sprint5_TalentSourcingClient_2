@@ -373,4 +373,15 @@ readPartnerInterviewDetails(userName): Observable<any> {
         catchError(this.errorMgmt)
       )
   }
+
+  //get Operations Candidate List
+  getOperationsCandidateList(): Observable<any> {
+  let url = `${this.userResultUri}/getOperationsCandidateList`;
+  return this.http.get(url, {headers: this.headers}).pipe(
+        map((res: Response) => {
+          return res || {}
+        }),
+        catchError(this.errorMgmt)
+  )
+}
 }
