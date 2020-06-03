@@ -29,6 +29,7 @@ import { StreamCreateComponent } from './components/stream-create/stream-create.
 import {UserModule} from './components/view-testresults/user.module';
 import { PartnerInterviewComponent } from './components/partner-interview/partner-interview.component';
 import { PartnerInterviewInitiateComponent } from './components/partner-interview-initiate/partner-interview-initiate.component';
+import { OperationsCandidateListComponent } from './components/operations-candidate-list/operations-candidate-list.component';
 
 export let browserRefresh = false;
 
@@ -53,7 +54,8 @@ export let browserRefresh = false;
     JrssCreateComponent,
     StreamCreateComponent,
     PartnerInterviewComponent,
-    PartnerInterviewInitiateComponent],
+    PartnerInterviewInitiateComponent,
+    OperationsCandidateListComponent],
   imports: [
     BrowserModule,
     NgxPaginationModule,
