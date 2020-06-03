@@ -28,7 +28,7 @@
           <th scope="col" width="23%">Technical Interview Result</th>
           <th scope="col" width="23%">Partner Interview Result</th>
           <th scope="col" width="15%">CV Download</th>
-          <th scope="col center" width="20%">Action</th>
+          <!--<th scope="col center" width="20%">Action</th>-->
         </tr>
         </thead>
         <tbody>
@@ -38,11 +38,6 @@
               <td  width="23%">{{operationsList.smeResult}}</td>
               <td  width="23%">{{operationsList.managementResult}}</td>
               <td  width="8%"><a href="#" routerLinkActive="active">Click Here</a></td>
-              <td  class="text-center edit-block" width="20%">
-                <a class="edit" [routerLink]="['/initiate-partner-interview/', operationsList.userName]" [state]="{username:this.userName}">
-                  <button type="button" class="btn btn-success btn-sm">Initiate Interview</button>&nbsp;
-                </a>
-              </td>
             </tr>
             </tbody>
       </table>
