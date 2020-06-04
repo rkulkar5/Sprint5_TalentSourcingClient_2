@@ -40,8 +40,7 @@ pageChange(newPage: number) {
 getOperationsCandidateList(){
   this.apiService.getOperationsCandidateList().subscribe((data) => {
    this.operationsCandidateList = data;   
-  })
-  console.log("Result=" + this.operationsCandidateList);
+  })  
 }
 
 }

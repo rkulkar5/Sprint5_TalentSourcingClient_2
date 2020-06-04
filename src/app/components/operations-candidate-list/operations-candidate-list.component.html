@@ -24,11 +24,11 @@
         <thead class="table-success">
         <tr>
           <th scope="col" width="12%">Name</th>          
-          <th scope="col" width="23%">Online Assessment Result</th>
-          <th scope="col" width="23%">Technical Interview Result</th>
-          <th scope="col" width="23%">Partner Interview Result</th>
-          <th scope="col" width="15%">CV Download</th>
-          <!--<th scope="col center" width="20%">Action</th>-->
+          <th scope="col" width="20%">Online Assessment Result</th>
+          <th scope="col" width="20%">Technical Interview Result</th>
+          <th scope="col" width="20%">Partner Interview Result</th>
+          <th scope="col" width="8%">CV Download</th>
+          <th scope="col center" width="20%">Action</th>
         </tr>
         </thead>
         <tbody>
@@ -38,6 +38,11 @@
               <td  width="23%">{{operationsList.smeResult}}</td>
               <td  width="23%">{{operationsList.managementResult}}</td>
               <td  width="8%"><a href="#" routerLinkActive="active">Click Here</a></td>
+              <td  class="text-center edit-block" width="20%">
+                <a class="edit" [routerLink]="['/initiate-operations-project/', operationsList.userName]" [state]="{username:this.userName}">
+                  <button type="button" class="btn btn-success btn-sm">Initiate Project</button>&nbsp;
+                </a>
+              </td>
             </tr>
             </tbody>
       </table>

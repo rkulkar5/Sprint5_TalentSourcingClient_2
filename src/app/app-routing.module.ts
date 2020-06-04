@@ -23,6 +23,7 @@ import { StreamCreateComponent } from './components/stream-create/stream-create.
 import { PartnerInterviewComponent } from './components/partner-interview/partner-interview.component';
 import { PartnerInterviewInitiateComponent } from './components/partner-interview-initiate/partner-interview-initiate.component';
 import { OperationsCandidateListComponent } from './components/operations-candidate-list/operations-candidate-list.component';
+import { OperationsProjectInitiateComponent } from './components/operations-project-initiate/operations-project-initiate.component';
 
 const routes: Routes = [
   { path: '', pathMatch: 'full', redirectTo: 'login-component' },
@@ -47,7 +48,8 @@ const routes: Routes = [
   { path: 'stream-create', component: StreamCreateComponent },
   { path: 'partner-list', component:PartnerInterviewComponent },
   { path: 'initiate-partner-interview/:id', component:PartnerInterviewInitiateComponent },
-  { path: 'operations-candidate-list', component:OperationsCandidateListComponent }
+  { path: 'operations-candidate-list', component:OperationsCandidateListComponent },
+  { path: 'initiate-operations-project/:id', component:OperationsProjectInitiateComponent }
 ];
 
 @NgModule({
