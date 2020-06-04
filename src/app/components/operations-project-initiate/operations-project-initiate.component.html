@@ -47,8 +47,47 @@
       </table>
     </div>
     <br>
-
-
-
+    <div class="col-sm-6"><i><b><font style="font-size:12px">Please enter and submit the form to assign a candidate to a particular project</font></b></i></div>
+    <div class="card">
+      <form [formGroup]="operationsProjectForm" (ngSubmit)="onSubmit(this.operationsProjectDetails[0]._id)" >
+        <div class="form-group row">
+          <label for="inputLocation" class="col-sm-4 col-form-label" style="color: mediumpurple">Location:</label>
+          <div class="col-sm-4" style="size:50px">
+            <select class="custom-select form-control" (change)="updateLocation($event.target.value)"
+                    formControlName="projectLocation" id="inputLocation" [ngClass]="{ 'is-invalid': submitted && myForm.projectLocation.errors }">
+              <option value="" disabled>Choose...</option>
+              <option *ngFor="let location of ProjectLocation" value="{{location}}">{{location}}
+              </option>
+            </select>
+            <div *ngIf="submitted && myForm.projectLocation.errors" class="invalid-feedback">
+              <div *ngIf="myForm.projectLocation.errors.required">Location is required</div>
+            </div>
+          </div>
+        </div>
+        <div class="form-group row">
+          <label for="inputProjectName" class="col-sm-4 col-form-label" style="color: mediumpurple">Project Name:</label>
+          <div class="col-sm-4" style="size:50px">
+            <input class="form-control" type="text" formControlName="projectName" id="inputProjectName" [ngClass]="{ 'is-invalid': submitted && myForm.projectName.errors }">
+            <div *ngIf="submitted && myForm.projectName.errors" class="invalid-feedback">
+              <div *ngIf="myForm.projectName.errors.required">Project Name is required</div>
+            </div>
+          </div>
+        </div>
+        <div class="form-group row">
+          <label for="inputPosition" class="col-sm-4 col-form-label" style="color: mediumpurple">Position:</label>
+          <div class="col-sm-4" style="size:50px">
+            <input class="form-control" type="text" formControlName="projectPosition" id="inputPosition" [ngClass]="{ 'is-invalid': submitted && myForm.projectPosition.errors }">
+            <div *ngIf="submitted && myForm.projectPosition.errors" class="invalid-feedback">
+              <div *ngIf="myForm.projectPosition.errors.required">Position is required</div>
+            </div>
+          </div>
+        </div>
+        <div class="text-center" style="width: 1000px">
+          <button type="submit">Submit</button>&nbsp;&nbsp;
+          <button type="button" (click)="resetForm()">Clear</button>&nbsp;&nbsp;
+          <button type="button" (click)="cancelForm()">Cancel</button>
+        </div>
+      </form>
+    </div>
   </div>
   
