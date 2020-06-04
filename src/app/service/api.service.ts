@@ -384,4 +384,16 @@ readPartnerInterviewDetails(userName): Observable<any> {
         catchError(this.errorMgmt)
   )
 }
+
+//read operations project Details
+readOperationsProjectDetails(userName): Observable<any> {
+  let url = `${this.userResultUri}/readOperationsProjectDetails/${userName}`;
+  return this.http.get(url, {headers: this.headers}).pipe(
+        map((res: Response) => {
+          return res || {}
+        }),
+        catchError(this.errorMgmt)
+  )
+}
+
 }
