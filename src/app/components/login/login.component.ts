@@ -108,9 +108,9 @@ export class LoginComponent implements OnInit {
              }else if (res.accessLevel === 'sme') {
               this.ngZone.run(() => this.router.navigateByUrl('/technical-interview-list',{state:{username:res.username}}))
             } else if (res.accessLevel === 'partner') {
-               this.ngZone.run(() => this.router.navigateByUrl('/partner-list',{state:{username:res.username}}))
+               this.ngZone.run(() => this.router.navigateByUrl('/partner-list',{state:{username:res.username,accessLevel:res.accessLevel}}))
              }else if (res.accessLevel === 'management') {
-              this.ngZone.run(() => this.router.navigateByUrl('/operations-candidate-list',{state:{username:res.username}}))
+              this.ngZone.run(() => this.router.navigateByUrl('/operations-candidate-list',{state:{username:res.username,accessLevel:res.accessLevel}}))
             } else if(res.userLoggedin=='false') {
               if(res.quizNumber == 1 && res.status == 'Active' && res.password == appConfig.defaultEncryptedPassword){
                 this.ngZone.run(() => this.router.navigateByUrl('/change-password',{state:{username:res.username,quizNumber:res.quizNumber}}))  

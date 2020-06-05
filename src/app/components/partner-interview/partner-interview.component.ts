@@ -14,6 +14,8 @@ export class PartnerInterviewComponent implements OnInit {
   userName: String = "";
   PartnerInterviewList: any = [];
   config: any;
+  accessLevel: String = "";
+  mode: string = "";
 
   constructor(private route: ActivatedRoute, private router: Router, private apiService: ApiService) {
       this.config = {
@@ -24,6 +26,8 @@ export class PartnerInterviewComponent implements OnInit {
       this.browserRefresh = browserRefresh;
       if (!this.browserRefresh) {
           this.userName = this.router.getCurrentNavigation().extras.state.username;
+          this.accessLevel = this.router.getCurrentNavigation().extras.state.accessLevel;
+          console.log("accessLevel*",this.accessLevel);
       }
       route.queryParams.subscribe(
       params => this.config.currentPage= params['page']?params['page']:1 );
