@@ -396,4 +396,15 @@ readOperationsProjectDetails(userName): Observable<any> {
   )
 }
 
+//getTechnicalInterviewList
+getTechnicalInterviewList(): Observable<any> {
+  let url = `${this.userResultUri}/getTechnicalInterviewList`;
+  return this.http.get(url, {headers: this.headers}).pipe(
+        map((res: Response) => {
+          return res || {}
+        }),
+        catchError(this.errorMgmt)
+  )
+}
+
 }

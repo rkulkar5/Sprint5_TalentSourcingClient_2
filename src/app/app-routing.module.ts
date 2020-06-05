@@ -24,6 +24,7 @@ import { PartnerInterviewComponent } from './components/partner-interview/partne
 import { PartnerInterviewInitiateComponent } from './components/partner-interview-initiate/partner-interview-initiate.component';
 import { OperationsCandidateListComponent } from './components/operations-candidate-list/operations-candidate-list.component';
 import { OperationsProjectInitiateComponent } from './components/operations-project-initiate/operations-project-initiate.component';
+import { TechnicalInterviewListComponent } from './components/technical-interview-list/technical-interview-list.component';
 
 const routes: Routes = [
   { path: '', pathMatch: 'full', redirectTo: 'login-component' },
@@ -46,6 +47,7 @@ const routes: Routes = [
   { path: 'jrss-create', component: JrssCreateComponent },
   { path: 'view-testresults', component:ViewTestresultsComponent},
   { path: 'stream-create', component: StreamCreateComponent },
+  { path: 'technical-interview-list', component:TechnicalInterviewListComponent},
   { path: 'partner-list', component:PartnerInterviewComponent },
   { path: 'initiate-partner-interview/:id', component:PartnerInterviewInitiateComponent },
   { path: 'operations-candidate-list', component:OperationsCandidateListComponent },

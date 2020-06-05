@@ -31,6 +31,7 @@ import { PartnerInterviewComponent } from './components/partner-interview/partne
 import { PartnerInterviewInitiateComponent } from './components/partner-interview-initiate/partner-interview-initiate.component';
 import { OperationsCandidateListComponent } from './components/operations-candidate-list/operations-candidate-list.component';
 import { OperationsProjectInitiateComponent } from './components/operations-project-initiate/operations-project-initiate.component';
+import { TechnicalInterviewListComponent } from './components/technical-interview-list/technical-interview-list.component';
 
 export let browserRefresh = false;
 
@@ -57,7 +58,8 @@ export let browserRefresh = false;
     PartnerInterviewComponent,
     PartnerInterviewInitiateComponent,
     OperationsCandidateListComponent,
-    OperationsProjectInitiateComponent],
+    OperationsProjectInitiateComponent,
+    TechnicalInterviewListComponent],
   imports: [
     BrowserModule,
     NgxPaginationModule,
