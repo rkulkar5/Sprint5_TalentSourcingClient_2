@@ -17,6 +17,7 @@ export class ApiService {
   baseloginUri:string = appConfig.baseUri + '/api/login';
   baseBandUri:string = appConfig.baseUri + '/api/band';
   baseJrssUri:string = appConfig.baseUri + '/api/jrss';
+  baseQuestionUri:string = appConfig.baseUri +'/api/quiz';
   projectAllocUri:string = appConfig.baseUri + '/projectAlloc';
   headers = new HttpHeaders().set('Content-Type', 'application/json');
 
@@ -32,6 +33,19 @@ getJRSS() {
       .pipe(
         catchError(this.errorMgmt)
       )
+  }
+
+  
+  // Get Users table records based on username
+getPreTechniaclQuestions(jrss,userName): Observable<any> {
+  let url = `${this.baseQuestionUri}/getPreTechQuestionanire/${jrss}/${userName}`;
+  
+  return this.http.get(url, {headers: this.headers}).pipe(
+    map((res: Response) => {
+      return res || {}
+    }),
+    catchError(this.errorMgmt)
+  )
   }
 
   // GET Candidate JRSS

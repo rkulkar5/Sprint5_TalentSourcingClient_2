@@ -25,6 +25,7 @@ import { PartnerInterviewInitiateComponent } from './components/partner-intervie
 import { OperationsCandidateListComponent } from './components/operations-candidate-list/operations-candidate-list.component';
 import { OperationsProjectInitiateComponent } from './components/operations-project-initiate/operations-project-initiate.component';
 import { TechnicalInterviewListComponent } from './components/technical-interview-list/technical-interview-list.component';
+import { PreTechFormComponent } from './components/pre-tech-form/pre-tech-form.component';
 
 const routes: Routes = [
   { path: '', pathMatch: 'full', redirectTo: 'login-component' },
@@ -51,6 +52,7 @@ const routes: Routes = [
   { path: 'partner-list', component:PartnerInterviewComponent },
   { path: 'initiate-partner-interview/:id', component:PartnerInterviewInitiateComponent },
   { path: 'operations-candidate-list', component:OperationsCandidateListComponent },
+  {path: 'pre-tech-form', component:PreTechFormComponent},
   { path: 'initiate-operations-project/:id', component:OperationsProjectInitiateComponent }
 ];
 
