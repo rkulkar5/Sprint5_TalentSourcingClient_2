@@ -3,6 +3,7 @@ import { ApiService } from './../../service/api.service';
 import { FormGroup, FormBuilder, Validators } from "@angular/forms";
 import { ActivatedRoute, Router } from '@angular/router';
 import { browserRefresh } from '../../app.component';
+import { OperationsDetails } from './../../model/OperationsDetails';
 
 @Component({
   selector: 'app-operations-project-initiate',
@@ -41,8 +42,7 @@ get myForm(){
 }
 
   // Choose Location with select dropdown
-  updateLocation(e){
-    console.log("Inside updateLocation="+e);
+  updateLocation(e){    
     this.operationsProjectForm.get('projectLocation').setValue(e, {
     onlySelf: true
     })
@@ -58,8 +58,16 @@ get myForm(){
   onSubmit(id) {
     this.submitted = true;
 
-    // TO-DO - Code to insert/update the value to ProjectAlloc table
+    let operationsDetails = new OperationsDetails(this.operationsProjectForm.value.projectLocation,
+      this.operationsProjectForm.value.projectName,this.operationsProjectForm.value.projectPosition);
 
+    this.apiService.insertOperationsDetails(operationsDetails).subscribe(
+              (res) => {
+                console.log('Operations Details successfully inserted!')
+                this.ngZone.run(() => this.router.navigateByUrl('/operations-candidate-list',{state:{username:this.userName}}))
+              }, (error) => {
+                console.log(error);
+              });
 }
 
 //Reset

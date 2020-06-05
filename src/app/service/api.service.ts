@@ -17,6 +17,7 @@ export class ApiService {
   baseloginUri:string = appConfig.baseUri + '/api/login';
   baseBandUri:string = appConfig.baseUri + '/api/band';
   baseJrssUri:string = appConfig.baseUri + '/api/jrss';
+  projectAllocUri:string = appConfig.baseUri + '/projectAlloc';
   headers = new HttpHeaders().set('Content-Type', 'application/json');
 
   constructor(private http: HttpClient) { }
@@ -395,6 +396,15 @@ readOperationsProjectDetails(userName): Observable<any> {
         catchError(this.errorMgmt)
   )
 }
+
+//Insert Operations project Details
+insertOperationsDetails(data): Observable<any> { 
+  let url = `${this.projectAllocUri}/insertOperatioDetails`;
+  return this.http.post(url, data)
+    .pipe(
+      catchError(this.errorMgmt)
+    )
+} 
 
 //getTechnicalInterviewList
 getTechnicalInterviewList(): Observable<any> {
