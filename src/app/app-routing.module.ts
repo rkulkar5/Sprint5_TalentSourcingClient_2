@@ -26,6 +26,7 @@ import { OperationsCandidateListComponent } from './components/operations-candid
 import { OperationsProjectInitiateComponent } from './components/operations-project-initiate/operations-project-initiate.component';
 import { TechnicalInterviewListComponent } from './components/technical-interview-list/technical-interview-list.component';
 import { PreTechFormComponent } from './components/pre-tech-form/pre-tech-form.component';
+import { TechnicalInterviewComponent } from './components/technical-interview/technical-interview.component';
 
 const routes: Routes = [
   { path: '', pathMatch: 'full', redirectTo: 'login-component' },
@@ -34,7 +35,7 @@ const routes: Routes = [
   { path: 'take-quiz', component: QuizComponent },
   { path: 'result-page', component: ResultPageComponent },
   { path: 'change-password', component: ChangePasswordComponent },
-  { path: 'quizInstructions', component: TestInstructionComponent },  
+  { path: 'quizInstructions', component: TestInstructionComponent },
   { path: 'edit-band/:id', component: BandEditComponent },
   { path: 'create-candidate', component: CandidateCreateComponent, canDeactivate:[DeactivateGuard] },
   { path: 'edit-candidate/:id/:user_id', component: CandidateEditComponent, canDeactivate:[DeactivateGuard] },
@@ -53,7 +54,8 @@ const routes: Routes = [
   { path: 'initiate-partner-interview/:id', component:PartnerInterviewInitiateComponent },
   { path: 'operations-candidate-list', component:OperationsCandidateListComponent },
   {path: 'pre-tech-form', component:PreTechFormComponent},
-  { path: 'initiate-operations-project/:id', component:OperationsProjectInitiateComponent }
+  { path: 'initiate-operations-project/:id', component:OperationsProjectInitiateComponent },
+  { path: 'technical-list', component:TechnicalInterviewComponent }
 ];
 
 @NgModule({

@@ -27,10 +27,10 @@ export class AppComponent implements OnDestroy {
   }
 
   //Disable Right Click on application
-  @HostListener('contextmenu', ['$event'])
+/*  @HostListener('contextmenu', ['$event'])
   onRightClick(event) {
       event.preventDefault();
-  }
+  }*/
 //Commented to allow paste in question tab
    //Disable Paste on application
 //   @HostListener('paste', ['$event'])

@@ -1,0 +1,114 @@
+<div>
+  <div>
+    <h3 class="my-0 mr-md-auto font-weight-normal">Initiate Technical SME Interview </h3>
+  </div>
+  <br/>
+  <div class="col-sm-6"><i><b><font style="font-size:12px">View Candidate Details</font></b></i></div>
+  <div class="card">
+    <table>
+      <tbody>
+      <tr>
+        <td  width="25%"><label style="color: mediumpurple">Name:</label></td>
+        <td  width="25%">{{this.candidateInterviewDetails[0].result_users[0].employeeName}}</td>
+        <td  width="25%"><label style="color: mediumpurple">JRSS:</label></td>
+        <td  width="25%">{{this.candidateInterviewDetails[0].result_users[0].JRSS}}</td>
+      </tr>
+      <tr>
+        <td  width="25%"><label style="color: mediumpurple">Technology Stream:</label></td>
+        <td  width="25%">{{this.candidateInterviewDetails[0].result_users[0].technologyStream}}</td>
+        <td  width="25%"><label style="color: mediumpurple">Online Assessment Score:</label></td>
+        <td  width="25%">{{this.candidateInterviewDetails[0].userScore}}%</td>
+      </tr>
+      <tr>
+        <td  width="25%"><label style="color: mediumpurple">You can download CV here:</label></td>
+        <td  width="25%"><a href="#" routerLinkActive="active">Click here</a></td>
+        <td  width="25%"><label style="color: mediumpurple">You can access the Pre-Technical-Interview form here:</label></td>
+        <td  width="25%"><a href="#" routerLinkActive="active">Click here</a></td>
+      </tr>
+      </tbody>
+    </table>
+  </div>
+</div>
+<br>
+<!-- Dynamic Form Table -->
+  <div class="card">
+    <form [formGroup]="techskillForm" (ngSubmit)="onSubmit()">
+      <table  formArrayName="techStream">
+        <tr>
+          <td colspan="4" width="100%" ><label style="color: mediumpurple;font-style:italic;"><B>Select Technical Area For Assessment:</B></label></td>
+        </tr>
+        <br/>
+        <tr>
+          <td  width="25%" ><label style="color: mediumpurple"><b>Technical Stream</b></label></td>
+          <td  width="25%"><label style="color: mediumpurple"><b>Score:</b></label></td>
+          <td  width="25%"></td>
+          <td  width="25%"></td>
+        </tr>
+
+        <tr *ngFor="let dynamic of dynamicArray; let i = index;" [formGroupName]="i">
+          <td  width="25%">
+              <select class="form-control" formControlName="technologyStream" [ngModel]="dynamic[0].value">
+                <option  *ngFor="let ts of dynamic;" [value]="ts.value">
+                  {{ts.value}}
+                </option>
+              </select>
+          </td>
+          <td width="25%">
+              <input type="text" size="5" formControlName="score" class="form-control" (change)="averageCalc($event.target.value)">
+          </td>
+          <td colspan="2"  width="50%" *ngIf="dynamicArray.length == i+1">
+            <button type="button" (click)="addQuantity(i)" class="btn btn-secondary">Add</button>
+           &nbsp;&nbsp;
+            <button (click)="removeQuantity(i)" class="btn btn-secondary">Remove</button>
+          </td>
+        </tr>
+      </table>
+<br>
+      <table style="table-layout: fixed" >
+        <tr>
+          <td  width="100%" colspan="4"><label style="color: mediumpurple"><B>Calculate Final Score:</B></label></td>
+        </tr>
+        <br/>
+        <tr>
+          <td><label style="color: mediumpurple">Final Score</label></td>
+          <td><input class="form-control" formControlName="finalscore" size="10" type="text" value={{this.averageScore}} /></td>
+          <td><label style="color: mediumpurple">Final Result</label></td>
+          <td>
+             <select formControlName="finalResult" class="form-control">
+              <option value="">Choose...</option>
+              <option id="Recommended">Recommended</option>
+              <option id="Not Suitable">Not Suitable</option>
+              <option id="StandBy">StandBy</option>
+             </select>
+            </td>
+        </tr>
+        <br/>
+        <tr>
+          <td><label style="color: mediumpurple">Technical Feedback</label></td>
+          <td colspan="3">
+            <textarea class="form-control" type="textarea" rows="5" cols="50"  maxlength="3000" formControlName="feedback"></textarea>
+          </td>
+        </tr>
+        <br/>
+        <tr>
+          <td colspan="3" class="text-center">
+            <button size="8" type="submit"class="btn btn-secondary" >Submit</button>
+            &nbsp;&nbsp;&nbsp;&nbsp;
+            <button size="8" type="submit" (click)="resetForm()" class="btn btn-secondary">Clear</button>
+            &nbsp;&nbsp;&nbsp;&nbsp;
+            <button size="8"  type="submit" (click)="cancelForm()" class="btn btn-secondary">Cancel</button>
+          </td>
+          <!-- <td><button class="form-control" type="submit" (click)="resetForm()">Clear</button></td>
+          <td><button class="form-control" type="submit" (click)="cancelForm()">Cancel</button></td> -->
+          <td></td>
+            </tr>
+      </table>
+
+  <!-- {{this.techskillForm.value | json}} -->
+
+  </form>
+  </div>
+
+
+
+

@@ -33,6 +33,7 @@ import { OperationsCandidateListComponent } from './components/operations-candid
 import { OperationsProjectInitiateComponent } from './components/operations-project-initiate/operations-project-initiate.component';
 import { TechnicalInterviewListComponent } from './components/technical-interview-list/technical-interview-list.component';
 import { PreTechFormComponent } from './components/pre-tech-form/pre-tech-form.component';
+import { TechnicalInterviewComponent } from './components/technical-interview/technical-interview.component';
 
 export let browserRefresh = false;
 
@@ -61,7 +62,8 @@ export let browserRefresh = false;
     OperationsCandidateListComponent,
     OperationsProjectInitiateComponent,
     TechnicalInterviewListComponent,
-    PreTechFormComponent],
+    PreTechFormComponent,
+    TechnicalInterviewComponent],
   imports: [
     BrowserModule,
     NgxPaginationModule,

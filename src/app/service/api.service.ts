@@ -3,7 +3,7 @@ import { Observable, throwError } from 'rxjs';
 import { catchError, map } from 'rxjs/operators';
 import { HttpClient, HttpHeaders, HttpErrorResponse } from '@angular/common/http';
 import { appConfig } from './../model/appConfig';
-
+import {UserResult} from './../model/userResult';
 
 //var passport = require('passport');
 @Injectable({
@@ -35,11 +35,11 @@ getJRSS() {
       )
   }
 
-  
+
   // Get Users table records based on username
 getPreTechniaclQuestions(jrss,userName): Observable<any> {
   let url = `${this.baseQuestionUri}/getPreTechQuestionanire/${jrss}/${userName}`;
-  
+
   return this.http.get(url, {headers: this.headers}).pipe(
     map((res: Response) => {
       return res || {}
@@ -412,13 +412,13 @@ readOperationsProjectDetails(userName): Observable<any> {
 }
 
 //Insert Operations project Details
-insertOperationsDetails(data): Observable<any> { 
+insertOperationsDetails(data): Observable<any> {
   let url = `${this.projectAllocUri}/insertOperatioDetails`;
   return this.http.post(url, data)
     .pipe(
       catchError(this.errorMgmt)
     )
-} 
+}
 
 //getTechnicalInterviewList
 getTechnicalInterviewList(): Observable<any> {
@@ -428,6 +428,21 @@ getTechnicalInterviewList(): Observable<any> {
           return res || {}
         }),
         catchError(this.errorMgmt)
+  )
+}
+
+getResultByUser(username: string,quiznumber:number){
+  let url = `${this.userResultUri}/getResultByUser/${username}/${quiznumber}`;
+  return this.http.get(url, { headers: this.headers }).pipe(
+    catchError(this.errorMgmt)
+  )
+}
+
+// Update candidate
+updateResults(id: string,data: UserResult): Observable<any> {
+  let url = `${this.userResultUri}/updateResults/${id}`;
+  return this.http.put(url, data, { headers: this.headers }).pipe(
+    catchError(this.errorMgmt)
   )
 }
 
