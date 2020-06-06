@@ -81,7 +81,20 @@
               <div *ngIf="myForm.projectPosition.errors.required">Position is required</div>
             </div>
           </div>
+        </div>        
+      <div class="form-group row">
+        <label for="inputComments" class="col-sm-4 col-form-label" style="color: mediumpurple">Comments:</label>
+        <div class="col-sm-8">
+        <textarea class="form-control" id="inputComments" type="textarea" rows="2" cols="50"  maxlength="3000" formControlName="managementComments" [ngClass]="{ 'is-invalid': submitted && myForm.managementComments.errors }">
+        </textarea>
+          <div class="col-sm-6"><i><b><font style="font-size:12px">[Max 3000 Characters]</font></b></i></div>
+          <!-- error -->
+        <div *ngIf="submitted && myForm.managementComments.errors" class="invalid-feedback">
+          <div *ngIf="myForm.managementComments.errors.required">Enter your Comments</div>
         </div>
+        </div>
+
+      </div>
         <div class="text-center" style="width: 1000px">
           <button type="submit">Submit</button>&nbsp;&nbsp;
           <button type="button" (click)="resetForm()">Clear</button>&nbsp;&nbsp;

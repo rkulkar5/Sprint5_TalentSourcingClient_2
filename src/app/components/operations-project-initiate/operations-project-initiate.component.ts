@@ -20,7 +20,7 @@ export class OperationsProjectInitiateComponent implements OnInit {
 
  constructor(public fb: FormBuilder, private actRoute: ActivatedRoute, private router: Router,private ngZone: NgZone,
   private apiService: ApiService) {
-       this.userName = this.router.getCurrentNavigation().extras.state.username;
+       this.userName = this.router.getCurrentNavigation().extras.state.username;       
        let id = this.actRoute.snapshot.paramMap.get('id');
        this.readOperationsProjectDetails(id); 
        this.mainForm();     
@@ -33,7 +33,8 @@ export class OperationsProjectInitiateComponent implements OnInit {
     this.operationsProjectForm = this.fb.group({
       projectLocation: ['', [Validators.required]],
       projectName: ['', [Validators.required]],
-      projectPosition: ['', [Validators.required]]
+      projectPosition: ['', [Validators.required]],
+      managementComments: ['', [Validators.required]]
     })
 }
 
@@ -58,8 +59,8 @@ get myForm(){
   onSubmit(id) {
     this.submitted = true;
 
-    let operationsDetails = new OperationsDetails(this.operationsProjectForm.value.projectLocation,
-      this.operationsProjectForm.value.projectName,this.operationsProjectForm.value.projectPosition);
+    let operationsDetails = new OperationsDetails(this.operationsProjectDetails[0].result_users[0].employeeName, this.operationsProjectForm.value.projectLocation,
+      this.operationsProjectForm.value.projectName, this.operationsProjectForm.value.projectPosition, this.operationsProjectForm.value.managementComments, this.userName, new Date());
 
     this.apiService.insertOperationsDetails(operationsDetails).subscribe(
               (res) => {
