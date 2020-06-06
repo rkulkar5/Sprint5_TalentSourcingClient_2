@@ -52,7 +52,7 @@
               <td  width="23%">{{operationsList.managementResult}}</td>
               <td  width="8%"><a href="#" routerLinkActive="active">Click Here</a></td>
               <td  class="text-center edit-block" width="20%">
-                <a class="edit" [routerLink]="['/initiate-operations-project/', operationsList.userName]" [state]="{username:this.userName}">
+                <a class="edit" [routerLink]="['/initiate-operations-project/', operationsList.userName]" [state]="{username:this.userName,accessLevel:this.accessLevel}">
                   <button type="button" class="btn btn-success btn-sm">Initiate Project</button>&nbsp;
                 </a>
               </td>

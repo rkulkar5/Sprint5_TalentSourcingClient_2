@@ -17,10 +17,12 @@ export class OperationsProjectInitiateComponent implements OnInit {
   operationsProjectForm: FormGroup;
   submitted = false;
   formReset = false;
+  accessLevel: string = "";
 
  constructor(public fb: FormBuilder, private actRoute: ActivatedRoute, private router: Router,private ngZone: NgZone,
   private apiService: ApiService) {
-       this.userName = this.router.getCurrentNavigation().extras.state.username;       
+       this.userName = this.router.getCurrentNavigation().extras.state.username;          
+       this.accessLevel = this.router.getCurrentNavigation().extras.state.accessLevel;            
        let id = this.actRoute.snapshot.paramMap.get('id');
        this.readOperationsProjectDetails(id); 
        this.mainForm();     
@@ -67,7 +69,7 @@ get myForm(){
     this.apiService.insertOperationsDetails(operationsDetails).subscribe(
               (res) => {
                 console.log('Operations Details successfully inserted!')
-                this.ngZone.run(() => this.router.navigateByUrl('/operations-candidate-list',{state:{username:this.userName}}))
+                this.ngZone.run(() => this.router.navigateByUrl('/operations-candidate-list',{state:{username:this.userName,accessLevel:this.accessLevel}}))
               }, (error) => {
                 console.log(error);
               });
@@ -81,6 +83,6 @@ resetForm(){
 }
 //Cancel
 cancelForm(){
-  this.ngZone.run(() => this.router.navigateByUrl('/operations-candidate-list',{state:{username:this.userName}}))
+  this.ngZone.run(() => this.router.navigateByUrl('/operations-candidate-list',{state:{username:this.userName,accessLevel:this.accessLevel}}))
 }
 }
