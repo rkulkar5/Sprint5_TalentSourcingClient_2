@@ -33,9 +33,12 @@ export class QuestionsAddComponent implements OnInit {
                   private apiService: ApiService) { this.readJRSS();this.mainForm();}
 
   ngOnInit() {this.apiService.getQuestionID().subscribe(
-    (res) => {
-      console.log("Question successfully created! ",+res.questionID);                  
-      this.questionID=res.questionID;
+    (res) => {  
+      if(!isNaN(res.questionID))    {            
+      this.questionID=res.questionID;}
+      else{
+        this.questionID=0;
+      }
     }, (error) => {
       console.log(error);
     });       }
