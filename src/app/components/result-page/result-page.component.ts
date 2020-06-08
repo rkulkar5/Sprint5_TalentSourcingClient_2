@@ -114,7 +114,7 @@ export class ResultPageComponent implements OnInit {
                            this.stage5="Skipped";
                        }
                    let data;
-                   if(this.numberOfCorrectAns>50) {
+                   if(this.numberOfCorrectAns>80) {
                      let userResultWokFlow = new UserResultWorkFlow(this.username,Number(this.scorePercentage),
                                              this.quizNumber,this.stage1,this.stage2,this.stage3,this.stage4,this.stage5);
                      data = JSON.stringify( userResultWokFlow );
