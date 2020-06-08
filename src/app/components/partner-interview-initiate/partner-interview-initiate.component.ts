@@ -56,6 +56,10 @@ export class PartnerInterviewInitiateComponent implements OnInit {
 
    onSubmit(id) {
           this.submitted = true;
+          
+          if (!this.partnerFeedbackForm.valid) {
+            return false;
+          } else {
           let partnerDetails = new PartnerDetails(this.partnerFeedbackForm.value.finalResult,
               this.partnerFeedbackForm.value.partnerFeedback,this.userName,new Date(), true);
 
@@ -66,6 +70,7 @@ export class PartnerInterviewInitiateComponent implements OnInit {
                       }, (error) => {
                         console.log(error);
                       });
+          }
    }
 
    //Reset
