@@ -17,10 +17,12 @@ export class PartnerInterviewInitiateComponent implements OnInit {
   partnerFeedbackForm: FormGroup;
   submitted = false;
   formReset = false;
+  accessLevel: String = "";
 
  constructor(public fb: FormBuilder, private actRoute: ActivatedRoute, private router: Router,private ngZone: NgZone,
   private apiService: ApiService) {
        this.userName = this.router.getCurrentNavigation().extras.state.username;
+       this.accessLevel = this.router.getCurrentNavigation().extras.state.accessLevel;
        let id = this.actRoute.snapshot.paramMap.get('id');
        this.readPartnerInterviewDetails(id);
        this.mainForm();
@@ -66,7 +68,7 @@ export class PartnerInterviewInitiateComponent implements OnInit {
           this.apiService.savePartnerFeedBack(id, partnerDetails).subscribe(
                       (res) => {
                         console.log('Partner Details successfully created!')
-                        this.ngZone.run(() => this.router.navigateByUrl('/partner-list',{state:{username:this.userName}}))
+                        this.ngZone.run(() => this.router.navigateByUrl('/partner-list',{state:{username:this.userName,accessLevel:this.accessLevel}}))
                       }, (error) => {
                         console.log(error);
                       });
@@ -80,7 +82,7 @@ export class PartnerInterviewInitiateComponent implements OnInit {
    }
    //Cancel
     cancelForm(){
-        this.ngZone.run(() => this.router.navigateByUrl('/partner-list',{state:{username:this.userName}}))
+        this.ngZone.run(() => this.router.navigateByUrl('/partner-list',{state:{username:this.userName,accessLevel:this.accessLevel}}))
     }
 
 }
