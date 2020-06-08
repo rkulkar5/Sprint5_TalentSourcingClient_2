@@ -183,7 +183,7 @@ export class QuestionsAddBulkComponent implements OnInit {
       this.answerArray=[];  
       this.optionsArray=[];   
       this.validQuestionType=false;
-
+      
       //Check Valid QuestionType And update
       for(var j = 0; j<this.QuestionTypes.length; j++){
         if(jsonQuestionObj[i]["QuestionType"] == this.QuestionTypes[j]){
@@ -224,13 +224,13 @@ export class QuestionsAddBulkComponent implements OnInit {
       console.log("Mismatch in Answer ID length and Question Type on row "+(i+2));
       continue;
     }
-  
+
       //First two options are mandatory
-      if(!(jsonQuestionObj[i]["Option1"] && jsonQuestionObj[i]["Option2"])){
+      if((jsonQuestionObj[i]["Option1"]==undefined) || (jsonQuestionObj[i]["Option2"]==undefined)){
               console.log("First two options are mandatory on row "+(i+2));
               continue;
       }
-      else if ((!jsonQuestionObj[i]["Option3"]) && jsonQuestionObj[i]["Option4"])
+      else if ((jsonQuestionObj[i]["Option3"]==undefined) && (jsonQuestionObj[i]["Option4"]!=undefined))
       {
         //Option 3 has to be entered and then option 4
         console.log("Enter value for Option3 and then for Option4 on row "+(i+2));
@@ -238,10 +238,10 @@ export class QuestionsAddBulkComponent implements OnInit {
       }
       if (jsonQuestionObj[i]["QuestionType"] == "SingleSelect"){
         //Check if option 3/4 exists if Answers ID contains 3/4 values for Single select
-        if ((<String>jsonQuestionObj[i]["AnswerID"]) == "3" && !jsonQuestionObj[i]["Option3"]){
+        if ((<String>jsonQuestionObj[i]["AnswerID"]) == "3" && (jsonQuestionObj[i]["Option3"]==undefined)){
             console.log("Single Select: Please enter option 3 if answer ID contains 3 on row "+(i+2));
             continue;
-        }else if ((<String>jsonQuestionObj[i]["AnswerID"]) == "4" && !jsonQuestionObj[i]["Option4"]){
+        }else if ((<String>jsonQuestionObj[i]["AnswerID"]) == "4" && (jsonQuestionObj[i]["Option4"]==undefined)){
           console.log("Single Select: Please enter option 4 if answer ID contains 4 on row "+(i+2));
           continue;
         }    
@@ -251,10 +251,10 @@ export class QuestionsAddBulkComponent implements OnInit {
           //Check if option 3/4 exists if Answers ID contains 3/4 values for MultiSelect select
           for( let j = 0; j<answerIDArray.length; j++)
           {   
-            if (answerIDArray[j] == "3" && !jsonQuestionObj[i]["Option3"]){
+            if (answerIDArray[j] == "3" && (jsonQuestionObj[i]["Option3"]==undefined)){
               console.log("Multi Select: Please enter option 3 if answer ID contains 3 on row "+(i+2));
               optionNotPresent = true;
-            }else if (answerIDArray[j] == "4" && !jsonQuestionObj[i]["Option4"]){
+            }else if (answerIDArray[j] == "4" && (jsonQuestionObj[i]["Option4"]==undefined)){
               console.log("Multi Select: Please enter option 4 if answer ID contains 4 on row "+(i+2));
               optionNotPresent = true;
             }
@@ -265,11 +265,11 @@ export class QuestionsAddBulkComponent implements OnInit {
           }
      }
       //Pushing Options to Options Array
-      if (jsonQuestionObj[i]["Option3"] && !jsonQuestionObj[i]["Option4"]){
+      if ((jsonQuestionObj[i]["Option3"]!=undefined) && (jsonQuestionObj[i]["Option4"]==undefined)){
           this.optionsArray.push({optionID:1,option:jsonQuestionObj[i]["Option1"]},
           {optionID:2,option:jsonQuestionObj[i]["Option2"]},
           {optionID:3,option:jsonQuestionObj[i]["Option3"]});
-      }else if (jsonQuestionObj[i]["Option4"]){
+      }else if (jsonQuestionObj[i]["Option4"]!=undefined){
           this.optionsArray.push({optionID:1,option:jsonQuestionObj[i]["Option1"]},
           {optionID:2,option:jsonQuestionObj[i]["Option2"]},
           {optionID:3,option:jsonQuestionObj[i]["Option3"]},
