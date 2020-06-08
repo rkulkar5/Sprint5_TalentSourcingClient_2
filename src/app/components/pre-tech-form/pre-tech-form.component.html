@@ -5,18 +5,24 @@
         <div class="form-group row" >
             <div class="col-sm-4"></div>
         <div class="col-sm-4 col-form-label"><b>Pre Technical Interview Form</b></div></div></font>
-      <div class="form-group row" *ngFor="let question of result" >
-        <div class="col-sm-4"></div>
+      <div class="form-group row" *ngFor="let preTechAssmntQ of preTechAssmntQuestions" >
         <br/>
         <label style="width:500px">
           <!--To display questions as entered with line breaks-->
-          <b> &nbsp;{{question.preTechQuestion}}</b>
+          <b> &nbsp;{{preTechAssmntQ.preTechQuestion}}</b>
         </label>
-        <input class="form-control" type="text"  size="" value={{question.questions[0].answer}}>
-    
+        <input class="form-control" type="text"  size="">
   </div>
 </div>
+
+ <div class="text-center" style="width: 600px">
+        <button type="button" (click)="mode = 'review'" >Submit</button>&nbsp;&nbsp;&nbsp;
+        <button type="button"  (click)="mode = 'review'">Save Draft</button> &nbsp;&nbsp;&nbsp;
+        <button type="button"   (click)="mode = 'review'">Clear</button> &nbsp;&nbsp;&nbsp;
+        <button type="button" (click)="mode = 'review'">Cancel</button>&nbsp;&nbsp;
+      </div>
   
   </div>
+  
 
   
