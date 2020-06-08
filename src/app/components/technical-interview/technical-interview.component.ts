@@ -27,8 +27,8 @@ export class TechnicalInterviewComponent implements OnInit {
   constructor(private fb:FormBuilder, private actRoute: ActivatedRoute, private router: Router,private ngZone: NgZone,
     private apiService: ApiService) {
    // this.userName = this.router.getCurrentNavigation().extras.state.username;
-    let id ="george@gmail.com";// this.actRoute.snapshot.paramMap.get('id');
-    this.readPartnerInterviewDetails(id);
+    let id ="";// this.actRoute.snapshot.paramMap.get('id');
+    this.readCandidateTechnicalInterviewDetails(id);
     this.techskillForm = this.fb.group({
         finalscore:'',
         finalResult:'',
@@ -45,12 +45,10 @@ export class TechnicalInterviewComponent implements OnInit {
   }
 
   //Read candidate details
-  readPartnerInterviewDetails(id) {
-    console.log("readPartnerInterviewDetails id ="+id)
-    this.apiService.readPartnerInterviewDetails(id).subscribe(data => {
-    console.log("partnerInterviewDetails data ="+data);
-
-    //this.partnerInterviewDetails = data;
+  readCandidateTechnicalInterviewDetails(id) {
+    console.log("readTechInterviewDetails id ="+id)
+    this.apiService.readTechInterviewDetails(id).subscribe(data => {
+    console.log("readTechInterviewDetails data ="+data);
     for(var candidate of data){
        var userScore:number=candidate.userScore;
 
@@ -105,6 +103,7 @@ export class TechnicalInterviewComponent implements OnInit {
     } else {
         this.techStream().removeAt(i);
         this.dynamicArray.splice(i, 1);
+        this.averageCalc("");
         return true;
     }
 

@@ -57,9 +57,12 @@
               <input type="text" size="5" formControlName="score" class="form-control" (change)="averageCalc($event.target.value)">
           </td>
           <td colspan="2"  width="50%" *ngIf="dynamicArray.length == i+1">
-            <button type="button" (click)="addQuantity(i)" class="btn btn-secondary">Add</button>
+            &nbsp;&nbsp;
+            <a> <img src="assets/images/add.jpg" width="25" height="25" (click)="addQuantity(i)"> </a>
+            <!-- <button type="button" (click)="addQuantity(i)" class="btn btn-secondary">Add</button> -->
            &nbsp;&nbsp;
-            <button (click)="removeQuantity(i)" class="btn btn-secondary">Remove</button>
+           <a> <img src="assets/images/remove.jpg" width="25" height="25" (click)="removeQuantity(i)"> </a>
+            <!-- <button (click)="removeQuantity(i)" class="btn btn-secondary">Remove</button> -->
           </td>
         </tr>
       </table>

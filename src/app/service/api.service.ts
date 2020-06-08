@@ -446,4 +446,15 @@ updateResults(id: string,data: UserResult): Observable<any> {
   )
 }
 
+readTechInterviewDetails(userName): Observable<any> {
+  let url = `${this.userResultUri}/readCandidateTechSMEReviewDetails/${userName}`;
+  return this.http.get(url, {headers: this.headers}).pipe(
+        map((res: Response) => {
+          return res || {}
+        }),
+        catchError(this.errorMgmt)
+  )
+}
+
+
 }
