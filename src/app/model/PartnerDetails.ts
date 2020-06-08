@@ -3,14 +3,14 @@ export class PartnerDetails {
    partnerFeedback: string;
    managerName: string;
    managementAssessmentDate: Date;
-   skip_stage3: Boolean;
+   stage4_status: string;
 
-   constructor(finalResult, partnerFeedback,managerName,managementAssessmentDate,skip_stage3) {
+   constructor(finalResult, partnerFeedback,managerName,managementAssessmentDate,stage4_status) {
       this.finalResult = finalResult;
    		this.partnerFeedback = partnerFeedback;
    		this.managerName  = managerName;
    		this.managementAssessmentDate = managementAssessmentDate;
-   		this.skip_stage3 = skip_stage3;
+   		this.stage4_status = stage4_status;
    }
 
 }

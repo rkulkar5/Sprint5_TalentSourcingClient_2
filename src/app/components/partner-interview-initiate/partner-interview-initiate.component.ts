@@ -61,7 +61,7 @@ export class PartnerInterviewInitiateComponent implements OnInit {
             return false;
           } else {
           let partnerDetails = new PartnerDetails(this.partnerFeedbackForm.value.finalResult,
-              this.partnerFeedbackForm.value.partnerFeedback,this.userName,new Date(), true);
+              this.partnerFeedbackForm.value.partnerFeedback,this.userName,new Date(), 'Completed');
 
           this.apiService.savePartnerFeedBack(id, partnerDetails).subscribe(
                       (res) => {
