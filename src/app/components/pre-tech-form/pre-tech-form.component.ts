@@ -16,7 +16,7 @@ export class PreTechFormComponent implements OnInit {
 	result:any=[];
 	jrss = "";
 	userName = "";
-mode= "";
+mode= "instructions";
 	preTechAssmntQuestions:any = [];
  
  
@@ -29,7 +29,9 @@ mode= "";
 this.userName = this.router.getCurrentNavigation().extras.state.userName;
 	}
     
-
+preTech(){
+  this.mode='pre-tech'
+}
 
  ngOnInit(): void {
 	

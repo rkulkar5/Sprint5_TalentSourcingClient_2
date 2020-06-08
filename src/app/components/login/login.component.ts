@@ -125,8 +125,18 @@ export class LoginComponent implements OnInit {
 
                 this.ngZone.run(() => this.router.navigateByUrl('/quizInstructions',{state:{username:res.username,quizNumber:res.quizNumber}}))
                 } else{
-                this.error='You are not an active user'
-                      }
+                  this.apiService.getResultByUser(res.username,res.quizNumber).subscribe(result => {                    
+                  if(result['userScore']>=80){
+                    this.ngZone.run(() => this.router.navigateByUrl('/pre-tech-form',{state:{userName:res.username}}))
+                  }
+                  else{
+                    this.error='You are not an active user'
+                  }
+                }, (error) => {
+                  console.log(error);
+                  }
+                );	            
+                }
                 }             
               }else if(res.status !== 'Active'){ //When user is NOT Active and logged in thendisplay below:
                 this.error='You are not an active user'
