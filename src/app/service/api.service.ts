@@ -3,7 +3,7 @@ import { Observable, throwError } from 'rxjs';
 import { catchError, map } from 'rxjs/operators';
 import { HttpClient, HttpHeaders, HttpErrorResponse } from '@angular/common/http';
 import { appConfig } from './../model/appConfig';
-import {UserResult} from './../model/userResult';
+import { UserResult} from './../model/userResult';
 
 //var passport = require('passport');
 @Injectable({
@@ -419,6 +419,15 @@ insertOperationsDetails(data): Observable<any> {
       catchError(this.errorMgmt)
     )
 }
+
+//saveOperationsStatus
+saveOperationsStatus(id, status): Observable<any> {  
+  let url = `${this.userResultUri}/updateOperationsStatus/${id}`;
+    return this.http.post(url, status)
+      .pipe(
+        catchError(this.errorMgmt)
+      )
+  }
 
 //getTechnicalInterviewList
 getTechnicalInterviewList(): Observable<any> {

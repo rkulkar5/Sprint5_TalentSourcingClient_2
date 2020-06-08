@@ -18,6 +18,7 @@ export class OperationsProjectInitiateComponent implements OnInit {
   submitted = false;
   formReset = false;
   accessLevel: string = "";
+  status: string = "Completed";
 
  constructor(public fb: FormBuilder, private actRoute: ActivatedRoute, private router: Router,private ngZone: NgZone,
   private apiService: ApiService) {
@@ -66,13 +67,21 @@ get myForm(){
     let operationsDetails = new OperationsDetails(this.operationsProjectDetails[0].result_users[0].employeeName, this.operationsProjectForm.value.projectLocation,
       this.operationsProjectForm.value.projectName, this.operationsProjectForm.value.projectPosition, this.operationsProjectForm.value.managementComments, this.userName, new Date());
 
+    // Insert into projectAlloc table
     this.apiService.insertOperationsDetails(operationsDetails).subscribe(
-              (res) => {
-                console.log('Operations Details successfully inserted!')
-                this.ngZone.run(() => this.router.navigateByUrl('/operations-candidate-list',{state:{username:this.userName,accessLevel:this.accessLevel}}))
-              }, (error) => {
-                console.log(error);
-              });
+      (res) => {
+          // Update Results table
+          this.apiService.saveOperationsStatus(id, status).subscribe(
+            (res) => {
+              console.log("Operations stage status successfully updated to Results table!");
+            }, (error) => {
+              console.log(error);
+            });
+        console.log('Operations details successfully inserted to ProjectAlloc table!')
+        this.ngZone.run(() => this.router.navigateByUrl('/operations-candidate-list',{state:{username:this.userName,accessLevel:this.accessLevel}}))
+        }, (error) => {
+          console.log(error);
+        });
   }
 }
 
