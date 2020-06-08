@@ -23,17 +23,18 @@
       </div>
 </div>
   <div *ngIf="mode=='instructions'" oncopy="return false">
-    <h4 class="text-center">Please read the instructions below</h4>
+    Congratulations on completing the exam,
+    <h4 class="text-center"> <br>Instructions for filling up the pre-technical assessment form</h4>
      <br>
-   <ol> The objective behind the pre-technical assessment form is to understand more about your work experience against the requirements of the job role.</ol>
-<ol>All the questions in the pre-technical assessment form are mandatory to answer.</ol>
-<ol>Please note that the answers provided in the form might be used in the upcoming assessment rounds.</ol>
-<ol>Please note that you also have an option to "Save Draft" anytime and hence you don't need to fill-up the form in one go.</ol>
-<ol>If you don't have anything to share against a particular question, then please mention as "Not Applicable".</ol>
-<span (click)="preTech()">
-  <div class="text-center">
-  <button type="button" class="btn btn-danger btn-sm">Start Pre-tech form</button></div>
-</span>
+   <ol>1. The objective behind the pre-technical assessment form is to understand more about your work experience against the requirements of the job role.</ol>
+<ol>2. All the questions in the pre-technical assessment form are mandatory to answer.</ol>
+<ol>3. Please note that the answers provided in the form might be used in the upcoming assessment rounds.</ol>
+<ol>4. Please note that you also have an option to "Save Draft" anytime and hence you don't need to fill-up the form in one go.</ol>
+<ol>5. If you don't have anything to share against a particular question, then please mention as "Not Applicable".</ol>
+
+  You can find the pre-technical assessment form here  
+<a class="nav-link" (click)="preTech()" routerLink="/pre-tech" routerLinkActive="active" >pre-technical interview form</a>
+
   </div>
   
   

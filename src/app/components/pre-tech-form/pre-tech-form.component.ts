@@ -27,14 +27,15 @@ mode= "instructions";
 	private preTechService: PreTechService,
     private apiService: ApiService) {
 this.userName = this.router.getCurrentNavigation().extras.state.userName;
+this.mode = this.router.getCurrentNavigation().extras.state.mode;
+
 	}
-    
-preTech(){
-  this.mode='pre-tech'
-}
+ preTech(){
+   this.mode="pre-tech"
+ }
 
  ngOnInit(): void {
-	
+	console.log('here in pre',this.mode)
 	 this.getPreTechAssessmentQuestions();
 	 
 }
