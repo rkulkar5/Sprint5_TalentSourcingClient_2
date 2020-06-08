@@ -2,6 +2,7 @@ import { Component, OnInit } from '@angular/core';
 import { Question } from './../../model/questions';
 import { QuizService } from './../../components/quiz/quiz.service';
 import { UserResult } from './../../model/userResult';
+import { UserResultWorkFlow } from './../../model/userResultWorkFlow';
 import { ApiService } from './../../service/api.service';
 import { browserRefresh } from '../../app.component';
 import { ResultPageService } from './../../components/result-page/result-page.service';
@@ -22,6 +23,12 @@ export class ResultPageComponent implements OnInit {
   username;
   quizNumber;
   mode;
+  jrss = "";
+  stage1;
+  stage2;
+  stage3;
+  stage4;
+  stage5;
   
   constructor(
       private router: Router,
@@ -76,14 +83,53 @@ export class ResultPageComponent implements OnInit {
       }
 
      //Sprint2: Save the quiz results for the user into 'Results' collection
-      let userResult = new UserResult(this.username,Number(this.scorePercentage), this.quizNumber);
-      let data = JSON.stringify( userResult );
-         this.resultPageService.saveResult(data).subscribe(
-          (res) => {
-            console.log('Quiz results for the user have been successfully saved!');
-             }, (error) => {
-            console.log(error);
+     // Read the candidate JRSS by username
+     this.apiService.getCandidateJrss(this.username).subscribe((res) => {
+                       this.jrss=res['JRSS'];
+                     // Read the work flow details by reading jrss record by jrss name.
+                     this.apiService.getJrss(this.jrss).subscribe((res) => {
+                       if(res['stage1_OnlineTechAssessment']) {
+                           this.stage1="Completed";
+                       } else {
+                           this.stage1="Skipped";
+                       }
+                       if(res['stage2_PreTechAssessment']) {
+                           this.stage2="Not Started";
+                       } else {
+                           this.stage2="Skipped";
+                       }
+                       if(res['stage3_TechAssessment']) {
+                           this.stage3="Not Started";
+                       } else {
+                           this.stage3="Skipped";
+                       }
+                       if(res['stage4_ManagementInterview']) {
+                           this.stage4="Not Started";
+                       } else {
+                           this.stage4="Skipped";
+                       }
+                       if(res['stage5_ProjectAllocation']) {
+                            this.stage5="Not Started";
+                       } else {
+                           this.stage5="Skipped";
+                       }
+                   let data;
+                   if(this.numberOfCorrectAns>50) {
+                     let userResultWokFlow = new UserResultWorkFlow(this.username,Number(this.scorePercentage),
+                                             this.quizNumber,this.stage1,this.stage2,this.stage3,this.stage4,this.stage5);
+                     data = JSON.stringify( userResultWokFlow );
+                   } else {
+                     let userResult = new UserResult(this.username,Number(this.scorePercentage), this.quizNumber,);
+                     data = JSON.stringify( userResult );
+                   }
+                  this.resultPageService.saveResult(data).subscribe(
+                   (res) => {
+                     console.log('Quiz results for the user have been successfully saved!');
+                      }, (error) => {
+                     console.log(error);
+                   });
           });
+      });
 
       //Update user loggedin status to false
         this.apiService.updateUserLoggedinStatus(this.username, 'false').subscribe(
