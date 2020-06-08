@@ -1,5 +1,11 @@
   <div>
-  <h4>{{mode}}<br>{{displayMsg}}<br><br> You have scored <b><strong><mark>{{scorePercentage}}%</mark></strong></b> in the exam.
-<br>Our team will contact you regarding your progression to the further rounds.</h4>
-<a class="nav-link" routerLink="/pre-tech-form" routerLinkActive="active" [state]="{userName:this.username}" >pre-technical-form</a>
+  <h4>{{mode}}<br>{{displayMsg}}<br><br> You have scored  <b><strong><mark>{{scorePercentage}}%</mark></strong></b> and thus you are selected for the next technical round.
+<br><br>
+<div *ngIf="numberOfCorrectAns >=80">
+<nav class="nav nav-pills flex-column flex-sm-row">
+  So, please fill up the
+  <a class="nav-link" routerLink="/pre-tech-form" routerLinkActive="active" [state]="{userName:this.username}" >pre-technical interview form</a>
+</nav>
+</div>
+</h4>
   </div>

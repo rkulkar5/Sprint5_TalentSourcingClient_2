@@ -70,7 +70,7 @@ export class ResultPageComponent implements OnInit {
       this.scorePercentage=(Math.round(this.numberOfCorrectAns * 100) / this.userAnswers.length).toFixed(2);
       this.numberOfCorrectAns=Math.round(this.numberOfCorrectAns * 100) / this.userAnswers.length;
       if(this.numberOfCorrectAns>80){
-        this.displayMsg="Congratulations,you have passed the technical assessment."
+        this.displayMsg="Congratulations on completing the exam."
       }else{
         this.displayMsg="Unfortunately, you didn't meet the selection criteria."
       }
