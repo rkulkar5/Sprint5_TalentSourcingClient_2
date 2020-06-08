@@ -23,11 +23,12 @@ export class TechnicalInterviewComponent implements OnInit {
   submitted = false;
   formReset = false;
   userName: String = "";
-
+  accessLevel: String = "";
   constructor(private fb:FormBuilder, private actRoute: ActivatedRoute, private router: Router,private ngZone: NgZone,
     private apiService: ApiService) {
    // this.userName = this.router.getCurrentNavigation().extras.state.username;
-    let id ="";// this.actRoute.snapshot.paramMap.get('id');
+    let id ="george@gmail.com";// this.actRoute.snapshot.paramMap.get('id');
+    this.accessLevel = this.router.getCurrentNavigation().extras.state.accessLevel;
     this.readCandidateTechnicalInterviewDetails(id);
     this.techskillForm = this.fb.group({
         finalscore:'',
@@ -130,11 +131,12 @@ export class TechnicalInterviewComponent implements OnInit {
   }
 //Cancel
  cancelForm(){
-    // this.ngZone.run(() => this.router.navigateByUrl('/partner-list',{state:{username:this.userName}}))
+     this.ngZone.run(() => this.router.navigateByUrl('/technical-interview-list',{state:{username:this.userName}}))
  }
 
 
   onSubmit() {
+    this.submitted = true;
     let userName=this.candidateInterviewDetails[0].userName;
     let userScore=this.candidateInterviewDetails[0].userScore;
     let quizNumber=this.candidateInterviewDetails[0].quizNumber;
@@ -146,7 +148,8 @@ export class TechnicalInterviewComponent implements OnInit {
           this.techskillForm.value.finalResult,
           this.techskillForm.value.feedback);
           this.apiService.updateResults(res['_id'],updateResults).subscribe(res => {
-          console.log('Candidate Details updated successfully!');
+          console.log('Candidate SME Interview Details updated successfully!');
+          this.ngZone.run(() => this.router.navigateByUrl('/technical-interview-list',{state:{username:this.userName,accessLevel:this.accessLevel}}))
           }, (error) => {
           console.log(error);
           })
