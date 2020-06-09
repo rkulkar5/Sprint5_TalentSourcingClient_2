@@ -136,17 +136,22 @@ export class TechnicalInterviewComponent implements OnInit {
 
 
   onSubmit() {
+    alert(this.techskillForm.value.techsmeName);
     this.submitted = true;
     let userName=this.candidateInterviewDetails[0].userName;
     let userScore=this.candidateInterviewDetails[0].userScore;
     let quizNumber=this.candidateInterviewDetails[0].quizNumber;
     this.apiService.getResultByUser(userName,quizNumber).subscribe(res => {
-         console.log('get the result data'+res['_id']+"\t"+ res['userName']);
+         //console.log('get the result data'+res['_id']+"\t"+ res['userName']);
           let updateResults=new TechnicalInterview(userName,userScore, quizNumber,
           this.techskillForm.value.techStream,
           this.averageScore,
           this.techskillForm.value.finalResult,
-          this.techskillForm.value.feedback);
+          this.techskillForm.value.feedback,
+          this.techskillForm.value.techsmeName,
+          new Date,
+          "Completed");
+
           this.apiService.updateResults(res['_id'],updateResults).subscribe(res => {
           console.log('Candidate SME Interview Details updated successfully!');
           this.ngZone.run(() => this.router.navigateByUrl('/technical-interview-list',{state:{username:this.userName,accessLevel:this.accessLevel}}))
