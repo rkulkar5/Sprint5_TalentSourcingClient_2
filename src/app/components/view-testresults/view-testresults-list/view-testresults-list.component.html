@@ -22,7 +22,7 @@
           <td *ngIf="result.result_users.length  > 0"></td>
           <td *ngIf="result.result_users.length  > 0">{{result.result_users[0].JRSS}}</td>
           <td *ngIf="result.result_users.length  > 0">{{result.quizNumber}}</td>
-          <td *ngIf="result.result_users.length  > 0"><a href="#assessmentModal"  (click)="getCandidateAssessmentDetails(result.userName,result.quizNumber,result.result_users[0].employeeName)" class="col-4 cursor-pointer" data-toggle="modal" >{{result.userScore}}%</a></td>
+          <td *ngIf="result.result_users.length  > 0"><a href="#assessmentModal"  (click)="getCandidateAssessmentDetails(result.userName,result.quizNumber,result.result_users[0].employeeName,result.userScore,result.createdDate)" class="col-4 cursor-pointer" data-toggle="modal" >{{result.userScore}}%</a></td>
         </tr>
         </tbody>
       </table>
@@ -94,32 +94,34 @@
 <div id="assessmentModal" class="modal fade" role="dialog">
   <div class="modal-dialog modal-lg">
     <!-- Modal content-->
-    <div class="modal-content" *ngFor="let assessmentDetails of this.candidateAssessmentDetails.results">
-      <div *ngIf="assessmentDetails.quizNumber == this.quizNumber">
+     <div class="modal-content">
+      <!-- <div *ngIf="assessmentDetails.quizNumber == this.quizNumber"> -->
       <div class="modal-header table-success">
         <h4 class="modal-title">Candidate Assessment Details</h4>
         <button type="button" class="close" data-dismiss="modal">&times;</button>
       </div>
       <div class="modal-body" *ngIf="mode=='displayAssessmentModalBody'">
-        <table style="table-layout: fixed; width: 100%;color:grey">
+        <table style="table-layout: fixed; width: 100%">
           <thead>
           <tr>
             <td scope="col" width="10%">{{this.userName}}'s answers</td>
-            <td scope="col" width="10%">Attempt No : {{assessmentDetails.quizNumber}}</td>
-            <td scope="col" width="10%"> Date : {{ assessmentDetails.createdDate.substring(0,10) }}</td>
-            <td scope="col" width="10%"> Score : {{ assessmentDetails.userScore }}%</td>
+            <td scope="col" width="10%">Attempt No : {{this.quizNumber}}</td>
+            <td scope="col" width="10%"> Date : {{ this.assesmentDate.substring(0,10) }}</td>
+            <td scope="col" width="10%"> Score : {{ this.userScore }}%</td>
           </tr>
           </thead>
           <tbody>
           <tr>
-            <td colspan="4" scope="col" style="font-size:x-small;color:black;font-style: italic;">You have answered {{(assessmentDetails.userScore * assessmentDetails.userAnswer.length)/100}} questions out of {{assessmentDetails.userAnswer.length}}</td>
+            <td colspan="4" scope="col" style="font-size:x-small;color:black;font-style: italic;">
+              You have answered {{(this.userScore * this.candidateAssessmentDetails.results.length)/100}} questions out of  {{this.candidateAssessmentDetails.results.length}}
+            </td>
           </tr>
           </tbody>
         </table>
       </div>
-      <div *ngFor="let answer of assessmentDetails.userAnswer;let i=index">
-        <div *ngFor="let questions of answer.userAttemptedQuestion" >
-          <table border="0"  style="table-layout: fixed; width: 100%;color:gray">
+      <div *ngFor="let answer of this.candidateAssessmentDetails.results;let i=index">
+        <div *ngFor="let questions of answer.userAttemptedQs" >
+          <table  style="table-layout: fixed; width: 100%">
             <tbody>
               <tr>
                 <td width="2%">
@@ -146,7 +148,7 @@
       </div>
       <div class="modal-footer table-success">
         <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
-      </div>
+      <!-- </div> -->
     </div>
     </div>
 

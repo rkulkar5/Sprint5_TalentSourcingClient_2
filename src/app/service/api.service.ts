@@ -347,8 +347,8 @@ deleteJrss(id): Observable<any> {
  * 29May2020
  *
  */
-getCandidateAssessmentDetails(username): Observable<any> {
-  let url = `${this.userResultUri}/quizDetailsByUser/${username}`;
+getCandidateAssessmentDetails(username,quizNumber): Observable<any> {
+  let url = `${this.userResultUri}/quizDetailsByUser/${username}/${quizNumber}`;
   return this.http.get(url, {headers: this.headers}).pipe(
         map((res: Response) => {
           return res || {}
@@ -421,7 +421,7 @@ insertOperationsDetails(data): Observable<any> {
 }
 
 //saveOperationsStatus
-saveOperationsStatus(id, status): Observable<any> {  
+saveOperationsStatus(id, status): Observable<any> {
   let url = `${this.userResultUri}/updateOperationsStatus/${id}`;
     return this.http.post(url, status)
       .pipe(
