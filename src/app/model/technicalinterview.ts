@@ -9,8 +9,12 @@ export class TechnicalInterview {
   public avgTechScore:number;
   public smeResult:any;
   public smeFeedback;
+  public smeName;
+  public smeAssessmentDate;
+  public stage3_status;
 
-  constructor(userName,userScore, quizNumber,smeScores,avgTechScore,smeResult,smeFeedback) {
+
+  constructor(userName,userScore, quizNumber,smeScores,avgTechScore,smeResult,smeFeedback,smeName,smeAssessmentDate,stage3_status) {
 
     this.userName = userName;
     this.userScore = userScore;
@@ -20,6 +24,9 @@ export class TechnicalInterview {
     this.avgTechScore = avgTechScore;
     this.smeResult = smeResult;
     this.smeFeedback = smeFeedback;
+    this.smeName=smeName;
+    this.smeAssessmentDate=smeAssessmentDate;
+    this.stage3_status=stage3_status;
 
     }
 
