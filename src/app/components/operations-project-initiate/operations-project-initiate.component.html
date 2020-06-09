@@ -1,6 +1,6 @@
 <div>
     <div>
-      <h4 class="my-0 mr-md-auto font-weight-normal">Candidate project Assignment </h4>
+      <h4 class="my-0 mr-md-auto font-weight-normal">Candidate Project Assignment </h4>
     </div>
     <br/>
     <div class="col-sm-6"><i><b><font style="font-size:12px">View Candidate Details</font></b></i></div>
@@ -27,16 +27,18 @@
         </tr>
         <tr>
           <td  width="25%"><label style="color: mediumpurple">Technical Interview Feedback:</label></td>
-          <td  width="25%">{{this.operationsProjectDetails[0].smeFeedback}}</td>
-          <td  width="25%"><label style="color: mediumpurple">Partner Interview Result:</label></td>
-          <td  width="25%">{{this.operationsProjectDetails[0].managementResult}}</td>
+          <td  colspan="3" width="75%"><textarea readonly maxlength="3000" cols="90" value="{{this.operationsProjectDetails[0].smeFeedback}}"></textarea></td>
         </tr>
         <tr>
             <td  width="25%"><label style="color: mediumpurple">Partner Interview Feedback:</label></td>
-            <td  width="25%">{{this.operationsProjectDetails[0].managementFeedback}}</td>
-            <td></td>
-            <td></td>
-          </tr>
+            <td  colspan="3" width="75%"><textarea readonly maxlength="3000" cols="90" value="{{this.operationsProjectDetails[0].managementFeedback}}"></textarea></td>
+        </tr>
+        <tr>
+          <td  width="25%"><label style="color: mediumpurple">Partner Interview Result:</label></td>
+          <td  width="25%">{{this.operationsProjectDetails[0].managementResult}}</td>
+          <td width="25%"></td>
+          <td width="25%"></td>
+        </tr>
         <tr>
           <td  width="25%"><label style="color: mediumpurple">You can download CV here:</label></td>
           <td  width="25%"><a href="#" routerLinkActive="active">Click here</a></td>
@@ -103,4 +105,3 @@
       </form>
     </div>
   </div>
-  
