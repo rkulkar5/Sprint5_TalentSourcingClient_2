@@ -1,5 +1,5 @@
 import { Component, OnInit, NgZone } from '@angular/core';
-import { FormGroup, FormControl, FormArray, FormBuilder } from '@angular/forms';
+import { FormGroup, FormControl, FormArray, FormBuilder,Validators } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
 import { ApiService } from './../../service/api.service';
 import {TechnicalInterview} from './../../model/technicalinterview';
@@ -32,8 +32,9 @@ export class TechnicalInterviewComponent implements OnInit {
     this.readCandidateTechnicalInterviewDetails(id);
     this.techskillForm = this.fb.group({
         finalscore:'',
-        finalResult:'',
-        feedback:'',
+        finalResult:['',Validators. required],
+        feedback:['',Validators. required],
+        smeName:['',Validators. required],
         techStream: this.fb.array([]) ,
       });
 
@@ -47,7 +48,6 @@ export class TechnicalInterviewComponent implements OnInit {
 
   //Read candidate details
   readCandidateTechnicalInterviewDetails(id) {
-    console.log("readTechInterviewDetails id ="+id)
     this.apiService.readTechInterviewDetails(id).subscribe(data => {
     console.log("readTechInterviewDetails data ="+data);
     for(var candidate of data){
@@ -68,6 +68,11 @@ export class TechnicalInterviewComponent implements OnInit {
       score: '0'
     })
 
+  }
+
+   // Getter to access form control
+   get myForm(){
+    return this.techskillForm.controls;
   }
 
   getTechnicalStreamFromJRSS(){
@@ -136,30 +141,33 @@ export class TechnicalInterviewComponent implements OnInit {
 
 
   onSubmit() {
-    alert(this.techskillForm.value.techsmeName);
-    this.submitted = true;
-    let userName=this.candidateInterviewDetails[0].userName;
-    let userScore=this.candidateInterviewDetails[0].userScore;
-    let quizNumber=this.candidateInterviewDetails[0].quizNumber;
-    this.apiService.getResultByUser(userName,quizNumber).subscribe(res => {
-         //console.log('get the result data'+res['_id']+"\t"+ res['userName']);
-          let updateResults=new TechnicalInterview(userName,userScore, quizNumber,
-          this.techskillForm.value.techStream,
-          this.averageScore,
-          this.techskillForm.value.finalResult,
-          this.techskillForm.value.feedback,
-          this.techskillForm.value.techsmeName,
-          new Date,
-          "Completed");
 
-          this.apiService.updateResults(res['_id'],updateResults).subscribe(res => {
-          console.log('Candidate SME Interview Details updated successfully!');
-          this.ngZone.run(() => this.router.navigateByUrl('/technical-interview-list',{state:{username:this.userName,accessLevel:this.accessLevel}}))
+    this.submitted = true;
+    if (!this.techskillForm.valid) {
+      return false;
+    } else {
+      let userName=this.candidateInterviewDetails[0].userName;
+      let userScore=this.candidateInterviewDetails[0].userScore;
+      let quizNumber=this.candidateInterviewDetails[0].quizNumber;
+      this.apiService.getResultByUser(userName,quizNumber).subscribe(res => {
+          //console.log('get the result data'+res['_id']+"\t"+ res['userName']);
+            let updateResults=new TechnicalInterview(userName,userScore, quizNumber,
+            this.techskillForm.value.techStream,
+            this.averageScore,
+            this.techskillForm.value.finalResult,
+            this.techskillForm.value.feedback,
+            this.techskillForm.value.smeName,
+            "Completed");
+
+            this.apiService.updateResults(res['_id'],updateResults).subscribe(res => {
+            console.log('Candidate SME Interview Details updated successfully!');
+            this.ngZone.run(() => this.router.navigateByUrl('/technical-interview-list',{state:{username:this.userName,accessLevel:this.accessLevel}}))
+            }, (error) => {
+            console.log(error);
+            })
           }, (error) => {
           console.log(error);
-          })
-        }, (error) => {
-         console.log(error);
-    })
+      })
+    }
   }
 }

@@ -4,20 +4,20 @@
   </div>
   <br/>
   <div class="col-sm-6"><i><b><font style="font-size:12px">View Candidate Details</font></b></i></div>
-  <div class="card">
+  <div class="card" *ngFor="let result of candidateInterviewDetails">
     <table>
       <tbody>
       <tr>
         <td  width="25%"><label style="color: mediumpurple">Name:</label></td>
-        <td  width="25%">{{this.candidateInterviewDetails[0].result_users[0].employeeName}}</td>
+        <td  width="25%">{{result.result_users[0].employeeName}}</td>
         <td  width="25%"><label style="color: mediumpurple">JRSS:</label></td>
-        <td  width="25%">{{this.candidateInterviewDetails[0].result_users[0].JRSS}}</td>
+        <td  width="25%">{{result.result_users[0].JRSS}}</td>
       </tr>
       <tr>
         <td  width="25%"><label style="color: mediumpurple">Technology Stream:</label></td>
-        <td  width="25%">{{this.candidateInterviewDetails[0].result_users[0].technologyStream}}</td>
+        <td  width="25%">{{result.result_users[0].technologyStream}}</td>
         <td  width="25%"><label style="color: mediumpurple">Online Assessment Score:</label></td>
-        <td  width="25%">{{this.candidateInterviewDetails[0].userScore}}%</td>
+        <td  width="25%">{{result.userScore}}%</td>
       </tr>
       <tr>
         <td  width="25%"><label style="color: mediumpurple">You can download CV here:</label></td>
@@ -55,7 +55,7 @@
           </td>
           <td width="25%">
               <input type="text" size="5" formControlName="score" class="form-control" (change)="averageCalc($event.target.value)">
-          </td>
+            </td>
           <td colspan="2"  width="50%" *ngIf="dynamicArray.length == i+1">
             &nbsp;&nbsp;
             <a> <img src="assets/images/add.jpg" width="25" height="25" (click)="addQuantity(i)"> </a>
@@ -74,21 +74,33 @@
         <br/>
         <tr>
           <td><label style="color: mediumpurple">Final Score</label></td>
-          <td><input class="form-control" formControlName="finalscore" size="10" type="text" value={{this.averageScore}} /></td>
+          <td><input class="form-control" formControlName="finalscore" size="10" type="text" value={{this.averageScore}}  />
+            <!-- [ngClass]="{ 'is-invalid': submitted && myForm.finalscore.errors}" -->
+            <!-- <div *ngIf="submitted && myForm.finalscore.errors" class="invalid-feedback">
+              <div *ngIf="myForm.finalscore.errors.required">Final Score is required</div>
+            </div> -->
+          </td>
           <td><label style="color: mediumpurple">Final Result</label></td>
           <td>
-             <select formControlName="finalResult" class="form-control">
+             <select formControlName="finalResult" class="form-control" [ngClass]="{ 'is-invalid': submitted && myForm.finalResult.errors }">
               <option value="">Choose...</option>
               <option id="Recommended">Recommended</option>
               <option id="Not Suitable">Not Suitable</option>
               <option id="StandBy">StandBy</option>
              </select>
+             <div *ngIf="submitted && myForm.finalResult.errors" class="invalid-feedback">
+              <div *ngIf="myForm.finalResult.errors.required">Final Result is required</div>
+            </div>
             </td>
         </tr>
         <tr>
           <td><label style="color: mediumpurple">Technical SME Name</label></td>
-          <td><input class="form-control" formControlName="techsmeName" size="10" type="text" /></td>
-          <td><label style="color: mediumpurple"></label></td>
+          <td><input type="text" class="form-control" formControlName="smeName" size="10" [ngClass]="{ 'is-invalid': submitted && myForm.smeName.errors}"/>
+            <div *ngIf="submitted && myForm.smeName.errors" class="invalid-feedback">
+              <div *ngIf="myForm.smeName.errors.required">Name is required</div>
+            </div>
+          </td>
+          <td></td>
           <td>
           </td>
         </tr>
@@ -96,7 +108,10 @@
         <tr>
           <td><label style="color: mediumpurple">Technical Feedback</label></td>
           <td colspan="3">
-            <textarea class="form-control" type="textarea" rows="5" cols="50"  maxlength="3000" formControlName="feedback"></textarea>
+            <textarea class="form-control" type="textarea" rows="5" cols="50"  maxlength="3000" formControlName="feedback" [ngClass]="{ 'is-invalid': submitted && myForm.feedback.errors}"></textarea>
+            <div *ngIf="submitted && myForm.feedback.errors" class="invalid-feedback">
+              <div *ngIf="myForm.feedback.errors.required">Feedback is required</div>
+            </div>
           </td>
         </tr>
         <br/>
@@ -118,7 +133,3 @@
 
   </form>
   </div>
-
-
-
-
