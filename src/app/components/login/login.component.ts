@@ -106,7 +106,7 @@ export class LoginComponent implements OnInit {
              if (res.accessLevel === 'admin') {
                this.ngZone.run(() => this.router.navigateByUrl('/candidates-list',{state:{username:res.username}}))
              }else if (res.accessLevel === 'sme') {
-              this.ngZone.run(() => this.router.navigateByUrl('/technical-interview-list',{state:{username:res.username}}))
+              this.ngZone.run(() => this.router.navigateByUrl('/technical-interview-list',{state:{username:res.username,accessLevel:res.accessLevel}}))
             } else if (res.accessLevel === 'partner') {
                this.ngZone.run(() => this.router.navigateByUrl('/partner-list',{state:{username:res.username,accessLevel:res.accessLevel}}))
              }else if (res.accessLevel === 'management') {

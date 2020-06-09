@@ -26,8 +26,8 @@ export class TechnicalInterviewComponent implements OnInit {
   accessLevel: String = "";
   constructor(private fb:FormBuilder, private actRoute: ActivatedRoute, private router: Router,private ngZone: NgZone,
     private apiService: ApiService) {
-   // this.userName = this.router.getCurrentNavigation().extras.state.username;
-    let id ="george@gmail.com";// this.actRoute.snapshot.paramMap.get('id');
+    this.userName = this.router.getCurrentNavigation().extras.state.username;
+    let id = this.actRoute.snapshot.paramMap.get('id');
     this.accessLevel = this.router.getCurrentNavigation().extras.state.accessLevel;
     this.readCandidateTechnicalInterviewDetails(id);
     this.techskillForm = this.fb.group({

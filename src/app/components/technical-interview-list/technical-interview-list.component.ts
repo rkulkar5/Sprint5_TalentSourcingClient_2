@@ -13,6 +13,7 @@ import { browserRefresh } from '../../app.component';
 export class TechnicalInterviewListComponent implements OnInit {
   public browserRefresh: boolean;
   userName: String = "";
+  accessLevel: String = "";
   TechnicalInterviewList: any = [];
   config: any;
 
@@ -25,7 +26,9 @@ export class TechnicalInterviewListComponent implements OnInit {
       this.browserRefresh = browserRefresh;
       if (!this.browserRefresh) {
           this.userName = this.router.getCurrentNavigation().extras.state.username;
-      }
+          this.accessLevel = this.router.getCurrentNavigation().extras.state.accessLevel;
+          console.log("accessLevel*",this.accessLevel);
+        }
       route.queryParams.subscribe(
       params => this.config.currentPage= params['page']?params['page']:1 );
       this.getTechnicalInterviewList();

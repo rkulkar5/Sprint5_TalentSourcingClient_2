@@ -55,7 +55,7 @@ const routes: Routes = [
   { path: 'operations-candidate-list', component:OperationsCandidateListComponent },
   {path: 'pre-tech-form', component:PreTechFormComponent},
   { path: 'initiate-operations-project/:id', component:OperationsProjectInitiateComponent },
-  { path: 'technical-list', component:TechnicalInterviewComponent }
+  { path: 'technical-list/:id', component:TechnicalInterviewComponent }
 ];
 
 @NgModule({
