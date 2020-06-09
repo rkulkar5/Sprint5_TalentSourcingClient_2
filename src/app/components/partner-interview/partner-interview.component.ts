@@ -27,14 +27,19 @@ export class PartnerInterviewComponent implements OnInit {
       if (!this.browserRefresh) {
           this.userName = this.router.getCurrentNavigation().extras.state.username;
           this.accessLevel = this.router.getCurrentNavigation().extras.state.accessLevel;
-          console.log("accessLevel*",this.accessLevel);
       }
       route.queryParams.subscribe(
       params => this.config.currentPage= params['page']?params['page']:1 );
       this.getPartnerInterviewList();
   }
 
-  ngOnInit(): void {
+  ngOnInit() {
+      this.accessLevel="partner";
+      this.browserRefresh = browserRefresh;
+      if (this.browserRefresh) {
+            window.alert('You are redirected to login screen.');
+            this.router.navigate(['/login-component']);
+      }
   }
 
   pageChange(newPage: number) {

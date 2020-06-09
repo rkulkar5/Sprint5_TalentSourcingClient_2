@@ -11,6 +11,7 @@ import { PartnerDetails } from './../../model/PartnerDetails';
   styleUrls: ['./partner-interview-initiate.component.css']
 })
 export class PartnerInterviewInitiateComponent implements OnInit {
+  public browserRefresh: boolean;
   userName: String = "";
   partnerInterviewDetails : any = [];
   FinalResult: any=['Recommended','Not Suitable','StandBy'];
@@ -28,8 +29,13 @@ export class PartnerInterviewInitiateComponent implements OnInit {
        this.mainForm();
    }
 
-  ngOnInit(): void {
-  }
+   ngOnInit() {
+        this.browserRefresh = browserRefresh;
+        if (this.browserRefresh) {
+             window.alert('You are redirected to login screen.');
+             this.router.navigate(['/login-component']);
+        }
+   }
 
   mainForm() {
       this.partnerFeedbackForm = this.fb.group({

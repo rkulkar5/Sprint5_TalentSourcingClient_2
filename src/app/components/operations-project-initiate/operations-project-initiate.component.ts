@@ -11,6 +11,7 @@ import { OperationsDetails } from './../../model/OperationsDetails';
   styleUrls: ['./operations-project-initiate.component.css']
 })
 export class OperationsProjectInitiateComponent implements OnInit {
+  public browserRefresh: boolean;
   userName: String = "";
   operationsProjectDetails : any = []; 
   ProjectLocation: any=['Onshore','Offshore']; 
@@ -29,8 +30,13 @@ export class OperationsProjectInitiateComponent implements OnInit {
        this.mainForm();     
    }
 
-  ngOnInit(): void {
-  } 
+   ngOnInit() {
+        this.browserRefresh = browserRefresh;
+        if (this.browserRefresh) {
+            window.alert('You are redirected to login screen.');
+            this.router.navigate(['/login-component']);
+        }
+   }
 
   mainForm() {
     this.operationsProjectForm = this.fb.group({

@@ -26,16 +26,19 @@ export class OperationsCandidateListComponent implements OnInit {
     if (!this.browserRefresh) {
         this.userName = this.router.getCurrentNavigation().extras.state.username;
         this.accessLevel = this.router.getCurrentNavigation().extras.state.accessLevel;
-        console.log("accessLevel*",this.accessLevel);
     }
     route.queryParams.subscribe(
     params => this.config.currentPage= params['page']?params['page']:1 );
     this.getOperationsCandidateList();
 }
 
-ngOnInit(): void {
-  }
-
+ ngOnInit() {
+      this.browserRefresh = browserRefresh;
+      if (this.browserRefresh) {
+            window.alert('You will be redirecting to login again.');
+            this.router.navigate(['/login-component']);
+      }
+ }
 pageChange(newPage: number) {
     this.router.navigate(['/operations-candidate-list'], { queryParams: { page: newPage } });
 }
