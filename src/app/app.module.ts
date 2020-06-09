@@ -34,6 +34,7 @@ import { OperationsProjectInitiateComponent } from './components/operations-proj
 import { TechnicalInterviewListComponent } from './components/technical-interview-list/technical-interview-list.component';
 import { PreTechFormComponent } from './components/pre-tech-form/pre-tech-form.component';
 import { TechnicalInterviewComponent } from './components/technical-interview/technical-interview.component';
+import { WorkflowConfigComponent } from './components/workflow-config/workflow-config.component';
 
 export let browserRefresh = false;
 
@@ -63,7 +64,8 @@ export let browserRefresh = false;
     OperationsProjectInitiateComponent,
     TechnicalInterviewListComponent,
     PreTechFormComponent,
-    TechnicalInterviewComponent],
+    TechnicalInterviewComponent,
+    WorkflowConfigComponent],
   imports: [
     BrowserModule,
     NgxPaginationModule,

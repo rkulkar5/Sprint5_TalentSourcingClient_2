@@ -27,6 +27,7 @@ import { OperationsProjectInitiateComponent } from './components/operations-proj
 import { TechnicalInterviewListComponent } from './components/technical-interview-list/technical-interview-list.component';
 import { PreTechFormComponent } from './components/pre-tech-form/pre-tech-form.component';
 import { TechnicalInterviewComponent } from './components/technical-interview/technical-interview.component';
+import { WorkflowConfigComponent } from './components/workflow-config/workflow-config.component';
 
 const routes: Routes = [
   { path: '', pathMatch: 'full', redirectTo: 'login-component' },
@@ -55,7 +56,8 @@ const routes: Routes = [
   { path: 'operations-candidate-list', component:OperationsCandidateListComponent },
   {path: 'pre-tech-form', component:PreTechFormComponent},
   { path: 'initiate-operations-project/:id', component:OperationsProjectInitiateComponent },
-  { path: 'technical-list/:id', component:TechnicalInterviewComponent }
+  { path: 'technical-list/:id', component:TechnicalInterviewComponent }, 
+  { path: 'workflow-config', component:WorkflowConfigComponent }
 ];
 
 @NgModule({
