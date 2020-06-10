@@ -66,8 +66,10 @@ export class CandidateCreateComponent implements OnInit {
   }
  // Get all Jrss
  readJrss(){
+  console.log("In readJRSS"); 
   this.apiService.getJRSS().subscribe((data) => {
   this.JRSS = data;
+  console.log("data is "+this.JRSS); 
   })
 }
   // Choose designation with select dropdown

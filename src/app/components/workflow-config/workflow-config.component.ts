@@ -1,4 +1,6 @@
 import { Component, OnInit } from '@angular/core';
+import { ApiService } from './../../service/api.service';
+import { FormGroup, FormBuilder, Validators } from "@angular/forms";
 
 @Component({
   selector: 'app-workflow-config',
@@ -6,10 +8,27 @@ import { Component, OnInit } from '@angular/core';
   styleUrls: ['./workflow-config.component.css']
 })
 export class WorkflowConfigComponent implements OnInit {
+  submitted = false;
+  formReset = false;
+  questionForm: FormGroup;
+  JRSS:any = [];
 
-  constructor() { }
+  constructor(
+    private apiService: ApiService
+  ) 
+  { 
+    this.readJrss(); 
+  }
 
   ngOnInit(): void {
   }
+
+  // Get all Jrss
+ readJrss(){
+  this.apiService.getJRSS().subscribe((data) => {
+  this.JRSS = data;
+  console.log("data is "+this.JRSS); 
+  })
+ }
 
 }
