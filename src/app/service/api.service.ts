@@ -338,6 +338,14 @@ deleteJrss(id): Observable<any> {
     catchError(this.errorMgmt)
   )
 }
+// Update Workflow by JRSS name
+ updateWorkflow(id, data): Observable<any> {
+  let url = `${this.baseJrssUri}/updateWorkflow/${id}`;
+  return this.http.put(url, data, { headers: this.headers }).pipe(
+    catchError(this.errorMgmt)
+  )
+}
+
 
 /**
  *
