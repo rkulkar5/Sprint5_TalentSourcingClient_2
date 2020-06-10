@@ -1,27 +1,36 @@
-<div id="quiz"  *ngIf="mode=='pre-tech'">
+ 
+<form #preTechAssessmentForm="ngForm" (ngSubmit)="mode= 'Submit'; submitPreTechForm(preTechQuesAndAns)" >
     
     <div oncopy="return false">
         <font color="black" size="+2">
         <div class="form-group row" >
             <div class="col-sm-4"></div>
         <div class="col-sm-4 col-form-label"><b>Pre Technical Interview Form</b></div></div></font>
-      <div class="form-group row" *ngFor="let preTechAssmntQ of preTechAssmntQuestions" >
+      <div class="form-group" *ngFor="let preTechQAndA of preTechQuesAndAns; let i = index" >
         <br/>
-        <label style="width:500px">
+        <label for="{{preTechQAndA.preTechQuestion}}" style="width:500px">
           <!--To display questions as entered with line breaks-->
-          <b> &nbsp;{{preTechAssmntQ.preTechQuestion}}</b>
+          <b> &nbsp;{{preTechQAndA.preTechQuestion}}</b>
         </label>
-        <input class="form-control" type="text"  size="">
+        <textarea  required id = "{{preTechQAndA.preTechQuestion}}"   [readonly]="stage2Completed"
+		name = "{{preTechQAndA.preTechQuestion}}" 
+		[(ngModel)]= "preTechQAndA.answer" class="form-control" type="text"  #name="ngModel" > {{preTechQAndA.answer}} </textarea>
   </div>
 </div>
 
  <div class="text-center" style="width: 600px">
-        <button type="button" (click)="mode = 'review'" >Submit</button>&nbsp;&nbsp;&nbsp;
-        <button type="button"  (click)="mode = 'review'">Save Draft</button> &nbsp;&nbsp;&nbsp;
-        <button type="button"   (click)="mode = 'review'">Clear</button> &nbsp;&nbsp;&nbsp;
-        <button type="button" (click)="mode = 'review'">Cancel</button>&nbsp;&nbsp;
+        <button type="submit"   class="btn btn-primary"  >Submit</button>&nbsp;&nbsp;&nbsp;
+		<button type="button"  class="btn btn-primary" (click)="mode= 'Draft'; submitPreTechForm(preTechQuesAndAns)" >Save Draft</button>&nbsp;&nbsp;&nbsp;
+		
+		<button type="button"  class="btn btn-primary"  >Clear</button>&nbsp;&nbsp;&nbsp;
+		
+		<button type="button"  class="btn btn-primary" >Cancel</button>&nbsp;&nbsp;&nbsp;
+        
       </div>
-</div>
+ 
+ </form>
+  
+
   <div *ngIf="mode=='instructions'" oncopy="return false">
     Congratulations on completing the exam,
     <h4 class="text-center"> <br>Instructions for filling up the pre-technical assessment form</h4>
@@ -33,7 +42,7 @@
 <ol>5. If you don't have anything to share against a particular question, then please mention as "Not Applicable".</ol>
 
   You can find the pre-technical assessment form here  
-<a class="nav-link" (click)="preTech()" routerLink="/pre-tech" routerLinkActive="active" >pre-technical interview form</a>
+<a class="nav-link" (click)="mode= 'Draft'" routerLinkActive="active"  >pre-technical interview form</a>
 
   </div>
   
