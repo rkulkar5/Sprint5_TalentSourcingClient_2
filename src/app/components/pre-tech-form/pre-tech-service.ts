@@ -16,8 +16,8 @@ export class PreTechService {
  constructor(private http: HttpClient) { }
 
   // Get all questions
-  getPreTechAssessmentQuestions(jrss) {
-    let url = `${this.baseUri}/getPreTechQuestionanire/${jrss}`;
+  getPreTechAssessmentQuestions(jrss, userName) {
+    let url = `${this.baseUri}/getPreTechQuestionanire/${jrss}/${userName}`;
     return this.http.get(url, {headers: this.headers}).pipe(
       map((res: Response) => {
       return res || {}
@@ -25,9 +25,41 @@ export class PreTechService {
       catchError(this.errorMgmt)
     )
   }
-
+  
+  
+// Get workflow stage status by userName
+  getStageStatusByUserName( userName) {
+    let url = `${this.baseUri}/getStageStatus/${userName}`;
+	 
+    return this.http.get(url, {headers: this.headers}).pipe(
+      map((res: Response) => {
+      return res || {}
+      }),
+      catchError(this.errorMgmt)
+    )
+  }
+  
   
 
+  // Update stage 2 status status.
+ updateStage2Status(userName): Observable<any> {
+  let url = `${this.baseUri}/updateStage2Status/${userName}`;
+  console.log("******* updateStage2Status url ****** ",url);
+	return this.http.post(url, {headers: this.headers}).pipe(
+	 catchError(this.errorMgmt)
+)
+}
+  
+   // Save as draft / submit  the pre technical assessment answers given by candidate  User by ID
+   saveOrSubmitPreTechAssmentDetails(data): Observable<any> {
+   console.log(" insied service class*******data*****", data);
+    let url = `${this.baseUri}/saveOrSubmit`;
+    return this.http.put(url, data).pipe(
+      catchError(this.errorMgmt)
+    )
+  }
+  
+  
     // Error handling
     errorMgmt(error: HttpErrorResponse) {
       let errorMessage = '';
