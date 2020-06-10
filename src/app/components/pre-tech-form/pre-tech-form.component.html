@@ -1,5 +1,5 @@
- 
-<form #preTechAssessmentForm="ngForm" (ngSubmit)="mode= 'Submit'; submitPreTechForm(preTechQuesAndAns)" >
+ <div *ngIf="mode !='instructions'" >
+<form #preTechAssessmentForm="ngForm"   (ngSubmit)="mode= 'Submit'; submitPreTechForm(preTechQuesAndAns)" >
     
     <div oncopy="return false">
         <font color="black" size="+2">
@@ -29,7 +29,7 @@
       </div>
  
  </form>
-  
+ </div> 
 
   <div *ngIf="mode=='instructions'" oncopy="return false">
     Congratulations on completing the exam,
@@ -42,7 +42,11 @@
 <ol>5. If you don't have anything to share against a particular question, then please mention as "Not Applicable".</ol>
 
   You can find the pre-technical assessment form here  
-<a class="nav-link" (click)="mode= 'Draft'" routerLinkActive="active"  >pre-technical interview form</a>
+  
+  <button type="button" class="btn btn-link" (click)="mode = 'Draft'">pre-technical interview form</button>
+  
+<!-- <a class="nav-link" routerLink="/pre-tech-form" routerLinkActive="active" [state]="{userName:this.userName,mode:'Draft'}" >pre-technical interview form</a> -->
+  
 
   </div>
   
