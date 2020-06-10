@@ -18,7 +18,7 @@
     </div>
     <div class="container">
       <!-- No data message -->
-      <p *ngIf="TechnicalInterviewList.length <= 0" class="no-data text-center">There are no records in Partner Interview Assessment Queue</p>
+      <p *ngIf="TechnicalInterviewList.length <= 0" class="no-data text-center">There are no records in Technical Interview Assessment Queue</p>
   
       <!-- Technical Interview list -->
       <table class="table table-bordered" >
@@ -28,8 +28,8 @@
           <th scope="col" width="20%">JRSS</th>
           <th scope="col" width="20%">Online Assessment Result</th>
           <th scope="col" width="23%">Pre-Technical interview Assesment Form</th>
-          <th scope="col" width="23%">Technical interview Assesment</th>
           <th scope="col" width="8%">CV Download link</th>
+          <th scope="col" width="23%">Technical interview Assesment</th>
         </tr>
         </thead>
         <tbody>
@@ -38,12 +38,12 @@
           <td  width="20%">{{TechnicalInterview.result_users[0].JRSS}}</td>
           <td  width="20%">{{TechnicalInterview.userScore}}%</td>
           <td  width="8%"><a href="#" routerLinkActive="active">Click Here</a></td>
+          <td  width="8%"><a href="#" routerLinkActive="active">Click Here</a></td>
           <td  class="text-center edit-block" width="20%">
             <a class="edit" [routerLink]="['/technical-list/', TechnicalInterview.userName]" [state]="{username:this.userName,accessLevel:this.accessLevel}">
               <button type="button" class="btn btn-success btn-sm">Initiate Interview</button>&nbsp;
             </a>
           </td>
-          <td  width="8%"><a href="#" routerLinkActive="active">Click Here</a></td>
         </tr>
         </tbody>
       </table>
