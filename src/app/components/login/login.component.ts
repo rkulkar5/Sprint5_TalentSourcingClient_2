@@ -126,8 +126,11 @@ export class LoginComponent implements OnInit {
                 this.ngZone.run(() => this.router.navigateByUrl('/quizInstructions',{state:{username:res.username,quizNumber:res.quizNumber}}))
                 } else{
                   this.apiService.getResultByUser(res.username,res.quizNumber).subscribe(result => {                    
-                  if(result['userScore']>=80){
+                  if(result['userScore']>=80 && result['stage2_status']!="Completed"&& (result['stage1_status'] =="Skipped"||result['stage1_status'] =="Completed")){
                     this.ngZone.run(() => this.router.navigateByUrl('/pre-tech-form',{state:{userName:res.username,mode:'instructions'}}))
+                  }
+                  else if(result['stage2_status']=="Completed"){
+                    this.error='Our team will contact you regarding your progression to the further rounds.'
                   }
                   else{
                     this.error='You are not an active user'
