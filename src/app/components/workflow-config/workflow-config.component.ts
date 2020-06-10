@@ -12,6 +12,8 @@ export class WorkflowConfigComponent implements OnInit {
   formReset = false;
   questionForm: FormGroup;
   JRSS:any = [];
+  userName: String = "admin";
+  
 
   constructor(
     private apiService: ApiService

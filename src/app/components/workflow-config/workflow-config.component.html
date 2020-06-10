@@ -43,27 +43,8 @@
   </nav>
   <br/>
 <h4 class="my-0 mr-md-auto font-weight-normal">Workflow Configuration</h4>
-<div class="row justify-content-left">
-  <div class="col-lg-20 register-employee">
-    <div class="card-body">
-        <form [formGroup]="candidateForm" (ngSubmit)="onSubmit()" >
-    <br/>
-    <!-- JRSS Dropdown -->
-    <div class="form-group row">
-      <label for="inputJRSS3" class="col-sm-4 col-form-label">JRSS</label>
-        <div class="col-sm-8">
-          <select class="custom-select form-control" (change)="updateJrssProfile($event.target.value)"
-                formControlName="JRSS" id="inputJRSS3" [ngClass]="{ 'is-invalid': submitted && myForm.JRSS.errors }"> 
-          <option value="">Choose...</option>
-          <option *ngFor="let jrss of JRSS" value="{{jrss.jrss}}">{{jrss.jrss}}
-          </option>
-        </select>
-          <div *ngIf="submitted && myForm.JRSS.errors" class="invalid-feedback">
-            <div *ngIf="myForm.JRSS.errors.required">JRSS is required</div>
-          </div>
-        </div>
-      </div>
-    <br/><br/>
+
+
     <h6 class="my-0 mr-md-auto font-weight-normal">Please check the required recruitment process stages for the selected JRSS</h6>
     <br/>
     <div class="form-check">
@@ -87,5 +68,5 @@
     <div class="form-group">
         <button class="btn btn-success btn-lg btn-block" type="submit">Save Configuration</button>
     </div>
-    </form>
+   
 
