@@ -21,7 +21,7 @@ export class PreTechFormComponent implements OnInit {
 	preTechQuesAndAns: PreTechQuesAndAns[] = [];
 	jrss = "";
 	userName = "";
-	stage2_Status = "";
+	stage2_status = "";
 	
 	stage2Completed=false;
 mode= "instructions";
@@ -52,12 +52,12 @@ getPreTechAssessmentQuestions() {
 
 this.preTechService.getStageStatusByUserName(this.userName).subscribe(
     (res) => {      
-      this.stage2_Status = res['stage2_Status'];
+      this.stage2_status = res['stage2_status'];
 	  
-	  if (this.stage2_Status == "Completed") {
+	  if (this.stage2_status == "Completed") {
 			this.stage2Completed =  true	  
 	  }
-	  console.log("******* this.stage2_Status ****** ",this.stage2_Status);
+	  console.log("******* this.stage2_status ****** ",this.stage2_status);
 	  });
 	  
      // Get jrss
