@@ -113,6 +113,7 @@ this.preTechService.getStageStatusByUserName(this.userName).subscribe(
 		} else {
 		
 		this.stage2Completed = false;
+    alert("Answers saved as draft");
 		}
  
  }
