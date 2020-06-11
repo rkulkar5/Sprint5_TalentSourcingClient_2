@@ -1,30 +1,38 @@
- <div *ngIf="mode !='instructions'" >
-<form #preTechAssessmentForm="ngForm"   (ngSubmit)="mode= 'Submit'; submitPreTechForm(preTechQuesAndAns)" >
-    
-    <div oncopy="return false">
-        <font color="black" size="+2">
-        <div class="form-group row" >
-            <div class="col-sm-4"></div>
-        <div class="col-sm-4 col-form-label"><b>Pre Technical Interview Form</b></div></div></font>
-      <div class="form-group" *ngFor="let preTechQAndA of preTechQuesAndAns; let i = index" >
+<div  class="card-body" *ngIf="mode !='instructions'" >
+
+<form #preTechAssessmentForm="ngForm"  name= "form" (ngSubmit)="mode= 'Submit'; preTechAssessmentForm.form.valid && submitPreTechForm(preTechQuesAndAns)" >
+
+    <font color="black" size="+2">
+		<div class="col-sm-8 col-form-label"><b>Pre Technical Interview Form</b></div>
+        </font>
+    <div>
+        
+      <div *ngFor="let preTechQAndA of preTechQuesAndAns; let i = index" >
         <br/>
-        <label for="{{preTechQAndA.preTechQuestion}}" style="width:500px">
+		<div class="form-group"   class="scrollbar scrollbar-primary">
+        <label  class="control-label"  [class.has-error]="LocalVariable.invalid" for="{{preTechQAndA.preTechQuestion}}" >
           <!--To display questions as entered with line breaks-->
           <b> &nbsp;{{preTechQAndA.preTechQuestion}}</b>
         </label>
-        <textarea  required id = "{{preTechQAndA.preTechQuestion}}"   [readonly]="stage2Completed"
-		name = "{{preTechQAndA.preTechQuestion}}" 
-		[(ngModel)]= "preTechQAndA.answer" class="form-control" type="text"  #name="ngModel" > {{preTechQAndA.answer}} </textarea>
+        <textarea  id="{{preTechQAndA.preTechQuestion}}"   [readonly]="stage2Completed"
+		name = "{{preTechQAndA.preTechQuestion}}" [ngClass]="{ 'is-invalid': preTechAssessmentForm.submitted && LocalVariable.invalid }"
+		[(ngModel)]= "preTechQAndA.answer" class="form-control"  #LocalVariable="ngModel" required></textarea>
+		
+		<div *ngIf="preTechAssessmentForm.submitted && LocalVariable.invalid" class="invalid-feedback">
+                        <div *ngIf="LocalVariable.errors.required">This field is required.</div>
+                    </div>
+					
+		</div>
   </div>
 </div>
-
- <div class="text-center" style="width: 600px">
-        <button type="submit"   class="btn btn-primary"  >Submit</button>&nbsp;&nbsp;&nbsp;
-		<button type="button"  class="btn btn-primary" (click)="mode= 'Draft'; submitPreTechForm(preTechQuesAndAns)" >Save Draft</button>&nbsp;&nbsp;&nbsp;
+<br /><br />
+ <div class="text-center" style="width: 900px">
+        <button type="submit"   class="btn btn-primary">Submit</button>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+		<button type="button"  class="btn btn-primary" (click)="mode= 'Draft'; submitPreTechForm(preTechQuesAndAns)" >Save Draft</button>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
 		
-		<button type="button"  class="btn btn-primary"  >Clear</button>&nbsp;&nbsp;&nbsp;
+		<button type="reset"  class="btn btn-primary">Clear</button>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
 		
-		<button type="button"  class="btn btn-primary" >Cancel</button>&nbsp;&nbsp;&nbsp;
+		<button type="button"  class="btn btn-primary"  (click)="mode='instructions'">Cancel</button>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
         
       </div>
  
