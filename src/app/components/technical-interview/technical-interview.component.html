@@ -54,7 +54,11 @@
               </select>
           </td>
           <td width="25%">
-              <input type="text" size="5" formControlName="score" class="form-control" (change)="averageCalc($event.target.value)">
+              <input type="text" size="5" formControlName="score" class="form-control" (change)="averageCalc($event.target.value)" (keypress)="isNumber($event)">
+              <!-- [ngClass]="{ 'is-invalid': submitted && myForm.finalscore.errors}"
+              <div *ngIf="submitted && myForm.score.errors" class="invalid-feedback">
+                <div *ngIf="myForm.score.errors.required">Score is required.Value between 1 & 10</div>
+              </div> -->
             </td>
           <td colspan="2"  width="50%" *ngIf="dynamicArray.length == i+1">
             &nbsp;&nbsp;
@@ -74,11 +78,11 @@
         <br/>
         <tr>
           <td><label style="color: mediumpurple">Final Score</label></td>
-          <td><input class="form-control" formControlName="finalscore" size="10" type="text" value={{this.averageScore}}  />
+          <td><input class="form-control" formControlName="finalscore" size="10" type="text" value={{this.averageScore}}  [ngClass]="{ 'is-invalid': submitted && myForm.finalscore.errors}" disabled>
             <!-- [ngClass]="{ 'is-invalid': submitted && myForm.finalscore.errors}" -->
-            <!-- <div *ngIf="submitted && myForm.finalscore.errors" class="invalid-feedback">
-              <div *ngIf="myForm.finalscore.errors.required">Final Score is required</div>
-            </div> -->
+             <div *ngIf="submitted && myForm.finalscore.errors" class="invalid-feedback">
+              <div *ngIf="myForm.finalscore.errors.required">Final Score should be greather than zero.</div>
+            </div>
           </td>
           <td><label style="color: mediumpurple">Final Result</label></td>
           <td>

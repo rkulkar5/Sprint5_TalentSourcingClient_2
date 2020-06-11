@@ -127,6 +127,8 @@ export class TechnicalInterviewComponent implements OnInit {
       }
     }
     this.averageScore=this.totalScore/scoreCount;
+    if(isNaN(this.averageScore))
+      this.averageScore=0;
    }
 
    //Reset
@@ -139,10 +141,27 @@ export class TechnicalInterviewComponent implements OnInit {
      this.ngZone.run(() => this.router.navigateByUrl('/technical-interview-list',{state:{username:this.userName}}))
  }
 
+ isNumber(evt) {
+  var iKeyCode = (evt.which) ? evt.which : evt.keyCode
+  if (iKeyCode != 46 && iKeyCode > 31 && (iKeyCode < 48 || iKeyCode > 57))
+      return false;
+
+  return true;
+}
+ dynamicFormControlValidation(){
+   if(this.averageScore==0){
+     this.techskillForm.get("finalscore").setValidators([Validators.required])
+     this.techskillForm.get("finalscore").updateValueAndValidity();
+   }else{
+    this.techskillForm.get("finalscore").clearValidators();
+    this.techskillForm.get("finalscore").updateValueAndValidity();
+   }
+ }
 
   onSubmit() {
 
     this.submitted = true;
+    this.dynamicFormControlValidation();
     if (!this.techskillForm.valid) {
       return false;
     } else {
@@ -159,7 +178,7 @@ export class TechnicalInterviewComponent implements OnInit {
             this.techskillForm.value.smeName,
             "Completed");
 
-            this.apiService.updateResults(res['_id'],updateResults).subscribe(res => {
+			this.apiService.updateResults(res['_id'],updateResults).subscribe(res => {
             console.log('Candidate SME Interview Details updated successfully!');
             this.ngZone.run(() => this.router.navigateByUrl('/technical-interview-list',{state:{username:this.userName,accessLevel:this.accessLevel}}))
             }, (error) => {
