@@ -39,8 +39,8 @@
         </tr>
         <br/>
         <tr>
-          <td  width="25%" ><label style="color: mediumpurple"><b>Technical Stream</b></label></td>
-          <td  width="25%"><label style="color: mediumpurple"><b>Score:</b></label></td>
+          <td  width="25%" ><label style="color: mediumpurple"><b>Technology Stream</b></label></td>
+          <td  width="25%"><label style="color: mediumpurple"><b>Score:</b></label><b><font style="font-size:10px">(1-10)</font></b></td>
           <td  width="25%"></td>
           <td  width="25%"></td>
         </tr>
@@ -54,7 +54,7 @@
               </select>
           </td>
           <td width="25%">
-              <input type="text" size="5" formControlName="score" class="form-control" (change)="averageCalc($event.target.value)" (keypress)="isNumber($event)">
+              <input type="text" size="5" formControlName="score" class="form-control" (change)="averageCalc($event.target.value)" (keypress)="isNumber($event,i)">
               <!-- [ngClass]="{ 'is-invalid': submitted && myForm.finalscore.errors}"
               <div *ngIf="submitted && myForm.score.errors" class="invalid-feedback">
                 <div *ngIf="myForm.score.errors.required">Score is required.Value between 1 & 10</div>
@@ -81,7 +81,7 @@
           <td><input class="form-control" formControlName="finalscore" size="10" type="text" value={{this.averageScore}}  [ngClass]="{ 'is-invalid': submitted && myForm.finalscore.errors}" disabled>
             <!-- [ngClass]="{ 'is-invalid': submitted && myForm.finalscore.errors}" -->
              <div *ngIf="submitted && myForm.finalscore.errors" class="invalid-feedback">
-              <div *ngIf="myForm.finalscore.errors.required">Final Score should be greather than zero.</div>
+              <div *ngIf="myForm.finalscore.errors.required">Final Score should be greather than 0.</div>
             </div>
           </td>
           <td><label style="color: mediumpurple">Final Result</label></td>
@@ -97,7 +97,7 @@
             </div>
             </td>
         </tr>
-        <tr>
+        <!--        <tr>
           <td><label style="color: mediumpurple">Technical SME Name</label></td>
           <td><input type="text" class="form-control" formControlName="smeName" size="10" [ngClass]="{ 'is-invalid': submitted && myForm.smeName.errors}"/>
             <div *ngIf="submitted && myForm.smeName.errors" class="invalid-feedback">
@@ -108,9 +108,11 @@
           <td>
           </td>
         </tr>
+        -->
+
         <br/>
         <tr>
-          <td><label style="color: mediumpurple">Technical Feedback</label></td>
+          <td><label style="color: mediumpurple">Technical Feedback</label><br><b><i><font style="font-size:10px">(max 3000 characters)</font></i></b></td>
           <td colspan="3">
             <textarea class="form-control" type="textarea" rows="5" cols="50"  maxlength="3000" formControlName="feedback" [ngClass]="{ 'is-invalid': submitted && myForm.feedback.errors}"></textarea>
             <div *ngIf="submitted && myForm.feedback.errors" class="invalid-feedback">
@@ -123,9 +125,9 @@
           <td colspan="3" class="text-center">
             <button size="8" type="submit"class="btn btn-secondary" >Submit</button>
             &nbsp;&nbsp;&nbsp;&nbsp;
-            <button size="8" type="submit" (click)="resetForm()" class="btn btn-secondary">Clear</button>
+            <button size="8" type="reset" (click)="resetForm()" class="btn btn-secondary">Clear</button>
             &nbsp;&nbsp;&nbsp;&nbsp;
-            <button size="8"  type="submit" (click)="cancelForm()" class="btn btn-secondary">Cancel</button>
+            <button size="8"  type="button" (click)="cancelForm()" class="btn btn-secondary">Cancel</button>
           </td>
           <!-- <td><button class="form-control" type="submit" (click)="resetForm()">Clear</button></td>
           <td><button class="form-control" type="submit" (click)="cancelForm()">Cancel</button></td> -->
