@@ -3,7 +3,7 @@ import { PreTechService } from './../../components/pre-tech-form/pre-tech-servic
 import { ApiService } from './../../service/api.service';
 import { Component, OnInit, NgZone } from '@angular/core';
 import { FormGroup, FormBuilder, Validators } from "@angular/forms";
-
+import { Location } from '@angular/common';
 import { PreTechQuesAndAns } from './../../model/PreTechQuesAndAns';
 
 
@@ -31,11 +31,17 @@ mode= "instructions";
     private router: Router,
     private ngZone: NgZone,
 	private preTechService: PreTechService,
+	private location: Location,
     private apiService: ApiService) {
 this.userName = this.router.getCurrentNavigation().extras.state.userName;
 this.mode = this.router.getCurrentNavigation().extras.state.mode;
 
 	}
+	
+	 cancel() {
+    this.location.back();
+  } 
+  
  preTech(){
    this.mode="pre-tech"
  }
@@ -57,7 +63,6 @@ this.preTechService.getStageStatusByUserName(this.userName).subscribe(
 	  if (this.stage2_status == "Completed") {
 			this.stage2Completed =  true	  
 	  }
-	  console.log("******* this.stage2_status ****** ",this.stage2_status);
 	  });
 	  
      // Get jrss
@@ -81,7 +86,6 @@ this.preTechService.getStageStatusByUserName(this.userName).subscribe(
 						
 	  });
 		 
-		 console.log("******* preTechQuesAndAns<<<< ****** ",this.preTechQuesAndAns);
          }, (error) => {
          console.log(error);
          });
@@ -91,8 +95,7 @@ this.preTechService.getStageStatusByUserName(this.userName).subscribe(
  
  
  submitPreTechForm( preTechQAndA : PreTechQuesAndAns[]) {
- console.log("******* mode ****** ",this.mode);
- 
+
      this.preTechService.saveOrSubmitPreTechAssmentDetails(preTechQAndA).subscribe(res => {
 
          }, (error) => {
@@ -111,7 +114,6 @@ this.preTechService.getStageStatusByUserName(this.userName).subscribe(
 		
 		this.stage2Completed = false;
 		}
-		
  
  }
  
