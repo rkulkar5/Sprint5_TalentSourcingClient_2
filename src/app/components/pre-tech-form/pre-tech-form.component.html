@@ -3,16 +3,18 @@
 <form #preTechAssessmentForm="ngForm"  name= "form" (ngSubmit)="mode= 'Submit'; preTechAssessmentForm.form.valid && submitPreTechForm(preTechQuesAndAns)" >
 
     <font color="black" size="+2">
-		<div class="col-sm-8 col-form-label"><b>Pre Technical Interview Form</b></div>
+		<div class="col-sm-10 col-form-label"><b>Pre Technical Interview Form</b></div>
         </font>
     <div>
         
       <div *ngFor="let preTechQAndA of preTechQuesAndAns; let i = index" >
         <br/>
 		<div class="form-group"   class="scrollbar scrollbar-primary">
-        <label  class="control-label"  [class.has-error]="LocalVariable.invalid" for="{{preTechQAndA.preTechQuestion}}" >
+		
+       <label  class="control-label"  [class.has-error]="LocalVariable.invalid" for="{{preTechQAndA.preTechQuestion}}"  
+		style="display: inline;   width: 90%;">
           <!--To display questions as entered with line breaks-->
-          <b> &nbsp;{{preTechQAndA.preTechQuestion}}</b>
+          <pre><b> {{i+1}}.&nbsp;{{preTechQAndA.preTechQuestion}}</b></pre>
         </label>
         <textarea  id="{{preTechQAndA.preTechQuestion}}"   [readonly]="stage2Completed"
 		name = "{{preTechQAndA.preTechQuestion}}" [ngClass]="{ 'is-invalid': preTechAssessmentForm.submitted && LocalVariable.invalid }"
@@ -20,26 +22,24 @@
 		
 		<div *ngIf="preTechAssessmentForm.submitted && LocalVariable.invalid" class="invalid-feedback">
                         <div *ngIf="LocalVariable.errors.required">This field is required.</div>
-                    </div>
+         </div>
 					
 		</div>
   </div>
 </div>
 <br /><br />
- <div class="text-center" style="width: 900px">
-        <button type="submit"   class="btn btn-primary">Submit</button>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-		<button type="button"  class="btn btn-primary" (click)="mode= 'Draft'; submitPreTechForm(preTechQuesAndAns)" >Save Draft</button>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-		
-		<button type="reset"  class="btn btn-primary">Clear</button>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-		
-		<button type="button"  class="btn btn-primary"  (click)="mode='instructions'">Cancel</button>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-        
+ <div class="text-center" style="width: 100%">
+ &nbsp;&nbsp;
+        <button type="submit"   class="btn btn-primary" [disabled]="stage2Completed" >Submit</button>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+		<button type="button"  class="btn btn-primary" [disabled]="stage2Completed" (click)="mode= 'Draft'; submitPreTechForm(preTechQuesAndAns);" >Save Draft</button>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+		<button type="reset"  class="btn btn-primary" [disabled]="stage2Completed" >Clear</button>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+		<button type="button"  class="btn btn-primary"  (click)="close()"> Close </button>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
       </div>
  
  </form>
  </div> 
 
-  <div *ngIf="mode=='instructions'" oncopy="return false">
+<div *ngIf="mode=='instructions'" oncopy="return false">
     Congratulations on completing the exam,
     <h4 class="text-center"> <br>Instructions for filling up the pre-technical assessment form</h4>
      <br>
@@ -58,6 +58,4 @@
 
   </div>
   
-  
-
-  
+ 
