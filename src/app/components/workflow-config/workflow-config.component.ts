@@ -30,6 +30,16 @@ export class WorkflowConfigComponent implements OnInit {
     this.workFlowForm.get('JRSS').setValue(e, {
       onlySelf: true
     })
+   this.apiService.getJrss(this.workFlowForm.value.JRSS).subscribe((data) => {
+        this.workFlowForm.setValue({
+            JRSS: data['jrss'],
+            stage1OnlineTechAssessment: data['stage1_OnlineTechAssessment'],
+            stage2PreTechAssessment: data['stage2_PreTechAssessment'],
+            stage3TechAssessment: data['stage3_TechAssessment'],
+            stage4ManagementInterview: data['stage4_ManagementInterview'],
+            stage5ProjectAllocation: data['stage5_ProjectAllocation']
+          });
+   });
   }
 
   // Getter to access form control
@@ -50,7 +60,7 @@ export class WorkflowConfigComponent implements OnInit {
 
   // Get all Jrss
  readJrss(){
-  this.apiService.getJRSS().subscribe((data) => {
+  this.apiService.getJrsss().subscribe((data) => {
   this.JRSS = data;
   })
  }
