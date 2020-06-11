@@ -27,14 +27,14 @@ export class TechnicalInterviewComponent implements OnInit {
   constructor(private fb:FormBuilder, private actRoute: ActivatedRoute, private router: Router,private ngZone: NgZone,
     private apiService: ApiService) {
     this.userName = this.router.getCurrentNavigation().extras.state.username;
-    let id = this.actRoute.snapshot.paramMap.get('id');
+    let id =this.actRoute.snapshot.paramMap.get('id');
     this.accessLevel = this.router.getCurrentNavigation().extras.state.accessLevel;
     this.readCandidateTechnicalInterviewDetails(id);
     this.techskillForm = this.fb.group({
         finalscore:'',
         finalResult:['',Validators. required],
         feedback:['',Validators. required],
-        smeName:['',Validators. required],
+        // smeName:['',Validators. required],
         techStream: this.fb.array([]) ,
       });
 
@@ -135,17 +135,33 @@ export class TechnicalInterviewComponent implements OnInit {
   resetForm(){
     this.formReset = true;
     this.techskillForm.reset();
+    this.averageScore=0;
+   // this.ngZone.run(() => this.router.navigateByUrl('/technical-list',{state:{username:this.userName}}))
   }
 //Cancel
  cancelForm(){
      this.ngZone.run(() => this.router.navigateByUrl('/technical-interview-list',{state:{username:this.userName}}))
  }
 
- isNumber(evt) {
+ isNumber(evt,rowCount) {
   var iKeyCode = (evt.which) ? evt.which : evt.keyCode
   if (iKeyCode != 46 && iKeyCode > 31 && (iKeyCode < 48 || iKeyCode > 57))
       return false;
-
+  var scoreValueArray1:any=[];
+  var count:number=0;
+  scoreValueArray1=this.techskillForm.value.techStream;
+  for(var sc of scoreValueArray1){
+    if(count==(parseInt(rowCount))){
+      var score:number=0;
+      score=parseInt(sc.score);
+      if((score==1 && iKeyCode>48)){
+      return false;
+      }else if((score>1 && iKeyCode>47)){
+        return false;
+      }
+    }
+    count++;
+  }
   return true;
 }
  dynamicFormControlValidation(){
@@ -175,7 +191,7 @@ export class TechnicalInterviewComponent implements OnInit {
             this.averageScore,
             this.techskillForm.value.finalResult,
             this.techskillForm.value.feedback,
-            this.techskillForm.value.smeName,
+            this.userName,
             "Completed");
 
 			this.apiService.updateResults(res['_id'],updateResults).subscribe(res => {

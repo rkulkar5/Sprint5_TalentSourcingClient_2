@@ -63,6 +63,7 @@ this.preTechService.getStageStatusByUserName(this.userName).subscribe(
 	  if (this.stage2_status == "Completed") {
 			this.stage2Completed =  true	  
 	  }
+	  console.log("******* this.stage2_status ****** ",this.stage2_status);
 	  });
 	  
      // Get jrss
@@ -95,7 +96,8 @@ this.preTechService.getStageStatusByUserName(this.userName).subscribe(
  
  
  submitPreTechForm( preTechQAndA : PreTechQuesAndAns[]) {
-
+ console.log("******* mode ****** ",this.mode);
+ 
      this.preTechService.saveOrSubmitPreTechAssmentDetails(preTechQAndA).subscribe(res => {
 
          }, (error) => {
@@ -113,7 +115,16 @@ this.preTechService.getStageStatusByUserName(this.userName).subscribe(
 		} else {
 		
 		this.stage2Completed = false;
+		alert("Information saved as draft");
+		
 		}
+		
+ }
+ 
+ 
+ //Close will logout the candidate from the application
+ close( ) {
+this.router.navigate(['/login-component']);	
  
  }
  
