@@ -1,7 +1,10 @@
 <div>
-  <div>
-    <h4 class="my-0 mr-md-auto font-weight-normal">Initiate Partner Interview </h4>
-  </div>
+  <font color="black" size="+2">
+    <div class="form-group row">
+      <div class="col-sm-10"><b>Initiate Partner Interview</b></div>
+      <div class="col-sm-2"><a class="nav-link" routerLink="/login-component"  routerLinkActive="active">Logout</a></div>
+    </div>
+  </font>
   <br/>
   <div class="col-sm-6"><i><b><font style="font-size:12px">View Candidate Details</font></b></i></div>
   <div class="card">
@@ -20,20 +23,20 @@
         <td  width="25%">{{this.partnerInterviewDetails[0].userScore}}%</td>
       </tr>
       <tr>
+        <td  width="25%"><label style="color: mediumpurple">You can download CV here:</label></td>
+        <td  width="25%"><a href="#" routerLinkActive="active">Click here</a></td>
+        <td  width="25%"><label style="color: mediumpurple">You can access the Pre-Technical-Interview form here:</label></td>
+        <td  width="25%"><a href="#" routerLinkActive="active">Click here</a></td>
+      </tr>
+      <tr *ngIf="displayTechInterviewFields">
         <td  width="25%"><label style="color: mediumpurple">Technical Interview Score:</label></td>
         <td  width="25%">{{this.partnerInterviewDetails[0].avgTechScore}}</td>
         <td  width="25%"><label style="color: mediumpurple">Technical Interview Result:</label></td>
         <td  width="25%">{{this.partnerInterviewDetails[0].smeResult}}</td>
       </tr>
-      <tr>
+      <tr *ngIf="displayTechInterviewFields">
         <td  width="25%"><label style="color: mediumpurple">Technical Interview Feedback:</label></td>
-        <td  colspan="3" width="75%"><textarea type="textArea" rows="5" cols="90" readonly maxlength="3000" value="{{this.partnerInterviewDetails[0].smeFeedback}}"></textarea></td>
-      </tr>
-      <tr>
-        <td  width="25%"><label style="color: mediumpurple">You can download CV here:</label></td>
-        <td  width="25%"><a href="#" routerLinkActive="active">Click here</a></td>
-        <td  width="25%"><label style="color: mediumpurple">You can access the Pre-Technical-Interview form here:</label></td>
-        <td  width="25%"><a href="#" routerLinkActive="active">Click here</a></td>
+        <td  colspan="3" width="75%"><textarea type="textArea" maxlength="3000" cols="90" disabled readonly value="{{this.partnerInterviewDetails[0].smeFeedback}}"></textarea></td>
       </tr>
       </tbody>
     </table>
