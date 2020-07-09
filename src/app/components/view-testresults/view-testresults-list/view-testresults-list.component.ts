@@ -5,11 +5,16 @@ import { browserRefresh } from '../../../app.component';
 import { HttpClient, HttpHeaders, HttpErrorResponse } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { appConfig } from './../../../model/appConfig';
+import { Injectable } from '@angular/core';
 
 @Component({
   selector: 'app-view-testresults-list',
   templateUrl: './view-testresults-list.component.html',
   styleUrls: []
+})
+
+@Injectable({
+  providedIn: 'root'
 })
 export class ViewTestresultsListComponent implements OnChanges {
 
@@ -34,11 +39,17 @@ export class ViewTestresultsListComponent implements OnChanges {
   mode: any;
   userScore:number=0;
   assesmentDate="";
+  questionCount:number=0;
+  correctAnswerCount:number=0;
+  displayContractorUIFields: Boolean = false;
+  displayRegularUIFields: Boolean = true;
+
+
   constructor(private ref: ChangeDetectorRef, private http: HttpClient, private route: ActivatedRoute, private router: Router, private apiService: ApiService) {
     this.config = {
-      currentPage: 1,
-      itemsPerPage: 5,
-      totalItems: 0
+      currentPage: appConfig.currentPage,
+      itemsPerPage: appConfig.itemsPerPage,
+      totalItems: appConfig.totalItems
     };
     route.queryParams.subscribe(
       params => this.config.currentPage = params['page'] ? params['page'] : 1);
@@ -104,7 +115,14 @@ export class ViewTestresultsListComponent implements OnChanges {
   getCandidateDetails(username) {
       this.mode="displayModalBody";
       this.apiService.getCandidateDetails(username).subscribe((data) => {
-             this.candidateDetails = data;
+           this.candidateDetails = data;
+           if (this.candidateDetails[0].employeeType == 'Contractor') {
+                this.displayContractorUIFields = true;
+                this.displayRegularUIFields = false;
+           } else {
+                this.displayContractorUIFields = false;
+                this.displayRegularUIFields = true;
+           }
       })
   }
 
@@ -122,6 +140,8 @@ export class ViewTestresultsListComponent implements OnChanges {
      this.mode="displayAssessmentModalBody";
      this.apiService.getCandidateAssessmentDetails(userid,quizId).subscribe((data) => {
      this.candidateAssessmentDetails = data;
+     this.questionCount=this.candidateAssessmentDetails.results.length;
+     this.correctAnswerCount=Math.round((userScore*this.questionCount)/100)
     })
  }
 

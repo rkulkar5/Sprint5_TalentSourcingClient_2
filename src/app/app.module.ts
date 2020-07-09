@@ -26,15 +26,23 @@ import { TestConfigAddComponent } from './components/test-config-add/test-config
 import { TestConfigEditComponent } from './components/test-config-edit/test-config-edit.component';
 import { JrssCreateComponent } from './components/jrss-create/jrss-create.component';
 import { StreamCreateComponent } from './components/stream-create/stream-create.component';
-import {UserModule} from './components/view-testresults/user.module';
-import { PartnerInterviewComponent } from './components/partner-interview/partner-interview.component';
+import { UserModule} from './components/view-testresults/user.module';
+import { DashboardUserModule } from './components/dashboard/dashboard-user.module';
+import { OperationsUserModule } from './components/operations-candidate-list/operations-user.module';
+import { PartnerUserModule } from './components/partner-interview/partner-user.module';
 import { PartnerInterviewInitiateComponent } from './components/partner-interview-initiate/partner-interview-initiate.component';
-import { OperationsCandidateListComponent } from './components/operations-candidate-list/operations-candidate-list.component';
 import { OperationsProjectInitiateComponent } from './components/operations-project-initiate/operations-project-initiate.component';
 import { TechnicalInterviewListComponent } from './components/technical-interview-list/technical-interview-list.component';
 import { PreTechFormComponent } from './components/pre-tech-form/pre-tech-form.component';
 import { TechnicalInterviewComponent } from './components/technical-interview/technical-interview.component';
 import { WorkflowConfigComponent } from './components/workflow-config/workflow-config.component';
+import { PreTechnicalInterviewFormComponent } from './components/pre-technical-interview-form/pre-technical-interview-form.component';
+import { AdminuserCreateComponent } from './components/adminuser-create/adminuser-create.component';
+import { ConfigPretechassessmentFormComponent } from './components/config-pretechassessment-form/config-pretechassessment-form.component';
+import { StreamDeleteComponent } from './components/stream-delete/stream-delete.component';
+import { ReportComponent } from './components/report/report.component';
+import { UserEditComponent } from './components/user-edit/user-edit.component';
+import { StreamAddComponent } from './components/stream-add/stream-add.component';
 
 
 export let browserRefresh = false;
@@ -58,15 +66,21 @@ export let browserRefresh = false;
     TestConfigAddComponent,
     TestConfigEditComponent,
     JrssCreateComponent,
-    StreamCreateComponent,
-    PartnerInterviewComponent,
-    PartnerInterviewInitiateComponent,
-    OperationsCandidateListComponent,
+    StreamCreateComponent,   
+    PartnerInterviewInitiateComponent,   
     OperationsProjectInitiateComponent,
     TechnicalInterviewListComponent,
     PreTechFormComponent,
     TechnicalInterviewComponent,
-    WorkflowConfigComponent],
+    WorkflowConfigComponent,
+    PreTechnicalInterviewFormComponent,
+    AdminuserCreateComponent,
+    ConfigPretechassessmentFormComponent,
+    StreamDeleteComponent,
+    ReportComponent,
+    UserEditComponent,
+    StreamAddComponent   
+    ],
   imports: [
     BrowserModule,
     NgxPaginationModule,
@@ -75,6 +89,9 @@ export let browserRefresh = false;
     ReactiveFormsModule,
     HttpClientModule,
     UserModule,
+    DashboardUserModule,
+    OperationsUserModule,
+    PartnerUserModule,
     [ NgxPaginationModule ],
     BackButtonDisableModule.forRoot({
       preserveScrollPosition: true

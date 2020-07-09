@@ -5,6 +5,7 @@ import { TestConfigService } from './../../service/testconfig.service';
 import { ApiService } from './../../service/api.service';
 import { TestConfig } from './../../model/testConfig';
 import { browserRefresh } from '../../app.component';
+import { appConfig } from './../../model/appConfig';
 
 @Component({
   selector: 'app-test-config-edit',
@@ -14,6 +15,7 @@ import { browserRefresh } from '../../app.component';
 export class TestConfigEditComponent implements OnInit {
   public browserRefresh: boolean;
   submitted = false;
+  config: any;
   testConfigEditForm: FormGroup;
   JRSS:any = [];
   testDuration: number;
@@ -22,6 +24,7 @@ export class TestConfigEditComponent implements OnInit {
   TestConfigs:any = [];
   userName: String = "admin";
   oldJRSS: String = "";
+  testConfigID: String = "";
 
   constructor(
       public fb: FormBuilder,
@@ -31,6 +34,13 @@ export class TestConfigEditComponent implements OnInit {
       private testconfigService: TestConfigService,
       private apiService: ApiService
     ) {
+      this.config = {
+                currentPage: appConfig.currentPage,
+                itemsPerPage: appConfig.itemsPerPage,
+                totalItems: appConfig.totalItems
+      };
+    actRoute.queryParams.subscribe(
+          params => this.config.currentPage= params['page']?params['page']:1 );
       this.browserRefresh = browserRefresh;
       this.getAllJRSS();
       let id = this.actRoute.snapshot.paramMap.get('id');
@@ -61,11 +71,27 @@ export class TestConfigEditComponent implements OnInit {
       })
     }
 
+    onSelectionChange(testConfigId) {
+      this.testConfigID = testConfigId;
+    }
+
+    editTestConfig() {
+      if (this.testConfigID == "") {
+        alert("Please select the test configuration record")
+      } else {
+        this.router.navigate(['/testconfig-edit/', this.testConfigID]);
+      }
+    }
+
     // Choose designation with select dropdown
     updateJrssProfile(e){
       this.testConfigEditForm.get('JRSS').setValue(e, {
         onlySelf: true
       })
+    }
+
+    pageChange(newPage: number) {
+          this.router.navigate(['/testconfig-add'], { queryParams: { page: newPage } });
     }
 
     getTestConfig(id) {
@@ -110,17 +136,21 @@ export class TestConfigEditComponent implements OnInit {
           if (this.oldJRSS != this.testConfigEditForm.value.JRSS) {
             window.alert("You can not edit JRSS.");
           } else {
-            let testConfig = new TestConfig(this.testConfigEditForm.value.JRSS,
-            this.testConfigEditForm.value.noOfQuestions, this.testConfigEditForm.value.testDuration,this.testConfigEditForm.value.passingScore);
-            let id = this.actRoute.snapshot.paramMap.get('id');
-            this.testconfigService.updateTestConfig(id, testConfig)
-                .subscribe(res => {
-                  this.router.navigateByUrl('/', {skipLocationChange: true}).then(() =>
-                  this.router.navigate(['/testconfig-add']));
-                  console.log('Content updated successfully!')
-                }, (error) => {
-                  console.log(error)
-            })
+            if (this.testConfigEditForm.value.passingScore < 50) {
+              window.alert("Please enter passing score above 50");
+            } else {
+              let testConfig = new TestConfig(this.testConfigEditForm.value.JRSS,
+              this.testConfigEditForm.value.noOfQuestions, this.testConfigEditForm.value.testDuration,this.testConfigEditForm.value.passingScore);
+              let id = this.actRoute.snapshot.paramMap.get('id');
+              this.testconfigService.updateTestConfig(id, testConfig)
+                  .subscribe(res => {
+                    this.router.navigateByUrl('/', {skipLocationChange: true}).then(() =>
+                    this.router.navigate(['/testconfig-add']));
+                    console.log('Content updated successfully!')
+                  }, (error) => {
+                    console.log(error)
+              })
+              }
           }
 
         }

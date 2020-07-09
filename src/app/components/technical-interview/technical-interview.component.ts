@@ -3,6 +3,10 @@ import { FormGroup, FormControl, FormArray, FormBuilder,Validators } from '@angu
 import { ActivatedRoute, Router } from '@angular/router';
 import { ApiService } from './../../service/api.service';
 import {TechnicalInterview} from './../../model/technicalinterview';
+import { saveAs } from 'file-saver';
+import {TechnicalInterviewListComponent} from '../technical-interview-list/technical-interview-list.component';
+
+
 @Component({
   selector: 'app-technical-interview',
   templateUrl: './technical-interview.component.html',
@@ -26,12 +30,22 @@ export class TechnicalInterviewComponent implements OnInit {
   userName: String = "";
   accessLevel: String = "";
   stage3_status: String = "";
-  constructor(private fb:FormBuilder, private actRoute: ActivatedRoute, private router: Router,private ngZone: NgZone,
+  quizNumber:any;
+  loginUser:string;
+  resumeName1:string;
+  resumeBlob:Blob;
+  resumeUploaded:boolean;
+
+  constructor(private cv:TechnicalInterviewListComponent,private fb:FormBuilder, private actRoute: ActivatedRoute, private router: Router,private ngZone: NgZone,
     private apiService: ApiService) {
-    this.userName =this.router.getCurrentNavigation().extras.state.username;
-    let id =this.actRoute.snapshot.paramMap.get('id');
+    this.loginUser = this.router.getCurrentNavigation().extras.state.username;
+    this.userName =this.actRoute.snapshot.paramMap.get('id');
+    this.quizNumber =this.router.getCurrentNavigation().extras.state.quizId;
+    /*console.log("loginUser==="+this.loginUser);
+    console.log("userName==="+this.userName);
+    console.log("quizNumber==="+this.quizNumber);*/
     this.accessLevel = this.router.getCurrentNavigation().extras.state.accessLevel;
-    this.readCandidateTechnicalInterviewDetails(id);
+    this.readCandidateTechnicalInterviewDetails(this.userName,this.quizNumber);
     this.techskillForm = this.fb.group({
         finalscore:'',
         finalResult:['',Validators. required],
@@ -48,18 +62,28 @@ export class TechnicalInterviewComponent implements OnInit {
       return this.techskillForm.get("techStream") as FormArray
   }
 
+  skipMethod(){
+    alert('Stage skipped');
+  }
+  
+   //To download candidate's CV if uploaded
+  downloadCandidateResume(id){
+    this.cv.downloadCandidateResume(id) 
+  }
+
   //Read candidate details
-  readCandidateTechnicalInterviewDetails(id) {
-    this.apiService.readTechInterviewDetails(id).subscribe(data => {
-    console.log("readTechInterviewDetails data ="+data);
-    for(var candidate of data){
+  readCandidateTechnicalInterviewDetails(id,quizId) {
+    this.apiService.readTechInterviewDetails(id,quizId).subscribe(data => {
+    console.log("readTechInterviewDetails data ="+JSON.stringify(data));
+    this.candidateInterviewDetails=data;
+    /*for(var candidate of data){
        var userScore:number=candidate.userScore;
 
        if(userScore>=80){
         this.candidateInterviewDetails.push(candidate);
         break;
        }
-     }
+     }*/
     });
   }
 
@@ -90,7 +114,7 @@ export class TechnicalInterviewComponent implements OnInit {
       this.dynamicArray.push(this.newDynamic);
       this.techStream().push(this.createTechStream());
       //console.log("Technical Stream getjrss: "+ JSON.stringify(this.technologyStreamArray));
-      console.log(this.technologyStreamArray.get("key"));
+      //console.log(this.technologyStreamArray.get("key"));
     })
   }
 
@@ -147,7 +171,7 @@ export class TechnicalInterviewComponent implements OnInit {
         scoreCount++;
       }
     }
-    this.averageScore=this.totalScore/scoreCount;
+    this.averageScore=Math.round((this.totalScore/scoreCount) *100 +Number.EPSILON)/100;
     if(isNaN(this.averageScore))
       this.averageScore=0;
       this.dynamicFormControlValidation();
@@ -166,7 +190,7 @@ export class TechnicalInterviewComponent implements OnInit {
   }
 //Cancel
  cancelForm(){
-     this.ngZone.run(() => this.router.navigateByUrl('/technical-interview-list',{state:{username:this.userName}}))
+     this.ngZone.run(() => this.router.navigateByUrl('/technical-interview-list',{state:{username:this.loginUser}}))
  }
 
  isNumber(evt,rowCount) {
@@ -210,31 +234,49 @@ export class TechnicalInterviewComponent implements OnInit {
       let userName=this.candidateInterviewDetails[0].userName;
       let userScore=this.candidateInterviewDetails[0].userScore;
       let quizNumber=this.candidateInterviewDetails[0].quizNumber;
+      let updateId=this.candidateInterviewDetails[0]._id;
       if (this.techskillForm.value.finalResult === 'Recommended' || this.techskillForm.value.finalResult === 'Strongly Recommended') {
           this.stage3_status = 'Completed';
       } else {
           this.stage3_status = 'Not Started';
       }
-      this.apiService.getResultByUser(userName,quizNumber).subscribe(res => {
-          //console.log('get the result data'+res['_id']+"\t"+ res['userName']);
-            let updateResults=new TechnicalInterview(userName,userScore, quizNumber,
-            this.techskillForm.value.techStream,
-            this.averageScore,
-            this.techskillForm.value.finalResult,
-            this.techskillForm.value.feedback,
-            this.userName,
-            this.stage3_status);
 
-			      this.apiService.updateResults(res['_id'],updateResults).subscribe(res => {
-            console.log('Candidate SME Interview Details updated successfully!');
-            alert("SME Interview Details saved successfully.");
-            this.ngZone.run(() => this.router.navigateByUrl('/technical-interview-list',{state:{username:this.userName,accessLevel:this.accessLevel}}))
-            }, (error) => {
-            console.log(error);
-            })
-          }, (error) => {
-          console.log(error);
+          /* this.apiService.getResultByUser(userName,quizNumber).subscribe(res => {
+          console.log('get the result data'+res['_id']+"\t"+ res['userName']+"\t"+updateId);*/
+      let updateResults=new TechnicalInterview(userName,userScore, quizNumber,
+      this.techskillForm.value.techStream,
+      this.averageScore,
+      this.techskillForm.value.finalResult,
+      this.techskillForm.value.feedback,
+      this.loginUser,
+      this.stage3_status);
+
+      this.apiService.updateResults(updateId,updateResults).subscribe(res => {
+      console.log('Candidate SME Interview Details updated successfully!');
+      window.alert("SME Interview Details saved successfully.");
+      this.ngZone.run(() => this.router.navigateByUrl('/technical-interview-list',{state:{username:this.userName,accessLevel:this.accessLevel}}))
+      }, (error) => {
+      console.log(error);
       })
+         /* }, (error) => {
+          console.log(error);
+      })*/
     }
   }
+
+  exceptionalApproval(emailSelected, quizNumber) {
+     if (window.confirm('Are you sure to provide exceptional approval?')) {
+        if (this.techskillForm.value.feedback == "") {
+          alert("Please enter feedback");
+        } else {
+          this.apiService.updateExceptionalApproval(emailSelected,quizNumber,this.techskillForm.value.feedback).subscribe(res => {
+            window.alert('Successfully moved candidate to next stage');
+            this.ngZone.run(() => this.router.navigateByUrl('/technical-interview-list',{state:{username:this.userName,accessLevel:this.accessLevel}}))
+          }, (error) => {
+            console.log(error);
+          })
+        }
+     }
+  }
+
 }

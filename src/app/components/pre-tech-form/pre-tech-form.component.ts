@@ -5,6 +5,7 @@ import { Component, OnInit, NgZone } from '@angular/core';
 import { FormGroup, FormBuilder, Validators } from "@angular/forms";
 import { Location } from '@angular/common';
 import { PreTechQuesAndAns } from './../../model/PreTechQuesAndAns';
+import { Candidate } from './../../model/candidate';
 
 
 @Component({
@@ -24,8 +25,13 @@ export class PreTechFormComponent implements OnInit {
 	stage2_status = "";
 	
 	stage2Completed=false;
-mode= "instructions";
+	mode= "instructions";
 	preTechAssmntQuestions:any = [];
+	resumeBlob:Blob;
+	resumeName1:string;
+	resumeUploaded:boolean;
+	candidateResume:File;
+	candidate:Candidate;
  
   constructor(
     private router: Router,
@@ -46,15 +52,15 @@ this.mode = this.router.getCurrentNavigation().extras.state.mode;
    this.mode="pre-tech"
  }
 logout(){	
-	if(window.confirm("are you sure?\nplease save the data if you haven't by clicking on Cancel")){
+	if(window.confirm("Proceed if you already saved your data!")){
 		this.router.navigate(['/login-component']);
 	}
 
 }
  ngOnInit(): void {
-	console.log('here in pre',this.mode)
 	 this.getPreTechAssessmentQuestions();
-	 
+	 this.downloadCandidateDetails();
+	 	 
 }
 
 //Read the pre technical assessment questions (based on the given JRSS) to be filled by the candidate
@@ -68,7 +74,6 @@ this.preTechService.getStageStatusByUserName(this.userName).subscribe(
 	  if (this.stage2_status == "Completed") {
 			this.stage2Completed =  true	  
 	  }
-	  console.log("******* this.stage2_status ****** ",this.stage2_status);
 	  });
 	  
      // Get jrss
@@ -95,10 +100,93 @@ this.preTechService.getStageStatusByUserName(this.userName).subscribe(
          }, (error) => {
          console.log(error);
          });
-    });
+	});
+} //end of loadQuestion()
+
+downloadCandidateDetails()
+{
+	this.apiService.getCandidateJrss(this.userName).subscribe(data => {
+		//Get resume Data
+		this.resumeName1 = data['resumeName'];
+		let resumeData1 : String = data['resumeData'];
+		console.log("Resume Uploaded name: "+this.resumeName1);
+		var byteString = atob(resumeData1.split(',')[1]);
+		// separate out the mime component
+		var mimeString = resumeData1.split(',')[0].split(':')[1].split(';')[0];
+  
+		// write the bytes of the string to an ArrayBuffer
+		var ab = new ArrayBuffer(byteString.length);
+		var ia = new Uint8Array(ab);
+		for (var i = 0; i < byteString.length; i++) {
+		  ia[i] = byteString.charCodeAt(i);
+		}
+		this.resumeBlob =  new Blob([ab], {type: mimeString});
+		
+		if (this.resumeName1 == "ResumeEmpty.doc")
+		{
+		  this.resumeUploaded=false;
+		}else{
+		  this.resumeUploaded = true;
+		}
+		if (data['employeeType'] == 'Regular' || data['employeeType'] == undefined) {
+			this.candidate = new Candidate(data['employeeName'],data['employeeType'],
+			data['email'], data['band'], data['JRSS'], data['technologyStream'], data[ 'phoneNumber'], data['dateOfJoining'],
+			data['createdBy'], data['createdDate'], data['updatedBy'], data['updatedDate'],
+			data['username'], data['resumeName'], data['resumeData']);
+		  }
+		  if (data['employeeType'] == 'Contractor') {
+			this.candidate = new Candidate(data['employeeName'],data['employeeType'],
+			data['email'], '', data['JRSS'], data['technologyStream'], data[ 'phoneNumber'], data['dateOfJoining'],
+			data['createdBy'], data['createdDate'], data['updatedBy'], data['updatedDate'],
+			data['username'], data['resumeName'], data['resumeData']);
+		  }
+		});
     
- } //end of loadQuestion()
+ } 
+
+  downloadResume()
+  {
+    saveAs(this.resumeBlob,this.resumeName1);
+  }
+
+  addResume(event){
+	this.candidateResume= event.target.files[0]; 
+  }
  
+ uploadResume(){
+	 //Resume upload call
+	 if(this.candidateResume){
+		console.log("Resume is selected");
+		//Set Resume Name
+		this.candidate.resumeName=this.candidateResume.name;
+		console.log("New resume uploaded: "+this.candidate.resumeName);
+		//Set updatedBy and updatedDate
+		this.candidate.updatedBy=this.userName;
+		this.candidate.updatedDate=new Date();
+
+		let reader = new FileReader();
+		reader.readAsDataURL(this.candidateResume);
+		reader.onload = (e) => {    
+		console.log("this.candidate.resumeData inside loop: "+reader.result);
+		//Set Resume Data
+		this.candidate.resumeData=<String>reader.result;
+		//Calling API service to update resume based on username
+		this.apiService.updateCandidateResume(this.userName,this.candidate).subscribe(
+			(res) => {    
+				window.alert("Resume is successfully uploaded");
+				console.log("Candidate Resume updated from Pre_Tech Form");
+				(<HTMLInputElement>document.getElementById('resumeFile')).value = "";
+				this.downloadCandidateDetails();
+			  }
+			);
+		}
+
+	}else{
+		console.log("Resume is not selected");
+		window.alert("Please select a resume.");
+	};
+
+ }
  
  submitPreTechForm( preTechQAndA : PreTechQuesAndAns[]) {
  console.log("******* mode ****** ",this.mode);

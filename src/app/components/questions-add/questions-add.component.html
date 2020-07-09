@@ -1,9 +1,9 @@
-<nav class="navbar navbar-expand-lg navbar-light table-success">
+<nav class="navbar navbar-expand-lg navbar-light table-success" style="background-color:powderblue">
   <div class="collapse navbar-collapse" id="navbarNavDropdown">
     <ul class="navbar-nav">
       <li class="nav-item dropdown">
         <a class="nav-link dropdown-toggle" routerLink="/candidates-list" [state]="{username:this.userName}" routerLinkActive="active" id="navbarDropdownMenuLink" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-          Manage Candidate<span class="sr-only">(current)</span>
+          <b>Manage Candidate</b><span class="sr-only">(current)</span>
         </a>
         <div class="dropdown-menu" aria-labelledby="navbarDropdownMenuLink">
           <a class="dropdown-item" routerLink="/create-candidate" [state]="{username:this.userName}" routerLinkActive="active">Add Candidate</a>
@@ -12,16 +12,17 @@
       </li>
       <li class="nav-item dropdown active">
         <a class="nav-link dropdown-toggle" id="navbarDropdownMenuLink" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-          Manage Questions<span class="sr-only">(current)</span>
+        <b>Manage Questions</b><span class="sr-only">(current)</span>
         </a>
         <div class="dropdown-menu" aria-labelledby="navbarDropdownMenuLink">
-          <a class="dropdown-item" routerLink="/manage-questionbank" routerLinkActive="active">Add question</a>
+          <a class="dropdown-item" routerLink="/manage-questionbank" routerLinkActive="active">Add Question</a>
           <a class="dropdown-item" routerLink="/manage-questionbank-bulk" routerLinkActive="active">Add Bulk Question</a>
+       
         </div>
       </li>
       <li class="nav-item dropdown">
         <a class="nav-link dropdown-toggle" routerLink="/jrss-create" routerLinkActive="active" id="navbarDropdownMenuLink" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-          Manage Metadata
+        <b>Manage Metadata</b>
         </a>
         <div class="dropdown-menu" aria-labelledby="navbarDropdownMenuLink">
           <a class="dropdown-item" routerLink="/jrss-create" routerLinkActive="active">Add JRSS</a>
@@ -30,23 +31,31 @@
         </div>
       </li>
       <li class="nav-item">
-        <a class="nav-link" routerLink="/workflow-config"routerLinkActive="active">Manage Workflow</a>
+        <a class="nav-link" routerLink="/workflow-config"routerLinkActive="active"><b>Manage Workflow</b></a>
       </li>
       <li class="nav-item">
-        <a class="nav-link" routerLink="/view-testresults"routerLinkActive="active">View TestResults</a>
+        <a class="nav-link" routerLink="/view-testresults"routerLinkActive="active"><b>View Test Results</b></a>
       </li>
+	  <li class="nav-item">
+      <a class="nav-link" routerLink="/adminuser-create"routerLinkActive="active"><b>Manage User</b></a>
+      </li>
+    </ul>
+  </div>
+  <div>
+    <ul class="navbar-nav navbar-right">
       <li class="nav-item">
-        <a class="nav-link" routerLink="/login-component" routerLinkActive="active">Logout</a>
+        <a class="nav-link" routerLink="/login-component" routerLinkActive="active"><b>Logout</b></a>
       </li>
     </ul>
   </div>
 </nav>
 <br/>
-<div class="row justify-content-center">
-  <div class="col-md-8 register-employee">
-    <h4 class="my-0 mr-md-auto font-weight-normal">Add Question</h4>
-    <br/>
+<div>
+  <h4 class="my-0 mr-md-auto font-weight-normal">Add Question</h4>
+  <br/>
+</div>
   <!-- form card register -->
+<div class="card">
   <div class="card-body">
     <form [formGroup]="questionForm" (ngSubmit)="onSubmit()" >
     <p style="color:red;">*All fields are mandatory</p>
@@ -147,11 +156,11 @@
     </div>
     </div>
     <div class="form-group">
-    <button class="btn btn-success btn-lg btn-block" type="submit">Add Question</button>
+    <div class="row justify-content-center">
+    <button class="btn btn-success btn-lg" style="background-color:#0043CE;" type="submit">Add Question</button>
+    </div>
     </div>
   </form>
-
-  </div>
 </div><!-- form card register -->
 </div>
 

@@ -1,8 +1,9 @@
-import { Router } from '@angular/router';
+import { ActivatedRoute, Router } from '@angular/router';
 import { ApiService } from './../../service/api.service';
 import { Component, OnInit, NgZone } from '@angular/core';
 import { FormGroup, FormBuilder, Validators } from "@angular/forms";
 import { browserRefresh } from '../../app.component';
+import { appConfig } from './../../model/appConfig';
 
 @Component({
   selector: 'app-jrss-create',
@@ -12,29 +13,34 @@ import { browserRefresh } from '../../app.component';
 export class JrssCreateComponent implements OnInit {
   error = '';
   public duplicateJrss : boolean;
+  public nullJrss : boolean;
   public browserRefresh: boolean;
   submitted = false;
   jrssForm: FormGroup;
   Jrss:any = [];
   userName: String = "admin";
+  config: any;
 
   constructor(
       public fb: FormBuilder,
       private router: Router,
+      private actRoute: ActivatedRoute,
       private ngZone: NgZone,
       private apiService: ApiService
     ) {
+      this.config = {
+                currentPage: appConfig.currentPage,
+                itemsPerPage: appConfig.itemsPerPage,
+                totalItems: appConfig.totalItems
+      };
+      actRoute.queryParams.subscribe(
+            params => this.config.currentPage= params['page']?params['page']:1 );
       this.readJrss();
       this.mainForm();
     }
 
   ngOnInit() { 
-    this.browserRefresh = browserRefresh;
-      if (this.browserRefresh) {
-          if (window.confirm('Your account will be deactivated. You need to contact administrator to login again. Are you sure?')) {
-             this.router.navigate(['/login-component']);
-          }
-      }
+    this.browserRefresh = browserRefresh;      
    }
 
   getJrss(id) {
@@ -61,6 +67,10 @@ export class JrssCreateComponent implements OnInit {
     get myForm(){
       return this.jrssForm.controls;
     }
+
+    pageChange(newPage: number) {
+          this.router.navigate(['/jrss-create'], { queryParams: { page: newPage } });
+    }
     
   removeJrss(jrss, index) {
     if(window.confirm('Are you sure?')) {
@@ -71,21 +81,44 @@ export class JrssCreateComponent implements OnInit {
     }
   }
 
+  // checkDuplicateJrss(){
+  //   for (var jrss of this.Jrss){
+  //     if(jrss.jrss.toLowerCase().trim() == this.jrssForm.value.jrss.toLowerCase().trim()
+  //         || this.jrssForm.value.jrss.toLowerCase().trim() === 'null'
+  //         || this.jrssForm.value.jrss.trim().length == 0
+  //         || this.jrssForm.value.jrss == ""){
+  //       this.duplicateJrss = true;
+  //     }
+  //   }
+  // }
+
+  // Check duplicate stream in techStream
   checkDuplicateJrss(){
     for (var jrss of this.Jrss){
-      if(jrss.jrss.toLowerCase() == this.jrssForm.value.jrss.toLowerCase()){
+      if(jrss.jrss.toLowerCase().trim() == this.jrssForm.value.jrss.toLowerCase().trim()
+        || jrss.jrss.toLowerCase().replace(/\s/g, "").replaceAll("-", "").trim() == this.jrssForm.value.jrss.toLowerCase().replace(/\s/g, "").replaceAll("-", "").trim()
+        || jrss.jrss.toLowerCase().replace(/\s/g, "").trim() == this.jrssForm.value.jrss.toLowerCase().replace(/\s/g, "").trim()      
+      ) {
         this.duplicateJrss = true;
+      } else if (this.jrssForm.value.jrss.toLowerCase().trim() === 'null'
+            || this.jrssForm.value.jrss.trim().length == 0) {
+        this.nullJrss = true;
       }
     }
   }	
+
     onSubmit() {
         this.submitted = true;
         this.duplicateJrss = false;
+        this.nullJrss = false;
         this.checkDuplicateJrss();
+        
         if (!this.jrssForm.valid) {
           return false;
+        } else if (this.nullJrss){
+          this.error = 'Invalid entries found - Null/Space not allowed!';
         } else if(this.duplicateJrss){
-          this.error = 'This entry is already existing';
+          this.error = 'Invalid entries found - Job Role already exist!';
         } else{
           this.apiService.createJrss(this.jrssForm.value).subscribe(
             (res) => {

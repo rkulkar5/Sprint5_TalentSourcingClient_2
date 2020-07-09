@@ -1,12 +1,16 @@
 import { Router } from '@angular/router';
 import { ApiService } from './../../service/api.service';
 import { Candidate } from './../../model/candidate';
+import { CandidateContractor } from './../../model/candidateContractor';
 import { UserDetails } from './../../model/userDetails';
 import { Component, OnInit, NgZone } from '@angular/core';
 import { FormGroup, FormBuilder, Validators } from "@angular/forms";
 import { appConfig } from './../../model/appConfig';
 import { browserRefresh } from '../../app.component';
 import * as CryptoJS from 'crypto-js';
+import { UserResultWorkFlow } from './../../model/userResultWorkFlow';
+import { ResultPageService } from './../../components/result-page/result-page.service';
+
 
 @Component({
   selector: 'app-candidate-create',
@@ -19,6 +23,7 @@ export class CandidateCreateComponent implements OnInit {
   submitted = false;
   candidateForm: FormGroup;
   JRSS:any = []
+  JRSSFull:any = [];
   Band:any = [];
   quizNumber: number;
   userName: String = "admin";
@@ -26,12 +31,24 @@ export class CandidateCreateComponent implements OnInit {
   currDate: Date ;
   technologyStream:any= [];
   skillArray:any= [];  
+  resume: File;
+  resumeText: any;
+  EmployeeType:any = ['Regular','Contractor'];
+  displayContractorUIFields: Boolean = false;
+  displayRegularUIFields: Boolean = true;
+  passingScore;
+  stage1;
+  stage2;
+  stage3;
+  stage4;
+  stage5;
 
   constructor(
     public fb: FormBuilder,
     private router: Router,
     private ngZone: NgZone,
-    private apiService: ApiService
+    private apiService: ApiService,
+    private resultPageService: ResultPageService
   ) {
     this.browserRefresh = browserRefresh;
     if (!this.browserRefresh) {
@@ -46,46 +63,55 @@ export class CandidateCreateComponent implements OnInit {
 
   ngOnInit() {
     this.browserRefresh = browserRefresh;
-    if (this.browserRefresh) {
-        if (window.confirm('Your account will be deactivated. You need to contact administrator to login again. Are you sure?')) {
-           this.router.navigate(['/login-component']);
-        }
-    }
   }
 
   mainForm() {
     this.candidateForm = this.fb.group({
       employeeName: ['', [Validators.required]],
+      employeeType: ['', [Validators.required]],
       email: ['', [Validators.required, Validators.pattern('[A-z0-9._%+-]+@[A-z0-9.-]+\.[A-z]{2,3}$')]],
-      band: ['', [Validators.required]],
+      band: [''],
       JRSS: ['', [Validators.required]],
       technologyStream:['', [Validators.required]],
       phoneNumber: ['', [Validators.required, Validators.pattern('^[0-9]+$')]],
-      dateOfJoining: ['', Validators. required]
+      dateOfJoining: ['', Validators.required],
+      candidateResume: ['']
     })
   }
  // Get all Jrss
- readJrss(){
-  console.log("In readJRSS"); 
+ readJrss(){  
   this.apiService.getJRSS().subscribe((data) => {
-  this.JRSS = data;
-  console.log("data is "+this.JRSS); 
+  this.JRSSFull = data;
+  for(var i=0; i<this.JRSSFull.length; i++)
+  {
+    let workFlowPrsent = ((this.JRSSFull[i]['stage1_OnlineTechAssessment']==undefined) ||
+    ((this.JRSSFull[i]['stage1_OnlineTechAssessment']==false) &&
+    (this.JRSSFull[i]['stage2_PreTechAssessment']==false) &&
+    (this.JRSSFull[i]['stage3_TechAssessment']==false) &&
+    (this.JRSSFull[i]['stage4_ManagementInterview']==false) &&
+    (this.JRSSFull[i]['stage5_ProjectAllocation']==false)))
+    if (!workFlowPrsent){
+      this.JRSS.push(this.JRSSFull[i]);
+    }
+  }
   })
 }
   // Choose designation with select dropdown
   updateJrssProfile(e){
     this.candidateForm.get('JRSS').setValue(e, {
       onlySelf: true
-    })
+    })      
     // Get technologyStream from JRSS
-    for (var jrss of this.JRSS){          
+    for (var jrss of this.JRSS){      
       if(jrss.jrss == e){   
-        this.technologyStream = [];
+        this.technologyStream = [];   
         for (var skill of jrss.technologyStream){          
           this.technologyStream.push(skill);          
-        } 
+        
       }
+    }
     }    
+    
   } 
 
   // Choose band with select dropdown
@@ -94,6 +120,21 @@ export class CandidateCreateComponent implements OnInit {
       onlySelf: true
       })
     }
+
+  // Choose employee type with select dropdown
+  updateEmployeeTypeProfile(e){
+    this.candidateForm.get('employeeType').setValue(e, {
+    onlySelf: true
+    })
+
+    if (this.candidateForm.value.employeeType == 'Contractor') {
+        this.displayContractorUIFields = true;
+        this.displayRegularUIFields = false;
+    } else {
+       this.displayContractorUIFields = false;
+       this.displayRegularUIFields = true;
+    }
+  }
 
     // Get all Bands
     readBand(){
@@ -118,7 +159,10 @@ export class CandidateCreateComponent implements OnInit {
       return true;
     }
   }
-
+  addResume(event)     
+  {
+  this.resume= event.target.files[0]; 
+  }
   onSubmit() {
     this.submitted = true; 
     // Encrypt the password
@@ -134,21 +178,60 @@ export class CandidateCreateComponent implements OnInit {
           this.skillArray.push(stream.value);  
       }     
     }
-    this.candidateForm.value.technologyStream = this.skillArray.join(',');     
+    this.candidateForm.value.technologyStream = this.skillArray.join(',');    
+    
+    //Check if resume is not selected
+    if(!this.resume){
+      let bufferLength = 10;
+      let ab = new ArrayBuffer(bufferLength);
+      let resumeBlob : any;
+      resumeBlob =  new Blob([ab], {type: "application/octet-stream"});
+      resumeBlob.name =  "ResumeEmpty.doc";
+      this.resume = resumeBlob;
+      console.log("Resume not selected");
+    }
+    let reader = new FileReader();
+    reader.readAsDataURL(this.resume);
+    reader.onload = (e) => {    
+    this.resumeText = reader.result;
 
-    let candidate = new Candidate(this.candidateForm.value.employeeName,
-    this.candidateForm.value.email,
-    this.candidateForm.value.band,
-    this.candidateForm.value.JRSS,
-    this.candidateForm.value.technologyStream,
-    this.candidateForm.value.phoneNumber,
-    this.candidateForm.value.dateOfJoining,
-    this.userName,
-    new Date(),
-    this.userName,
-    new Date(),
-    this.candidateForm.value.email
-    );
+    let candidate;
+    if (this.candidateForm.value.employeeType == 'Regular' ) {
+      candidate = new Candidate(this.candidateForm.value.employeeName,this.candidateForm.value.employeeType,
+      this.candidateForm.value.email,
+      this.candidateForm.value.band,
+      this.candidateForm.value.JRSS,
+      this.candidateForm.value.technologyStream,
+      this.candidateForm.value.phoneNumber,
+      this.candidateForm.value.dateOfJoining,
+      this.userName,
+      new Date(),
+      this.userName,
+      new Date(),
+      this.candidateForm.value.email,
+      this.resume.name,
+      this.resumeText
+      );
+    }
+    console.log("this.candidateForm.value.employeeType",this.candidateForm.value.employeeType);
+
+    if (this.candidateForm.value.employeeType == 'Contractor' ) {
+      candidate = new CandidateContractor(this.candidateForm.value.employeeName,this.candidateForm.value.employeeType,
+      this.candidateForm.value.email,
+      this.candidateForm.value.JRSS,
+      this.candidateForm.value.technologyStream,
+      this.candidateForm.value.phoneNumber,
+      this.candidateForm.value.dateOfJoining,
+      this.userName,
+      new Date(),
+      this.userName,
+      new Date(),
+      this.candidateForm.value.email,
+      this.resume.name,
+      this.resumeText
+      );
+    } 
+ 
     let user = new UserDetails(this.candidateForm.value.email,
      this.password,
      this.quizNumber,
@@ -162,12 +245,13 @@ export class CandidateCreateComponent implements OnInit {
      "false"
      );
 
-     let formDate = new Date(this.candidateForm.value.dateOfJoining)
+     let formDate = new Date(this.candidateForm.value.dateOfJoining);
      this.currDate = new Date();
-     
+      console.log("this.candidateForm.valid", this.candidateForm.valid);
     if (!this.candidateForm.valid) {
       return false;
     } else {
+    console.log("in candidate-create.ts");
       if ( formDate > this.currDate) {
         window.confirm("Date Of Joining is a future date. Please verify.")
        } else {
@@ -196,11 +280,55 @@ export class CandidateCreateComponent implements OnInit {
                         }, (error) => {
                           console.log(error);
                         })
-            }}        
+              //Create Candidate details in Results collection, in case the Stage1 and Stage2 are skipped.
+              this.apiService.getJrss(this.candidateForm.value.JRSS).subscribe((res) => {
+                  if (res['stage1_OnlineTechAssessment']) {
+                    this.stage1 = "Not Started";
+                  } else {
+                    this.stage1 = "Skipped";
+                  }
+                  if (res['stage2_PreTechAssessment']) {
+                    this.stage2 = "Not Started";
+                  } else {
+                    this.stage2 = "Skipped";
+                  }
+                  if (res['stage3_TechAssessment']) {
+                    this.stage3 = "Not Started";
+                  } else {
+                    this.stage3 = "Skipped";
+                  }
+                  if (res['stage4_ManagementInterview']) {
+                    this.stage4 = "Not Started";
+                  } else {
+                    this.stage4 = "Skipped";
+                  }
+                  if (res['stage5_ProjectAllocation']) {
+                    this.stage5 = "Not Started";
+                  } else {
+                    this.stage5 = "Skipped";
+                  }
+                  if (this.stage1 == 'Skipped') {
+                  console.log("Stage 1 is skipped for this JRSS");
+                  //Initialzing the user Result workflow collection
+                  let userResultWokFlow = new UserResultWorkFlow(this.candidateForm.value.email, '',
+                  this.quizNumber, this.stage1, this.stage2, this.stage3, this.stage4, this.stage5);
+                  //Create Collecetion in User table.
+                  this.resultPageService.saveResult(userResultWokFlow).subscribe(
+                    (res) => {
+                      console.log('Results for the user have been successfully created if Stage 1 is skipped');
+                    }, (error) => {
+                      console.log(error);
+                    });
+                  } else{
+                    console.log("Stage 1 is not skipped for this JRSS");
+                  }
+                
+                });
+            }}       
           }, (error) => {
       console.log(error);
-    }
-  )
+    })
+  }
   }
   }
 }

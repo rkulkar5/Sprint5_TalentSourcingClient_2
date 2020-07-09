@@ -3,6 +3,7 @@ import { ApiService } from './../../service/api.service';
 import { FormGroup, FormBuilder, Validators } from "@angular/forms";
 import { ActivatedRoute, Router } from '@angular/router';
 import { browserRefresh } from '../../app.component';
+import { appConfig } from './../../model/appConfig';
 
 @Component({
   selector: 'app-candidate-list',
@@ -19,12 +20,17 @@ export class CandidateListComponent implements OnInit {
   quizNumber = 1;
   status = "";
   userName = "";
+  candidateId;
+  candidateUsersId;
+  candidateUserName;
+  index;
+  isRowSelected = false;
 
   constructor(private route: ActivatedRoute, private router: Router, private apiService: ApiService) {
     this.config = {
-      currentPage: 1,
-      itemsPerPage: 5,
-      totalItems:0
+      currentPage: appConfig.currentPage,
+      itemsPerPage: appConfig.itemsPerPage,
+      totalItems:appConfig.totalItems
     };
     this.browserRefresh = browserRefresh;
     if (!this.browserRefresh) {
@@ -37,11 +43,11 @@ export class CandidateListComponent implements OnInit {
 
   ngOnInit() {
     this.browserRefresh = browserRefresh;
-    if (this.browserRefresh) {
-        if (window.confirm('Your account will be deactivated. You need to contact administrator to login again. Are you sure?')) {
-          this.router.navigate(['/login-component']);
-        }
-    }
+    // if (this.browserRefresh) {
+    //     if (window.confirm('Your account will be deactivated. You need to contact administrator to login again. Are you sure?')) {
+    //       this.router.navigate(['/login-component']);
+    //     }
+    // }
   }
 
   pageChange(newPage: number) {
@@ -55,7 +61,7 @@ export class CandidateListComponent implements OnInit {
       
       this.Candidate.forEach(candidate => {
         candidate.candidate_users.forEach(user => {
-          if (user.status == 'Active' && user.userLoggedin === 'true' ){ candidate.state='Log Out'; } 
+          if (user.status == 'Active' && user.userLoggedin === 'true' ){ candidate.state='Clear\xa0Session'; } 
 		      else if (user.status == 'Active' )  { candidate.state='Disable'; } 
           else {candidate.state='Enable'; }
 	       });
@@ -66,22 +72,42 @@ export class CandidateListComponent implements OnInit {
   }
 
   //To remove candidate
-  removeCandidate(candidate, index) {
+  removeCandidate(candidateUsername,candidateId, index) {
+    if(this.isRowSelected == false){
+      alert("Please select the candidate");
+    }else{
     if(window.confirm('Are you sure?')) {
-        this.apiService.deleteCandidate(candidate._id,candidate.username).subscribe((data) => {
+        this.apiService.deleteCandidate(candidateId,candidateUsername).subscribe((data) => {
           this.Candidate.splice(index, 1);
         }
       )
       this.readCandidate();
+      this.isRowSelected = false;
     }
   }
+  }
 
+	invokeEdit(){
+    if (this.isRowSelected == false){
+      alert("Please select the user");
+      }else{
+      this.router.navigate(['/edit-candidate/', this.candidateId, this.candidateUsersId], {state: {username:this.userName}});
+      }
+    } 
+	
+
+  onSelectionChange(candidateId,candidateUsersId,candidateUserName,i){
+    this.candidateId=candidateId;
+    this.candidateUsersId=candidateUsersId;
+    this.candidateUserName=candidateUserName;
+    this.index=i;
+    this.isRowSelected = true;
+  }
    //Story#27 - Activate & Inactivate candidate's status for Assessment
    updateCandidateStatus(candidate, index) {     
     //Get quizNumber and status coulmns value from Users table
     this.apiService.getUserByUserName(candidate.username).subscribe(
       (res) => {
-      console.log('Users records fetched successfully - ' + res)      
       //If Status is Inactive and quizNumber < 3, increase quizNumber by 1 
       //and update the status and quizNumber columns of Users table 
       if (res.status === 'Inactive' && res.quizNumber < 3) {                          

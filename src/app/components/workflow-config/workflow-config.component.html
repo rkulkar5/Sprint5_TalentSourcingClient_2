@@ -1,9 +1,9 @@
-<nav class="navbar navbar-expand-lg navbar-light table-success">
+<nav class="navbar navbar-expand-lg navbar-light table-success" style="background-color:powderblue">
     <div class="collapse navbar-collapse" id="navbarNavDropdown">
       <ul class="navbar-nav">
         <li class="nav-item">
           <a class="nav-link dropdown-toggle" routerLink="/candidates-list" [state]="{username:this.userName}" routerLinkActive="active" id="navbarDropdownMenuLink" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-            Manage Candidate<span class="sr-only">(current)</span>
+            <b>Manage Candidate</b><span class="sr-only">(current)</span>
           </a>
           <div class="dropdown-menu" aria-labelledby="navbarDropdownMenuLink">
             <a class="dropdown-item" routerLink="/create-candidate" [state]="{username:this.userName}" routerLinkActive="active">Add Candidate</a>
@@ -12,16 +12,16 @@
         </li>
         <li class="nav-item dropdown">
           <a class="nav-link dropdown-toggle" routerLink="/manage-questionbank" routerLinkActive="active" id="navbarDropdownMenuLink" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-            Manage Questions
+          <b> Manage Questions</b>
           </a>
           <div class="dropdown-menu" aria-labelledby="navbarDropdownMenuLink">
-            <a class="dropdown-item" routerLink="/manage-questionbank" routerLinkActive="active">Add question</a>
+            <a class="dropdown-item" routerLink="/manage-questionbank" routerLinkActive="active">Add Question</a>
             <a class="dropdown-item" routerLink="/manage-questionbank-bulk" routerLinkActive="active">Add Bulk Question</a>
           </div>
         </li>
         <li class="nav-item dropdown">
           <a class="nav-link dropdown-toggle" routerLink="/jrss-create" routerLinkActive="active" id="navbarDropdownMenuLink" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-            Manage Metadata
+          <b>Manage Metadata</b>
           </a>
           <div class="dropdown-menu" aria-labelledby="navbarDropdownMenuLink">
             <a class="dropdown-item" routerLink="/jrss-create" routerLinkActive="active">Add Job Role</a>
@@ -30,31 +30,38 @@
           </div>
         </li>
         <li class="nav-item active">
-          <a class="nav-link" routerLink="/workflow-config"routerLinkActive="active">Manage Workflow</a>
+          <a class="nav-link" routerLink="/workflow-config"routerLinkActive="active"><b>Manage Workflow</b></a>
         </li>
         <li class="nav-item">
-          <a class="nav-link" routerLink="/view-testresults"routerLinkActive="active">View TestResults</a>
+          <a class="nav-link" routerLink="/view-testresults"routerLinkActive="active"><b>View Test Results</b></a>
         </li>
+		<li class="nav-item">
+      <a class="nav-link" routerLink="/adminuser-create"routerLinkActive="active"><b>Manage User</b></a>
+        </li>
+      </ul>
+    </div>
+    <div>
+      <ul class="navbar-nav navbar-right">
         <li class="nav-item">
-          <a class="nav-link" routerLink="/login-component" routerLinkActive="active">Logout</a>
+          <a class="nav-link" routerLink="/login-component" routerLinkActive="active"><b>Logout</b></a>
         </li>
       </ul>
     </div>
   </nav>
   <br/>
-<div class="row justify-content-center">
-  <div class="col-md-8 register-employee">
+  <div>
     <h4 class="my-0 mr-md-auto font-weight-normal">Workflow Configuration</h4>
     <br/>
-    <!-- form Test Config -->
     <h6 class="my-0 mr-md-auto font-weight-normal">Please check the required recruitment process stages for the selected Job Role</h6>
     <br/>
+  </div>
     <!-- form Test Config -->
-      <div class="card-body">
+    <div class="card w-85">
+       <div class="card-body">
         <form [formGroup]="workFlowForm" (ngSubmit)="onSubmit()">
           <div class="form-group row">
             <label for="inputJRSS3" class="col-sm-4 col-form-label">Job Role</label>
-            <div class="col-sm-8">
+            <div class="col-sm-6">
               <select class="custom-select form-control" (change)="updateJrssProfile($event.target.value)"
                       formControlName="JRSS" id="inputJRSS3" [ngClass]="{ 'is-invalid': submitted && myForm.JRSS.errors }">
                 <option value="">Choose...</option>
@@ -68,33 +75,57 @@
           </div>
         
       <br/>
-      <div>
+    <div class="form-group row">
+      <label for="inputJRSS3" class="col-sm-4 col-form-label"></label>
+      <div class="col-sm-6">
+       &nbsp;&nbsp;&nbsp;&nbsp;
        <input type="checkbox" class="form-check-input"  formControlName="stage1OnlineTechAssessment" id="stage1OnlineTechAssessmentCheck1">
        <label class="form-check-label" for="stage1OnlineTechAssessmentCheck1">Online Technical Assessment</label>
       </div>
-      <div>
-      <input type="checkbox" class="form-check-input" formControlName="stage2PreTechAssessment" id="stage2PreTechAssessmentCheck2">
+    </div>
+    <div class="form-group row">
+      <label for="inputJRSS3" class="col-sm-4 col-form-label"></label>
+      <div class="col-sm-6">
+        &nbsp;&nbsp;&nbsp;&nbsp;
+        
+      <input type="checkbox" class="form-check-input" (change)="preTechQuestionCheck($event)" formControlName="stage2PreTechAssessment" id="stage2PreTechAssessmentCheck2">
+    
       <label class="form-check-label" for="stage2PreTechAssessmentCheck2">Pre-technical Interview Assessment Form</label>
-        </div>
-        <div>
+      </div>
+    </div>
+    <div class="form-group row">
+      <label for="inputJRSS3" class="col-sm-4 col-form-label"></label>
+      <div class="col-sm-6">
+        &nbsp;&nbsp;&nbsp;&nbsp;
       <input type="checkbox" class="form-check-input" formControlName="stage3TechAssessment" id="stage3TechAssessmentCheck3">
       <label class="form-check-label" for="stage3TechAssessmentCheck3">Technical Interview</label>
-        </div>
-        <div class>
+      </div>
+    </div>
+    <div class="form-group row">
+      <label for="inputJRSS3" class="col-sm-4 col-form-label"></label>
+      <div class="col-sm-6">
+        &nbsp;&nbsp;&nbsp;&nbsp;
       <input type="checkbox" class="form-check-input" formControlName="stage4ManagementInterview" id="stage4ManagementInterviewCheck4">
       <label class="form-check-label" for="stage4ManagementInterviewCheck4">Partner Interview</label>
-        </div>
-        <div>
+      </div>
+    </div>
+    <div class="form-group row">
+      <label for="inputJRSS3" class="col-sm-4 col-form-label"></label>
+      <div class="col-sm-6">
+        &nbsp;&nbsp;&nbsp;&nbsp;
       <input type="checkbox" class="form-check-input" formControlName="stage5ProjectAllocation" id="stage5ProjectAllocationCheck5">
       <label class="form-check-label" for="stage5ProjectAllocationCheck5">Project Assignment</label>
-        </div>
-  <br/>
-  <div class="text-center">
-    <button class="btn btn-success btn-lg" type="submit">Save</button>
-  </div>
+      </div>
+    </div>
+    <br/>
+    <div class="form-group row">
+      <label for="inputJRSS3" class="col-sm-4 col-form-label"></label>
+      <div class="col-sm-6">
+      <button class="btn btn-success btn-lg" style="background-color:#0043CE;" type="submit">Save</button>
+      </div>
+    </div>
 
   </form>
-</div>
 </div>
 </div>
 

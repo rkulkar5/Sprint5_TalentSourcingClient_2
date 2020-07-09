@@ -17,16 +17,33 @@ export class ApiService {
   baseloginUri:string = appConfig.baseUri + '/api/login';
   baseBandUri:string = appConfig.baseUri + '/api/band';
   baseJrssUri:string = appConfig.baseUri + '/api/jrss';
+  basePreTechQuestionnaireUri:string = appConfig.baseUri + '/api/preTechForm/getPreTechQuestionanire';
   baseQuestionUri:string = appConfig.baseUri +'/api/quiz';
   projectAllocUri:string = appConfig.baseUri + '/projectAlloc';
   headers = new HttpHeaders().set('Content-Type', 'application/json');
+  baseUserroleUri:string = appConfig.baseUri + '/api/userrole';
+  techStreamUri:string = appConfig.baseUri + '/techStream';
 
   constructor(private http: HttpClient) { }
 // Get all JRSS
 getJRSS() {
   return this.http.get(`${this.baseJrssUri}`);
+  }
+
+// http://localhost:4000/api/preTechForm/getPreTechQuestionanire/Java%20Technical%20Assessment/candidate12@ibm.com
+getpreTechQuestions(jrss) {
+  let url = `${this.basePreTechQuestionnaireUri}/${jrss}/admin`;
+  console.log("the url is "+ url);
+  return this.http.get(`${this.basePreTechQuestionnaireUri}/${jrss}/admin`);
 }
-  // Create Candidate
+ 
+// Get all JRSS
+getJRSSPreTech(jrssName) {
+  let url = `${this.baseJrssUri}/getJrssPreTech/${jrssName}`;
+  console.log("the url 2 is "+ url);
+  return this.http.get(`${this.baseJrssUri}/getJrssPreTech/${jrssName}`);
+}
+// Create Candidate
   createCandidate(data): Observable<any> {
     let url = `${this.baseUri}/create`;
     return this.http.post(url, data)
@@ -102,8 +119,6 @@ getPreTechniaclQuestions(jrss,userName): Observable<any> {
   createUser(data): Observable<any> {
 
     let url = `${this.baseloginUri}/login`;
-    console.log('API SERVICE')
-    console.log('---get--'+ this.http.get(`${this.baseloginUri}`));
     return this.http.post(url, data)
       .pipe(
         catchError(this.errorMgmt)
@@ -214,6 +229,14 @@ getUserByUserName(id): Observable<any> {
     )
   }
 
+  //Update Candidate Resume from Pre-Tech Form.
+  updateCandidateResume(username, data): Observable<any> {
+    let url = `${this.baseUri}/updateCandidateResume/${username}`;
+    return this.http.put(url, data, { headers: this.headers }).pipe(
+      catchError(this.errorMgmt)
+    )
+  }
+
    // Update User by ID
    updateUserDetails(id, data): Observable<any> {
     let url = `${this.baseUri}/updateUser/${id}`;
@@ -311,6 +334,17 @@ getJrsss() {
   return this.http.get(`${this.baseJrssUri}`);
 }
 
+// Get jrss by id
+getJrssById(id): Observable<any> {
+  let url = `${this.baseJrssUri}/readJrssById/${id}`;
+  return this.http.get(url, {headers: this.headers}).pipe(
+    map((res: Response) => {
+      return res || {}
+    }),
+    catchError(this.errorMgmt)
+  )
+}
+
 // Get jrss
 getJrss(id): Observable<any> {
   let url = `${this.baseJrssUri}/readJrss/${id}`;
@@ -357,6 +391,28 @@ deleteJrss(id): Observable<any> {
  */
 getCandidateAssessmentDetails(username,quizNumber): Observable<any> {
   let url = `${this.userResultUri}/quizDetailsByUser/${username}/${quizNumber}`;
+  return this.http.get(url, {headers: this.headers}).pipe(
+        map((res: Response) => {
+          return res || {}
+        }),
+        catchError(this.errorMgmt)
+  )
+}
+
+//getDashboardList
+getDashboardList(): Observable<any> {
+  let url = `${this.userResultUri}/getDashboardList`;
+  return this.http.get(url, {headers: this.headers}).pipe(
+        map((res: Response) => {
+          return res || {}
+        }),
+        catchError(this.errorMgmt)
+  )
+}
+
+//viewDashboardDetails
+viewDashboardDetails(id): Observable<any> {
+  let url = `${this.userResultUri}/viewDashboardDetails/${id}`;
   return this.http.get(url, {headers: this.headers}).pipe(
         map((res: Response) => {
           return res || {}
@@ -463,14 +519,85 @@ updateResults(id: string,data: UserResult): Observable<any> {
   )
 }
 
-readTechInterviewDetails(userName): Observable<any> {
-  let url = `${this.userResultUri}/readCandidateTechSMEReviewDetails/${userName}`;
+
+// Update candidate
+updateExceptionalApproval(id: string,quizNumber,smeFeedback): Observable<any> {
+  let url = `${this.userResultUri}/updateExceptionalApproval/${id}/${quizNumber}/${smeFeedback}`;
+  return this.http.put(url, { headers: this.headers }).pipe(
+    catchError(this.errorMgmt)
+  )
+}
+
+// Update candidate
+updateExceptionalApprovalForStage4(data,id,quizNumber): Observable<any> {
+  let url = `${this.userResultUri}/updateExceptionalApprovalStage4/${id}/${quizNumber}`;
+  return this.http.put(url, data, { headers: this.headers }).pipe(
+    catchError(this.errorMgmt)
+  )
+}
+
+readTechInterviewDetails(userName,quizId): Observable<any> {
+  let url = `${this.userResultUri}/readCandidateTechSMEReviewDetails/${userName}/${quizId}`;
   return this.http.get(url, {headers: this.headers}).pipe(
         map((res: Response) => {
           return res || {}
         }),
         catchError(this.errorMgmt)
   )
+}
+
+// Get all userroles
+getUserroles() {
+  return this.http.get(`${this.baseUserroleUri}`);
+}
+
+
+//Check if any user already present with the same email id in Users table
+findUniqueUserEmail(email): Observable<any> {
+  let url = `${this.baseUserroleUri}/findUser/${email}`;
+  return this.http.get(url, {headers: this.headers}).pipe(
+    map((res: Response) => {
+      return res || {}
+    }),
+    catchError(this.errorMgmt)
+    )
+}
+
+
+//getAllSpecialUsers
+
+//Check if any user already present with the same email id in Users table
+findAllUser(): Observable<any> {
+  let url = `${this.baseUserroleUri}/findAllUser`;
+  return this.http.get(url, {headers: this.headers}).pipe(
+    map((res: Response) => {
+      return res || {}
+    }),
+    catchError(this.errorMgmt)
+    )
+}
+
+
+// Delete a user
+deleteUser(username): Observable<any> {
+  let url = `${this.baseUserroleUri}/deleteUser/${username}`;
+  return this.http.delete(url, { headers: this.headers }).pipe(
+    catchError(this.errorMgmt)
+  )
+}
+
+// Get all techStream
+getTechStream() {
+  return this.http.get(`${this.techStreamUri}`);
+}
+
+// Create techStream
+createTechStream(data): Observable<any> {
+  let url = `${this.techStreamUri}/createTechStream`;
+  return this.http.post(url, data)
+    .pipe(
+      catchError(this.errorMgmt)
+    )
 }
 
 

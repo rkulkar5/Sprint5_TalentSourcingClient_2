@@ -1,5 +1,7 @@
+
 export class Candidate {
    employeeName: string;
+   employeeType: string;
    email: string;
    band: string;
    JRSS: string;
@@ -11,10 +13,13 @@ export class Candidate {
    updatedBy: string;
    updatedDate: Date;
    username: String;
+   resumeName: String;
+   resumeData: String; 
 
-   constructor(employeeName,email,band,JRSS,technologyStream,phoneNumber
-   ,dateOfJoining,createdBy,createdDate,updatedBy,updatedDate,username) {
+   constructor(employeeName,employeeType, email,band,JRSS,technologyStream,phoneNumber
+   ,dateOfJoining,createdBy,createdDate,updatedBy,updatedDate,username,resumeName,resumeData) {
     this.employeeName = employeeName;
+    this.employeeType = employeeType;
     this.email = email;
     this.band = band;
     this.JRSS = JRSS;
@@ -26,5 +31,7 @@ export class Candidate {
     this.updatedBy = updatedBy;
     this.updatedDate = updatedDate;
     this.username = username;
+    this.resumeName = resumeName;
+    this.resumeData = resumeData;
    }
 }

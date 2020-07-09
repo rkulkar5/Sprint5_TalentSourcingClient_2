@@ -28,10 +28,21 @@ import { TechnicalInterviewListComponent } from './components/technical-intervie
 import { PreTechFormComponent } from './components/pre-tech-form/pre-tech-form.component';
 import { TechnicalInterviewComponent } from './components/technical-interview/technical-interview.component';
 import { WorkflowConfigComponent } from './components/workflow-config/workflow-config.component';
+import { DashboardComponent } from './components/dashboard/dashboard.component';
+import { PreTechnicalInterviewFormComponent } from './components/pre-technical-interview-form/pre-technical-interview-form.component';
+import { AdminuserCreateComponent } from './components/adminuser-create/adminuser-create.component';
+import { ConfigPretechassessmentFormComponent } from './components/config-pretechassessment-form/config-pretechassessment-form.component'
+import { StreamDeleteComponent } from './components/stream-delete/stream-delete.component';
+import { ReportComponent } from './components/report/report.component';
+import { UserEditComponent } from './components/user-edit/user-edit.component';
+import { StreamAddComponent } from './components/stream-add/stream-add.component';
 
 const routes: Routes = [
   { path: '', pathMatch: 'full', redirectTo: 'login-component' },
   { path: '', loadChildren: './components/view-testresults/user.module#UserModule'},
+  { path: '', loadChildren: './components/dashboard/dashboard-user.module#DashboardUserModule'},
+  { path: '', loadChildren: './components/operations-candidate-list/operations-user.module#OperationsUserModule'},
+  { path: '', loadChildren: './components/partner-interview/partner-user.module#PartnerUserModule'},
   { path: 'create-band', component: BandCreateComponent },
   { path: 'take-quiz', component: QuizComponent },
   { path: 'result-page', component: ResultPageComponent },
@@ -54,11 +65,18 @@ const routes: Routes = [
   { path: 'partner-list', component:PartnerInterviewComponent },
   { path: 'initiate-partner-interview/:id', component:PartnerInterviewInitiateComponent },
   { path: 'operations-candidate-list', component:OperationsCandidateListComponent },
-  {path: 'pre-tech-form', component:PreTechFormComponent},
+  { path: 'pre-tech-form', component:PreTechFormComponent},
+  { path: 'report', component:ReportComponent},
   { path: 'initiate-operations-project/:id', component:OperationsProjectInitiateComponent },
   { path: 'technical-list/:id', component:TechnicalInterviewComponent },
-  { path: 'workflow-config', component:WorkflowConfigComponent }
-  
+  { path: 'workflow-config', component:WorkflowConfigComponent },
+  { path: 'dashboard', component:DashboardComponent},
+  { path: 'pre-technical-interview-form/:jrss/:username',component:PreTechnicalInterviewFormComponent},
+  { path: 'adminuser-create', component:AdminuserCreateComponent },
+  { path:  'config-pretechassessment-form',component:ConfigPretechassessmentFormComponent },
+  { path: 'delete-stream/:id', component: StreamDeleteComponent, canDeactivate:[DeactivateGuard] },
+  { path: 'edit-user/:docid', component: UserEditComponent },
+  { path: 'stream-add', component: StreamAddComponent },
 ];
 
 @NgModule({

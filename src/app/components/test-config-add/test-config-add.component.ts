@@ -1,10 +1,11 @@
 import { Component, OnInit, NgZone } from '@angular/core';
-import { Router } from '@angular/router';
+import { ActivatedRoute,Router } from '@angular/router';
 import { FormGroup, FormBuilder, Validators } from "@angular/forms";
 import { TestConfigService } from './../../service/testconfig.service';
 import { ApiService } from './../../service/api.service';
 import { TestConfig } from './../../model/testConfig';
 import { browserRefresh } from '../../app.component';
+import { appConfig } from './../../model/appConfig';
 
 @Component({
   selector: 'app-test-config-add',
@@ -14,6 +15,7 @@ import { browserRefresh } from '../../app.component';
 export class TestConfigAddComponent implements OnInit {
   public browserRefresh: boolean;
   submitted = false;
+  config: any;
   testConfigAddForm: FormGroup;
   JRSS:any = [];
   testDuration: number;
@@ -22,14 +24,23 @@ export class TestConfigAddComponent implements OnInit {
   TestConfigs:any = [];
   TestConfigDetails:any = [];
   userName: String = "admin";
+  testConfigID: String = "";
 
   constructor(
       public fb: FormBuilder,
       private router: Router,
+      private actRoute: ActivatedRoute,
       private ngZone: NgZone,
       private testconfigService: TestConfigService,
       private apiService: ApiService
     ) {
+    this.config = {
+            currentPage: appConfig.currentPage,
+            itemsPerPage: appConfig.itemsPerPage,
+            totalItems: appConfig.totalItems
+          };
+      actRoute.queryParams.subscribe(
+            params => this.config.currentPage= params['page']?params['page']:1 );
       this.browserRefresh = browserRefresh;
       this.mainForm();
       this.readJrss();
@@ -38,19 +49,14 @@ export class TestConfigAddComponent implements OnInit {
 
     ngOnInit() {
       this.browserRefresh = browserRefresh;
-      if (this.browserRefresh) {
-          if (window.confirm('Your account will be deactivated. You need to contact administrator to login again. Are you sure?')) {
-             this.router.navigate(['/login-component']);
-          }
-      }
     }
 
     mainForm() {
         this.testConfigAddForm = this.fb.group({
           JRSS: ['', [Validators.required]],
           noOfQuestions: ['', [Validators.required, Validators.pattern('^[0-9]+$')]],
-          testDuration: ['', [Validators. required, Validators.pattern('^[0-9]+$')]],
-          passingScore: ['', [Validators. required, Validators.pattern('^[0-9]+$')]]
+          testDuration: ['', [Validators.required, Validators.pattern('^[0-9]+$')]],
+          passingScore: ['', [Validators.required, Validators.pattern('^[0-9]+$')]]
         })
       }
 
@@ -66,6 +72,20 @@ export class TestConfigAddComponent implements OnInit {
       this.testConfigAddForm.get('JRSS').setValue(e, {
         onlySelf: true
       })
+    }
+    pageChange(newPage: number) {
+          this.router.navigate(['/testconfig-add'], { queryParams: { page: newPage } });
+    }
+    onSelectionChange(testConfigId) {
+      this.testConfigID = testConfigId;
+    }
+
+    editTestConfig() {
+      if (this.testConfigID == "") {
+        alert("Please select the test configuration record");
+      } else {
+        this.router.navigate(['/testconfig-edit/', this.testConfigID]);
+      }
     }
 
     //get All Test Configs
@@ -87,17 +107,26 @@ export class TestConfigAddComponent implements OnInit {
         if (!this.testConfigAddForm.valid) {          
           return false;
         } else {
-          let jrss = this.testConfigAddForm.value.JRSS;
-          
-          this.testconfigService.findTestConfigByJRSS(jrss).subscribe(
+          if (this.testConfigAddForm.value.passingScore < 50) {
+            window.alert("Please enter passing score above 50");
+          } else {
+            let jrss = this.testConfigAddForm.value.JRSS;
+           let testConfig = new TestConfig(this.testConfigAddForm.value.JRSS,
+           this.testConfigAddForm.value.noOfQuestions, this.testConfigAddForm.value.testDuration,this.testConfigAddForm.value.passingScore);
+
+            this.testconfigService.findTestConfigByJRSS(jrss).subscribe(
                (res) => {
-                 window.alert("Record exists for the selected JRSS. Please click on the Edit link below to edit the details");
+                  let jrss = res['JRSS'];
+                  let id = res['_id'];
+                  this.testconfigService.updateTestConfig(id, testConfig)
+                     .subscribe(res => {
+                       this.router.navigateByUrl('/', {skipLocationChange: true}).then(() =>
+                       this.router.navigate(['/testconfig-add']));
+                       console.log('Content updated successfully!')
+                     }, (error) => {
+                       console.log(error)
+                 })
                }, (error) => {
-                
-                  let testConfig = new TestConfig(this.testConfigAddForm.value.JRSS,
-                   this.testConfigAddForm.value.noOfQuestions, this.testConfigAddForm.value.testDuration,this.testConfigAddForm.value.passingScore);
-                   console.log("innnn test config*********",testConfig)
-                   console.log("value",this.testConfigAddForm.value.passingScore)
                    this.testconfigService.createTestConfig(testConfig).subscribe(
                      (res) => {
                       console.log('Test Config successfully saved!')
@@ -107,6 +136,7 @@ export class TestConfigAddComponent implements OnInit {
                        console.log(error);
                   });
                });
+          }
           }
 
     }
