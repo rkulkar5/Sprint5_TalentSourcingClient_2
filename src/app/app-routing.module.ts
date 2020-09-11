@@ -36,13 +36,26 @@ import { StreamDeleteComponent } from './components/stream-delete/stream-delete.
 import { ReportComponent } from './components/report/report.component';
 import { UserEditComponent } from './components/user-edit/user-edit.component';
 import { StreamAddComponent } from './components/stream-add/stream-add.component';
+import { ViewInterviewStatusComponent } from './components/view-interview-status/view-interview-status.component';
+import { ViewInterviewStatusExceptionComponent } from './components/view-interview-status-exception/view-interview-status-exception.component';
+import { OpenpositionsListComponent } from './components/openpositions-list/openpositions-list.component';
+import { OpenpositionsCreateComponent } from './components/openpositions-create/openpositions-create.component';
+import { OpenpositionsEditComponent } from './components/openpositions-edit/openpositions-edit.component';
+import { ProjectAssignmentComponent } from './components/project-assignment/project-assignment.component';
+import { OpenPositionsListComponent } from './components/open-positions-list/open-positions-list.component';
+import { EligibleCandidatesComponent } from './components/eligible-candidates/eligible-candidates.component';
+import { QuestionAddBulkSectorsmeComponent } from './components/question-add-bulk-sectorsme/question-add-bulk-sectorsme.component';
+import { QuestionsAddSectorsmeComponent } from './components/questions-add-sectorsme/questions-add-sectorsme.component';
+import { SuperadminUserCreateComponent } from './components/superadmin-user-create/superadmin-user-create.component'
+import { TechIntSchedulerComponent } from './components/tech-int-scheduler/tech-int-scheduler.component';
+import {ViewQuestionComponent } from './components/view-question/view-question.component';
+import { QuestionEditComponent } from './components/question-edit/question-edit.component';
+import { SuperadminUserEditComponent } from './components/superadmin-user-edit/superadmin-user-edit.component';
 
 const routes: Routes = [
   { path: '', pathMatch: 'full', redirectTo: 'login-component' },
-  { path: '', loadChildren: './components/view-testresults/user.module#UserModule'},
   { path: '', loadChildren: './components/dashboard/dashboard-user.module#DashboardUserModule'},
   { path: '', loadChildren: './components/operations-candidate-list/operations-user.module#OperationsUserModule'},
-  { path: '', loadChildren: './components/partner-interview/partner-user.module#PartnerUserModule'},
   { path: 'create-band', component: BandCreateComponent },
   { path: 'take-quiz', component: QuizComponent },
   { path: 'result-page', component: ResultPageComponent },
@@ -76,7 +89,22 @@ const routes: Routes = [
   { path:  'config-pretechassessment-form',component:ConfigPretechassessmentFormComponent },
   { path: 'delete-stream/:id', component: StreamDeleteComponent, canDeactivate:[DeactivateGuard] },
   { path: 'edit-user/:docid', component: UserEditComponent },
+  { path: 'superadmin-edit-user/:docid', component: SuperadminUserEditComponent },
   { path: 'stream-add', component: StreamAddComponent },
+  { path: 'viewinterview-status', component: ViewInterviewStatusComponent },
+  { path: 'viewinterview-status-exception/:id', component: ViewInterviewStatusExceptionComponent },
+  { path: 'openpositions-create', component: OpenpositionsCreateComponent },
+  { path: 'openpositions-list', component: OpenpositionsListComponent },
+  { path: 'openpositions-edit/:id', component: OpenpositionsEditComponent },
+  { path: 'project_assignment', component: ProjectAssignmentComponent },
+  { path: 'open-positions-list', component: OpenPositionsListComponent },
+  { path: 'eligible-candidates', component: EligibleCandidatesComponent },
+  { path: 'manage-questionbank-bulk-sectorsme', component:QuestionAddBulkSectorsmeComponent},
+  { path: 'manage-questionbank-sectorsme', component:QuestionsAddSectorsmeComponent},
+  { path: 'superadmin-user-create' , component:SuperadminUserCreateComponent},
+  { path: 'interview_scheduler', component: TechIntSchedulerComponent },
+  { path: 'view-questionbank', component:ViewQuestionComponent},
+  { path: 'question-edit/:id', component:QuestionEditComponent}
 ];
 
 @NgModule({

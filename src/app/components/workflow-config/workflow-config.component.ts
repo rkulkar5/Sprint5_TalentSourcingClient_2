@@ -2,6 +2,7 @@ import { Component, OnInit, ɵConsole } from '@angular/core';
 import { ApiService } from './../../service/api.service';
 import { FormGroup, FormBuilder, Validators } from "@angular/forms";
 import { Workflow } from './../../model/workflow';
+import { browserRefresh } from '../../app.component';
 import { Router } from '@angular/router';
 
 @Component({
@@ -10,11 +11,13 @@ import { Router } from '@angular/router';
   styleUrls: ['./workflow-config.component.css']
 })
 export class WorkflowConfigComponent implements OnInit {
+  public browserRefresh: boolean;
   submitted = false;
   formReset = false;
   workFlowForm: FormGroup;
   JRSS: any = [];
   userName: String = "admin";
+  account: any;
   jrssDocId: String = "";
   stage1: boolean = false;
   stage2: boolean = false;
@@ -24,6 +27,11 @@ export class WorkflowConfigComponent implements OnInit {
   preTechQuestion;
 
   constructor(public fb: FormBuilder, private apiService: ApiService, private router: Router) {
+    this.browserRefresh = browserRefresh;
+    if (!this.browserRefresh) {
+        this.userName = this.router.getCurrentNavigation().extras.state.username;
+        this.account = this.router.getCurrentNavigation().extras.state.account;
+    }
     this.mainForm();
     this.readJrss();
     }
@@ -33,14 +41,11 @@ export class WorkflowConfigComponent implements OnInit {
 
   // Choose designation with select dropdown
   updateJrssProfile(e) {
-    console.log("here 3");
-       this.workFlowForm.get('JRSS').setValue(e, {
+    this.workFlowForm.get('JRSS').setValue(e.value, {
       onlySelf: true
     })
     this.apiService.getJRSSPreTech(this.workFlowForm.value.JRSS).subscribe((data) => {
-      console.log("inside this.workFlowForm.value.JRSS", this.workFlowForm.value.JRSS, data);
       this.preTechQuestion = data[0]['jrss_preTech'].length;
-      console.log("in kkkk", this.preTechQuestion)
       if (data[0]['stage1_OnlineTechAssessment']) {
         this.stage1 = data[0]['stage1_OnlineTechAssessment'];
       } else {
@@ -78,22 +83,18 @@ export class WorkflowConfigComponent implements OnInit {
   }
 
   preTechQuestionCheck(event) {
-    console.log("here 4");
     if (this.preTechQuestion <= 0) {
-      event.target.checked = false
-      window.alert("There are no Pre-technical Questions configured for this Job role")
-      this.workFlowForm.value.stage2PreTechAssessment=false
-
+      event.checked = false;
+      window.alert("There are no Pre-technical Questions configured for this Job role");
+      this.workFlowForm.value.stage2PreTechAssessment=false;
     }
   }
   // Getter to access form control
   get myForm() {
-    console.log("here 5");
     return this.workFlowForm.controls;
   }
 
   mainForm() {
-    console.log("here 1");
     this.workFlowForm = this.fb.group({
       JRSS: ['', [Validators.required]],
       stage1OnlineTechAssessment: [false],
@@ -106,14 +107,12 @@ export class WorkflowConfigComponent implements OnInit {
 
   // Get all Jrss
   readJrss() {
-    console.log("here 2");
     this.apiService.getJrsss().subscribe((data) => {
       this.JRSS = data;
     })
   }
 
   readJrssDocId() {
-    console.log("here 6");
     for (var jrss of this.JRSS) {
       if (jrss.jrss == this.workFlowForm.value.JRSS) {
         this.jrssDocId = jrss._id;
@@ -122,7 +121,6 @@ export class WorkflowConfigComponent implements OnInit {
   }
 
   onSubmit() {
-    console.log("here 7");
     this.submitted = true;
     this.readJrssDocId();
     if (!this.workFlowForm.valid) {
@@ -139,7 +137,7 @@ export class WorkflowConfigComponent implements OnInit {
         console.log('Workflow details updated successfully!');
         alert('Workflow details added successfully');
         this.router.navigateByUrl('/', { skipLocationChange: true }).then(() =>
-          this.router.navigate(['/workflow-config']));
+          this.router.navigate(['/workflow-config'] , { state: { username: this.userName,account: this.account }}));
       }, (error) => {
         console.log(error);
       })

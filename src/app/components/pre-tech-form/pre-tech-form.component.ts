@@ -6,6 +6,7 @@ import { FormGroup, FormBuilder, Validators } from "@angular/forms";
 import { Location } from '@angular/common';
 import { PreTechQuesAndAns } from './../../model/PreTechQuesAndAns';
 import { Candidate } from './../../model/candidate';
+import { SendEmail } from './../../model/sendEmail';
 
 
 @Component({
@@ -16,7 +17,9 @@ import { Candidate } from './../../model/candidate';
 
 export class PreTechFormComponent implements OnInit {
 
-	
+	smeUserList:any = [];
+	smeUsersEmail: String = "";
+	candidateName = "";
 	result:any=[];
 	
 	preTechQuesAndAns: PreTechQuesAndAns[] = [];
@@ -60,6 +63,7 @@ logout(){
  ngOnInit(): void {
 	 this.getPreTechAssessmentQuestions();
 	 this.downloadCandidateDetails();
+	 this.readSmeUser();
 	 	 
 }
 
@@ -79,7 +83,8 @@ this.preTechService.getStageStatusByUserName(this.userName).subscribe(
      // Get jrss
     this.apiService.getCandidateJrss(this.userName).subscribe(
     (res) => {      
-      this.jrss=res['JRSS'];
+	  this.jrss=res['JRSS'];
+	  this.candidateName = res['employeeName'];
      
          this.preTechService.getPreTechAssessmentQuestions(this.jrss, this.userName).subscribe(res => {
 		 
@@ -132,13 +137,14 @@ downloadCandidateDetails()
 			this.candidate = new Candidate(data['employeeName'],data['employeeType'],
 			data['email'], data['band'], data['JRSS'], data['technologyStream'], data[ 'phoneNumber'], data['dateOfJoining'],
 			data['createdBy'], data['createdDate'], data['updatedBy'], data['updatedDate'],
-			data['username'], data['resumeName'], data['resumeData']);
+			data['username'], data['resumeName'], data['resumeData'], data['account'],
+			data['userLOB'],data['grossProfit'],data['userPositionLocation'],data['openPositionName'],data['positionID']);
 		  }
 		  if (data['employeeType'] == 'Contractor') {
 			this.candidate = new Candidate(data['employeeName'],data['employeeType'],
 			data['email'], '', data['JRSS'], data['technologyStream'], data[ 'phoneNumber'], data['dateOfJoining'],
 			data['createdBy'], data['createdDate'], data['updatedBy'], data['updatedDate'],
-			data['username'], data['resumeName'], data['resumeData']);
+			data['username'], data['resumeName'], data['resumeData'], data['account'],'','','','','');
 		  }
 		});
     
@@ -187,6 +193,19 @@ downloadCandidateDetails()
 	};
 
  }
+
+ readSmeUser(){
+	this.apiService.getUserByRole('sme').subscribe((data) => {
+  this.smeUserList = data;
+  for (var smeEmail of this.smeUserList){
+    if(this.smeUsersEmail == ""){
+	  this.smeUsersEmail = smeEmail.username;
+    }else{
+	  this.smeUsersEmail = this.smeUsersEmail + ", "+smeEmail.username;
+    }
+  }
+	})
+ }
  
  submitPreTechForm( preTechQAndA : PreTechQuesAndAns[]) {
  console.log("******* mode ****** ",this.mode);
@@ -205,6 +224,27 @@ downloadCandidateDetails()
 			  }
 			);
 			this.stage2Completed =  true;
+
+			//Send email notification to SME
+			let fromAddress = "Talent.Sourcing@in.ibm.com";
+			let toAddress = this.smeUsersEmail;
+			let emailSubject = "Candidate assignment notification in Talent Sourcing Tool: SME evaluation pending"; 
+			let emailMessage = "Dear Team,<br><br> \
+			We would like to notify that the candidate "+this.candidateName+" is added to the queue for the job role " +this.jrss+".<br>\
+			Please assess the candidate for the new project assignment.<br>\
+			<p>Regards, <br>DWP Operations Team</p>"; 
+
+
+				   // Send notification to the SME user
+				   let sendEmailObject1 = new SendEmail(fromAddress, toAddress, emailSubject, emailMessage);
+				   this.apiService.sendEmail(sendEmailObject1).subscribe(
+					 (res) => {
+						 console.log("Email sent successfully to " + this.smeUsersEmail);            
+					 }, (error) => {
+						 console.log("Error occurred while sending email to " + this.smeUsersEmail);
+						 console.log(error);
+				   });
+
 		} else {
 		
 		this.stage2Completed = false;

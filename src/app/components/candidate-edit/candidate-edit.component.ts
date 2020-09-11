@@ -1,9 +1,10 @@
 import { Candidate } from './../../model/candidate';
 import { UserDetails } from './../../model/userDetails'
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit,NgZone } from '@angular/core';
 import { ActivatedRoute, Router } from "@angular/router";
 import { ApiService } from './../../service/api.service';
-import { FormGroup, FormBuilder, Validators } from "@angular/forms";
+import { OpenPositionService } from './../../service/openPosition.service';
+import { FormGroup, FormBuilder, FormControl, Validators } from "@angular/forms";
 import { DatePipe } from '@angular/common';
 import { browserRefresh } from '../../app.component';
 import { saveAs } from 'file-saver';
@@ -17,7 +18,9 @@ import { saveAs } from 'file-saver';
 export class CandidateEditComponent implements OnInit {
   public browserRefresh: boolean;
   submitted = false;
+  formReset = false;
   editForm: FormGroup;
+  myOpenPositionGroup: FormGroup;
   JRSS:any = [];
   JRSSFull:any = [];
   Band:any = [];
@@ -37,25 +40,52 @@ export class CandidateEditComponent implements OnInit {
   EmployeeType:any = ['Regular','Contractor'];
   displayContractorUIFields: Boolean = false;
   displayRegularUIFields: Boolean = true;
+  Account:any = [];
+  AccountArray:any = [];
 
+  OpenPositions: any = [];
+  lineOfBusiness:any;
+  positionID:any;
+  competencyLevel:any;
+  positionLocation:any;
+  UserPositionLocation:any = [];
+  rateCardJobRole:any;
+  OpenPosition: any= [];
+  UserLOB: any = [];
+  displayGPCalculate: boolean = false;
+  account: any;
+  accessLevel:any;
+  grossProfit: any;
+  gpCount: number = 0;
+  gp: any;
+  displayPositionDetails = false;
   constructor(
     public fb: FormBuilder,
     private actRoute: ActivatedRoute,
     private apiService: ApiService,
+    private ngZone: NgZone,
+    private openPositionService: OpenPositionService,
     private router: Router,
     private datePipe: DatePipe
   ) {
     this.browserRefresh = browserRefresh;
     if (!this.browserRefresh) {
         this.username = this.router.getCurrentNavigation().extras.state.username;
-    }    
+        this.account = this.router.getCurrentNavigation().extras.state.account;
+        this.accessLevel = this.router.getCurrentNavigation().extras.state.accessLevel;
+    }
     this.readJrss();
   }
 
   ngOnInit() {
     this.browserRefresh = browserRefresh;
-    this.readBand();    
+    this.mainOpenForm();
+    this.readUserPositionLocation();
+    this.readUserLineOfBusiness();
+    this.readBand();
+    this.readAccount();
     this.updateCandidate();
+
     let can_id = this.actRoute.snapshot.paramMap.get('id');
     let user_id = this.actRoute.snapshot.paramMap.get('user_id');
     this.getCandidate(can_id);
@@ -69,7 +99,22 @@ export class CandidateEditComponent implements OnInit {
       JRSS: ['', [Validators.required]],
       technologyStream:['', [Validators.required]],
       phoneNumber: ['', [Validators.required, Validators.pattern('^[0-9]+$')]],
-      dateOfJoining: ['', [Validators.required]]
+      dateOfJoining: ['', [Validators.required]],
+      account: ['', [Validators.required]],
+      userLOB: [''],
+      userPositionLocation: ['']
+    })
+    this.myOpenPositionGroup = this.fb.group({
+          positionName: '',
+          rateCardJobRole: '',
+          lineOfBusiness: '',
+          positionID: '',
+          positionLocation: '',
+          competencyLevel:'',
+          grossProfit: '',
+          gpUserPositionLocation: '',
+          gpUserLOB: '',
+          gpUserBand: ''
     })
   }
   // Get all Jrss
@@ -88,25 +133,25 @@ export class CandidateEditComponent implements OnInit {
         this.JRSS.push(this.JRSSFull[i]);
       }
     }
-  
+
   })
 }
   // Choose designation with select dropdown
   updateJrssProfile(e){
     this.editForm.get('JRSS').setValue(e, {
       onlySelf: true
-    })     
+    })
     // Get technologyStream from JRSS
     for (var jrss of this.JRSS){
       if(jrss.jrss == e){
         this.technologyStream = [];
-        for (var skill of jrss.technologyStream){          
+        for (var skill of jrss.technologyStream){
           this.technologyStream.push(skill);
-        }       
+        }
       }
-    }    
-    console.log("technology stream",this.technologyStream)
-  } 
+    }
+    this.getOpenPositionDetails();
+  }
 
   // Choose options with select-dropdown
   updateProfile(e) {
@@ -120,6 +165,8 @@ export class CandidateEditComponent implements OnInit {
       this.editForm.get('band').setValue(e, {
         onlySelf: true
       })
+      this.myOpenPositionGroup.get('gpUserBand').setValue(e);
+      this.gpCount = 0;
     }
 
   // Choose options with select-dropdown
@@ -143,9 +190,38 @@ export class CandidateEditComponent implements OnInit {
        this.Band = data;
        })
     }
+     // Choose options with select-dropdown
+  updateAccountProfile(e) {
+    this.editForm.get('account').setValue(e, {
+      onlySelf: true
+    })
+  }
+
+    // Get all Acconts
+    readAccount(){
+      this.apiService.getAccounts().subscribe((data) => {
+      this.Account = data;
+      //Remove 'sector' from Account collection
+      for (var accValue of this.Account){
+         if(accValue.account.toLowerCase() !== 'sector') {
+            this.AccountArray.push(accValue.account);
+          }
+      }
+      })
+    }
   // Getter to access form control
   get myForm() {
     return this.editForm.controls;
+  }
+  // Getter to access form control
+  get myOpenForm(){
+    return this.myOpenPositionGroup.controls;
+  }
+ // Get all User Line of business
+  readUserLineOfBusiness(){
+     this.openPositionService.getLineOfBusiness().subscribe((data) => {
+      this.UserLOB = data;
+     })
   }
 
   getCandidate(id) {
@@ -156,17 +232,42 @@ export class CandidateEditComponent implements OnInit {
       if (data['employeeType'] == 'Regular') {
        this.displayContractorUIFields = false;
        this.displayRegularUIFields = true;
+       this.stream = data['technologyStream'].split(",");
         this.editForm.setValue({
           employeeName: data['employeeName'],
           employeeType: data['employeeType'],
           email: data['email'],
           band: data['band'],
           JRSS: data['JRSS'],
-          technologyStream: data['technologyStream'],
+          technologyStream: this.stream,
           phoneNumber: data['phoneNumber'],
-          dateOfJoining : this.datePipe.transform(data['dateOfJoining'], 'yyyy-MM-dd')
+          dateOfJoining : this.datePipe.transform(data['dateOfJoining'], 'yyyy-MM-dd'),
+          account: data['account'],
+          userLOB: data['userLOB'],
+          userPositionLocation: data['userPositionLocation']
         });
-      }
+        this.openPositionService.readOpenPositionByPositionName(data['openPositionName']).subscribe((openPositionData) => {
+            this.lineOfBusiness = openPositionData['lineOfBusiness'];
+            this.competencyLevel = openPositionData['competencyLevel'];
+            this.positionLocation = openPositionData['positionLocation'];
+            this.rateCardJobRole = openPositionData['rateCardJobRole'];
+            this.positionID = openPositionData['positionID'];
+            this.myOpenPositionGroup.setValue({
+                  positionName: openPositionData['positionName'],
+                  positionID: openPositionData['positionID'],
+                  rateCardJobRole: openPositionData['rateCardJobRole'],
+                  lineOfBusiness: openPositionData['lineOfBusiness'],
+                  positionLocation: openPositionData['positionLocation'],
+                  competencyLevel : openPositionData['competencyLevel'],
+                  gpUserPositionLocation: data['userPositionLocation'],
+                  grossProfit: data['grossProfit'],
+                  gpUserLOB: data['userLOB'],
+                  gpUserBand: data['band']
+
+            });
+            this.displayPositionDetails = true;
+        }) ;
+       }
       if (data['employeeType'] == 'Contractor') {
         this.displayContractorUIFields = true;
         this.displayRegularUIFields = false;
@@ -176,19 +277,35 @@ export class CandidateEditComponent implements OnInit {
           email: data['email'],
           band: '',
           JRSS: data['JRSS'],
-          technologyStream: data['technologyStream'],
+          technologyStream: this.stream,
           phoneNumber: data['phoneNumber'],
-          dateOfJoining : this.datePipe.transform(data['dateOfJoining'], 'yyyy-MM-dd')
+          dateOfJoining : this.datePipe.transform(data['dateOfJoining'], 'yyyy-MM-dd'),
+          account: data['account'],
+          userLOB: '',
+          userPositionLocation: ''
+
         });
+        this.myOpenPositionGroup.setValue({
+          positionName: '',
+          positionID: '',
+          rateCardJobRole: '',
+          lineOfBusiness: '',
+          positionLocation: '',
+          competencyLevel:'',
+          grossProfit: '',
+          gpUserPositionLocation: '',
+          gpUserLOB: '',
+          gpUserBand:''
+        })
       }
       this.technologyStream = [];
       // Get technologyStream from JRSS
-      this.stream = this.editForm.value.technologyStream.split(",");
+      //this.stream = this.editForm.value.technologyStream.split(",");
       for (var jrss of this.JRSS){
         if(jrss.jrss == this.editForm.value.JRSS){
           this.technologyStream = [];
           for (var skill of jrss.technologyStream){
-            for(var streamValue of this.stream) { 
+            for(var streamValue of this.stream) {
               if(skill.value == streamValue){
                 skill.isSelected = "selected";
               }
@@ -201,13 +318,14 @@ export class CandidateEditComponent implements OnInit {
         this.candidate = new Candidate(data['employeeName'],data['employeeType'],
         data['email'], data['band'], data['JRSS'], data['technologyStream'], data[ 'phoneNumber'], data['dateOfJoining'],
         data['createdBy'], data['createdDate'], data['updatedBy'], data['updatedDate'],
-        data['username'], data['resumeName'], data['resumeData']);
+        data['username'], data['resumeName'], data['resumeData'], data['account'],
+        data['userLOB'],data['grossProfit'],data['userPositionLocation'], data['openPositionName'], data['positionID']);
       }
       if (data['employeeType'] == 'Contractor') {
         this.candidate = new Candidate(data['employeeName'],data['employeeType'],
         data['email'], '', data['JRSS'], data['technologyStream'], data[ 'phoneNumber'], data['dateOfJoining'],
         data['createdBy'], data['createdDate'], data['updatedBy'], data['updatedDate'],
-        data['username'], data['resumeName'], data['resumeData']);
+        data['username'], data['resumeName'], data['resumeData'], data['account'],'','','','','');
       }
     });
   }
@@ -228,27 +346,25 @@ export class CandidateEditComponent implements OnInit {
         ia[i] = byteString.charCodeAt(i);
       }
       this.resumeBlob =  new Blob([ab], {type: mimeString});
-      
-      if (this.resumeName1 == "ResumeEmpty.doc")
-      {
+
+      if (this.resumeName1 == "ResumeEmpty.doc") {
         this.resumeUploaded=false;
-      }else{
+      } else {
         this.resumeUploaded = true;
       }
-      });    
+      });
   }
 
-  downloadResume()
-  {
+  downloadResume() {
     saveAs(this.resumeBlob,this.resumeName1);
   }
-  
+
   getUser(id) {
     this.apiService.getUser(id).subscribe(data => {
       this.user = new UserDetails(
       data['username'],data['password'],data['quizNumber'],
       data['status'], data['acessLevel'],data['createdBy'],
-      data['createdDate'],data['updatedBy'], data['updatedDate'], 
+      data['createdDate'],data['updatedBy'], data['updatedDate'],
       data['DateOfJoining'],data['userLoggedin'])
     });
   }
@@ -262,10 +378,13 @@ export class CandidateEditComponent implements OnInit {
       JRSS: ['', [Validators.required]],
       technologyStream: ['', [Validators.required]],
       phoneNumber: ['', [Validators.required, Validators.pattern('^[0-9]+$')]],
-      dateOfJoining: ['', [Validators.required]]
+      dateOfJoining: ['', [Validators.required]],
+      account: [''],
+      userLOB: [''],
+      userPositionLocation: ['']
       })
   }
- 
+
   canExit(): boolean{
     if (this.editForm.dirty && !this.submitted){
       if(window.confirm("You have unsaved data in the Update Candidate form. Please confirm if you still want to proceed to new page")){
@@ -277,71 +396,44 @@ export class CandidateEditComponent implements OnInit {
       return true;
     }
   }
-  addResume(event)     
-  {
-  this.editCandResume= event.target.files[0]; 
+
+  //Add resume
+  addResume(event) {
+    this.editCandResume= event.target.files[0];
   }
-  onSubmit() {    
+
+  //submit button
+  onSubmit() {
     this.submitted = true;
 
      // Technology Stream
-     if( typeof(this.editForm.value.technologyStream) == 'object' )  
-     { 
+     if( typeof(this.editForm.value.technologyStream) == 'object' ) {
       this.editForm.value.technologyStream = this.editForm.value.technologyStream.join(',');
      }
      let updatedCandidate;
-     if(!this.editCandResume)
-     {
+     if(!this.editCandResume) {
       console.log("Resume is not selected");
       //Candidate details for a regular employee whose resume is not selected
       if (this.editForm.value.employeeType == 'Regular') {
         updatedCandidate = new Candidate(this.editForm.value.employeeName,this.editForm.value.employeeType,
-        this.editForm.value.email,
-        this.editForm.value.band,
-        this.editForm.value.JRSS,
-        this.editForm.value.technologyStream,
-        this.editForm.value.phoneNumber,
-        this.editForm.value.dateOfJoining,
-        this.candidate.createdBy,
-        this.candidate.createdDate,
-        this.username,
-        new Date(),
-        this.editForm.value.email,
-        this.candidate.resumeName,
-        this.candidate.resumeData
-        );
+        this.editForm.value.email, this.editForm.value.band, this.editForm.value.JRSS,this.editForm.value.technologyStream,
+        this.editForm.value.phoneNumber, this.editForm.value.dateOfJoining,this.candidate.createdBy,this.candidate.createdDate,
+        this.username,new Date(),this.editForm.value.email,this.candidate.resumeName,this.candidate.resumeData,
+        this.editForm.value.account,this.editForm.value.userLOB,this.grossProfit,this.editForm.value.userPositionLocation,
+        this.myOpenPositionGroup.value.positionName,this.myOpenPositionGroup.value.positionID);
       }
       //Candidate details for a Contractor employee whose resume is not selected
       if (this.editForm.value.employeeType == 'Contractor') {
         updatedCandidate = new Candidate(this.editForm.value.employeeName,this.editForm.value.employeeType,
-        this.editForm.value.email,
-        '',
-        this.editForm.value.JRSS,
-        this.editForm.value.technologyStream,
-        this.editForm.value.phoneNumber,
-        this.editForm.value.dateOfJoining,
-        this.candidate.createdBy,
-        this.candidate.createdDate,
-        this.username,
-        new Date(),
-        this.editForm.value.email,
-        this.candidate.resumeName,
-        this.candidate.resumeData
-        );
+        this.editForm.value.email,'',this.editForm.value.JRSS,this.editForm.value.technologyStream,
+        this.editForm.value.phoneNumber,this.editForm.value.dateOfJoining,this.candidate.createdBy,
+        this.candidate.createdDate,this.username,new Date(),this.editForm.value.email,this.candidate.resumeName,
+        this.candidate.resumeData,this.editForm.value.account,'','','','','');
       }
 
-      let updatedUser = new UserDetails(this.editForm.value.email,
-        this.user.password,
-        this.user.quizNumber,
-        this.user.status,
-        this.user.accessLevel,
-        this.user.createdBy,
-        this.user.CreatedDate,
-        this.username,
-        new Date(),
-        this.editForm.value.dateOfJoining,
-        this.user.userLoggedin
-        );
+      let updatedUser = new UserDetails(this.editForm.value.email,this.user.password,this.user.quizNumber,this.user.status,
+        this.user.accessLevel,this.user.createdBy,this.user.CreatedDate,this.username,new Date(),this.editForm.value.dateOfJoining,
+        this.user.userLoggedin);
 
         let formDate = new Date(this.editForm.value.dateOfJoining)
         this.currDate = new Date();
@@ -349,145 +441,285 @@ export class CandidateEditComponent implements OnInit {
         if (!this.editForm.valid) {
           return false;
         } else {
+          if (this.editForm.value.employeeType == 'Regular' ) {
+            if (this.editForm.value.band == '' || this.editForm.value.userLOB == ''
+                || this.editForm.value.userPositionLocation == '') {
+              window.confirm("Please select Candidate Line Of Business/Candidate Location/Band");
+              return false;
+            }
+          }
           if ( formDate > this.currDate) {
             window.confirm("Date Of Joining is a future date. Please verify.")
-           } else {       
-          this.apiService.findUniqueUsername(this.editForm.value.email).subscribe(
-            (res) => {
-              console.log('res.count inside response ' + res.count)
-              if (res.count > 0 && (this.editForm.value.email != this.candidate.email))
-                {
+          } else {
+             this.apiService.findUniqueUsername(this.editForm.value.email).subscribe((res) => {
+              if (res.count > 0 && (this.editForm.value.email != this.candidate.email)) {
                   window.confirm("Please use another Email ID");
-                } 
-                else 
-                {
-                if ((res.count > 0 || res.count == 0) && ((this.editForm.value.email != this.candidate.email) || (this.editForm.value.email == this.candidate.email)))
-                {
+              } else {
+                if ((res.count > 0 || res.count == 0) && ((this.editForm.value.email != this.candidate.email)
+                  || (this.editForm.value.email == this.candidate.email))) {
                   if (window.confirm('Are you sure?')) {
                   let can_id = this.actRoute.snapshot.paramMap.get('id');
                   let user_id = this.actRoute.snapshot.paramMap.get('user_id');
                   this.apiService.updateUserDetails(user_id, updatedUser).subscribe(res => {
                     console.log('User Details updated successfully!');
-                    }, (error) => {
+                  }, (error) => {
                     console.log(error);
-                    })  
+                  })
                   this.apiService.updateCandidate(can_id, updatedCandidate).subscribe(res => {
-                    this.router.navigateByUrl('/candidates-list', {state:{username:this.username}});
+                    this.router.navigateByUrl('/candidates-list', {state:{username:this.username,accessLevel:this.accessLevel,account:this.account}});
                     console.log('Candidate Details updated successfully!');
-                    }, (error) => {
+                  }, (error) => {
                     console.log(error);
-                    })
-                   }
+                  })
                   }
                 }
+              }
             }, (error) => {
               console.log(error);
           })
         }
-        }
-    } else{
+      }
+    } else {
         this.candidate.resumeName=this.editCandResume.name;
         console.log("New resume uploaded: "+this.candidate.resumeName)
-  
+
         let reader = new FileReader();
         reader.readAsDataURL(this.editCandResume);
-        reader.onload = (e) => {    
-        console.log("this.candidate.resumeData inside loop: "+reader.result);
+        reader.onload = (e) => {
         this.candidate.resumeData=<String>reader.result;
         //Candidate details for a regular employee whose resume is selected
         if (this.editForm.value.employeeType == 'Regular') {
-          updatedCandidate = new Candidate(this.editForm.value.employeeName,this.editForm.value.employeeType,
-          this.editForm.value.email,
-          this.editForm.value.band,
-          this.editForm.value.JRSS,
-          this.editForm.value.technologyStream,
-          this.editForm.value.phoneNumber,
-          this.editForm.value.dateOfJoining,
-          this.candidate.createdBy,
-          this.candidate.createdDate,
-          this.username,
-          new Date(),
-          this.editForm.value.email,
-          this.candidate.resumeName,
-          this.candidate.resumeData
-          );
+          updatedCandidate = new Candidate(this.editForm.value.employeeName,this.editForm.value.employeeType, this.editForm.value.email,
+          this.editForm.value.band,this.editForm.value.JRSS,this.editForm.value.technologyStream,this.editForm.value.phoneNumber,
+          this.editForm.value.dateOfJoining,this.candidate.createdBy,this.candidate.createdDate,this.username,new Date(),
+          this.editForm.value.email,this.candidate.resumeName,this.candidate.resumeData,this.editForm.value.account,this.editForm.value.userLOB,
+          this.grossProfit,this.editForm.value.userPositionLocation,this.myOpenPositionGroup.value.positionName,this.myOpenPositionGroup.value.positionID);
         }
         //Candidate details for a contractor employee whose resume is selected
         if (this.editForm.value.employeeType == 'Contractor') {
           updatedCandidate = new Candidate(this.editForm.value.employeeName,this.editForm.value.employeeType,
-          this.editForm.value.email,
-          '',
-          this.editForm.value.JRSS,
-          this.editForm.value.technologyStream,
-          this.editForm.value.phoneNumber,
-          this.editForm.value.dateOfJoining,
-          this.candidate.createdBy,
-          this.candidate.createdDate,
-          this.username,
-          new Date(),
-          this.editForm.value.email,
-          this.candidate.resumeName,
-          this.candidate.resumeData
-          );
+          this.editForm.value.email,'',this.editForm.value.JRSS,this.editForm.value.technologyStream,this.editForm.value.phoneNumber,
+          this.editForm.value.dateOfJoining,this.candidate.createdBy,this.candidate.createdDate,this.username,new Date(),
+          this.editForm.value.email,this.candidate.resumeName,this.candidate.resumeData,this.editForm.value.account,'',
+          '','','','');
         }
 
-          let updatedUser = new UserDetails(this.editForm.value.email,
-            this.user.password,
-            this.user.quizNumber,
-            this.user.status,
-            this.user.accessLevel,
-            this.user.createdBy,
-            this.user.CreatedDate,
-            this.username,
-            new Date(),
-            this.editForm.value.dateOfJoining,
-            this.user.userLoggedin
-            );
-    
+        let updatedUser = new UserDetails(this.editForm.value.email,this.user.password,this.user.quizNumber,this.user.status,
+            this.user.accessLevel,this.user.createdBy,this.user.CreatedDate,this.username,new Date(),this.editForm.value.dateOfJoining,
+            this.user.userLoggedin);
+
             let formDate = new Date(this.editForm.value.dateOfJoining)
             this.currDate = new Date();
-    
+
             if (!this.editForm.valid) {
               return false;
             } else {
+              if (this.editForm.value.employeeType == 'Regular' ) {
+                if (this.editForm.value.band == '' || this.editForm.value.userLOB == ''
+                    || this.editForm.value.userPositionLocation == '') {
+                  window.confirm("Please select Candidate Line Of Business/Candidate Location/Band");
+                  return false;
+                }
+              }
               if ( formDate > this.currDate) {
                 window.confirm("Date Of Joining is a future date. Please verify.")
-               } else {       
-              this.apiService.findUniqueUsername(this.editForm.value.email).subscribe(
-                (res) => {
-                  console.log('res.count inside response ' + res.count)
-                  if (res.count > 0 && (this.editForm.value.email != this.candidate.email))
-                    {
+              } else {
+              this.apiService.findUniqueUsername(this.editForm.value.email).subscribe((res) => {
+                  if (res.count > 0 && (this.editForm.value.email != this.candidate.email)) {
                       window.confirm("Please use another Email ID");
-                    } 
-                    else 
-                    {
-                    if ((res.count > 0 || res.count == 0) && ((this.editForm.value.email != this.candidate.email) || (this.editForm.value.email == this.candidate.email)))
-                    {
+                  } else {
+                    if ((res.count > 0 || res.count == 0) && ((this.editForm.value.email != this.candidate.email)
+                        || (this.editForm.value.email == this.candidate.email))) {
                       if (window.confirm('Are you sure?')) {
-                      let can_id = this.actRoute.snapshot.paramMap.get('id');
-                      let user_id = this.actRoute.snapshot.paramMap.get('user_id');
-                      this.apiService.updateUserDetails(user_id, updatedUser).subscribe(res => {
-                        console.log('User Details updated successfully!');
-                        }, (error) => {
-                        console.log(error);
-                        })  
-                      this.apiService.updateCandidate(can_id, updatedCandidate).subscribe(res => {
-                        this.router.navigateByUrl('/candidates-list', {state:{username:this.username}});
-                        console.log('Candidate Details updated successfully!');
-                        }, (error) => {
-                        console.log(error);
-                        })
-                       }
+                          let can_id = this.actRoute.snapshot.paramMap.get('id');
+                          let user_id = this.actRoute.snapshot.paramMap.get('user_id');
+                          this.apiService.updateUserDetails(user_id, updatedUser).subscribe(res => {
+                            console.log('User Details updated successfully!');
+                          }, (error) => {
+                            console.log(error);
+                          })
+                          this.apiService.updateCandidate(can_id, updatedCandidate).subscribe(res => {
+                            this.router.navigateByUrl('/candidates-list', {state:{username:this.username,accessLevel:this.accessLevel,account:this.account}});
+                            console.log('Candidate Details updated successfully!');
+                          }, (error) => {
+                          console.log(error);
+                          })
                       }
                     }
+                  }
                 }, (error) => {
                   console.log(error);
               })
             }
-            }
+        }
+    }
+    }
+  }
+
+   //Reset
+   resetForm(){
+    this.formReset = true;
+    this.editForm.reset();
+    this.myOpenPositionGroup.reset();
+   }
+
+   //Cancel
+   cancelForm(){
+     this.ngZone.run(() => this.router.navigateByUrl('/candidates-list',{state:{username:this.username,accessLevel:this.accessLevel,account:this.account}}))
+   }
+
+   //Update Userline of business
+   updateUserLOBProfile(e) {
+       this.editForm.get('userLOB').setValue(e, {
+         onlySelf: true
+       })
+      this.apiService.readBandsByLOB(e).subscribe((data) => {
+          this.Band = data
+      })
+      this.myOpenPositionGroup.get('gpUserLOB').setValue(e);
+      this.gpCount = 0;
+   }
+
+   mainOpenForm() {
+       this.myOpenPositionGroup = new FormGroup({
+         positionName: new FormControl(),
+         positionID: new FormControl(),
+         rateCardJobRole: new FormControl(),
+         lineOfBusiness: new FormControl(),
+         positionLocation: new FormControl(),
+         competencyLevel:new FormControl(),
+         gpUserPositionLocation:new FormControl(),
+         gpUserLOB: new FormControl(),
+         gpUserBand: new FormControl(),
+         grossProfit:new FormControl()
+       })
+   }
+
+  // Get all PositionLocation
+  readUserPositionLocation(){
+     this.openPositionService.getPositionLocations().subscribe((data) => {
+        this.UserPositionLocation = data;
+     })
+  }
+
+  //get all open positions
+  getOpenPositionDetails() {
+      let status = "Open";
+      if (this.editForm.value.JRSS == '') {
+        window.alert("Please select candidate Job Role");
+        this.displayGPCalculate = false;
+        return false;
+      } else {
+          this.displayGPCalculate = true;
+          this.openPositionService.listAllOpenPositionsBYJRSS(this.account, status,this.editForm.value.JRSS).subscribe((data) => {
+             this.OpenPositions = data;
+             this.myOpenPositionGroup.get('gpUserPositionLocation').setValue(this.editForm.value.userPositionLocation);
+             this.myOpenPositionGroup.get('gpUserLOB').setValue(this.editForm.value.userLOB);
+             this.myOpenPositionGroup.get('gpUserBand').setValue(this.editForm.value.band);
+          })
+       }
+  }
+
+  updateOpenPositionProfile(positionName) {
+       this.openPositionService.readOpenPositionByPositionName(positionName).subscribe((data) => {
+            this.lineOfBusiness = data['lineOfBusiness'];
+            this.competencyLevel = data['competencyLevel'];
+            this.positionLocation = data['positionLocation'];
+            this.rateCardJobRole = data['rateCardJobRole'];
+          this.myOpenPositionGroup.setValue({
+                positionName: data['positionName'],
+                rateCardJobRole: data['rateCardJobRole'],
+                positionID: data['positionID'],
+                lineOfBusiness: data['lineOfBusiness'],
+                positionLocation: data['positionLocation'],
+                competencyLevel : data['competencyLevel'],
+                gpUserPositionLocation: this.editForm.value.userPositionLocation,
+                gpUserLOB: this.editForm.value.userLOB,
+                gpUserBand: this.editForm.value.band,
+                grossProfit: ''
+
+          });
+          this.displayPositionDetails = true;
+       })
+  }
+
+   // Choose user position location with select dropdown
+   updateUserPositionLocationProfile(e){
+     this.editForm.get('userPositionLocation').setValue(e, {
+     onlySelf: true
+     })
+     this.myOpenPositionGroup.get('gpUserPositionLocation').setValue(e);
+     this.gpCount = 0;
+   }
+
+   //Update Userline of business
+   updateGPUserLOBProfile(e) {
+     this.myOpenPositionGroup.get('gpUserLOB').setValue(e, {
+       onlySelf: true
+     });
+      this.apiService.readBandsByLOB(e).subscribe((data) => {
+       this.Band = data;
+      });
+      this.gpCount = 1;
+   }
+
+   // Choose band with select dropdown
+   updateGPUserBandProfile(e){
+     this.myOpenPositionGroup.get('gpUserBand').setValue(e, {
+     onlySelf: true
+     })
+     this.gpCount = 1;
+   }
+
+    // Choose user position location with select dropdown
+   updateGPUserPositionLocationProfile(e){
+     this.myOpenPositionGroup.get('gpUserPositionLocation').setValue(e, {
+     onlySelf: true
+     })
+     this.gpCount = 1;
+   }
+
+    calculateGP(gpUserPositionLocation,userLOB,band,positionName) {
+      if (gpUserPositionLocation == null || positionName == null || gpUserPositionLocation == '' || positionName == '') {
+         window.alert("Please select Open Position/User Position Location");
+         return false;
       }
-      
-    }
-    }
+      if (userLOB == null || band == null || userLOB == '' || band == '') {
+         window.alert("Please select User Line Of Business/Band");
+         return false;
+      }
+      let GP: number = 0;
+      let rateCardValue: number = 0;
+      let costCardValue: number = 0;
+      let costCardCode = ""
+      let rateCardCode = ""
+      rateCardCode = this.myOpenPositionGroup.value.lineOfBusiness+" - "+this.myOpenPositionGroup.value.positionLocation+" - "+
+                     this.myOpenPositionGroup.value.rateCardJobRole+" - "+this.myOpenPositionGroup.value.competencyLevel;
+      console.log("RateCardCode ** : ",rateCardCode);
+      this.openPositionService.readRateCardsByRateCardCode(rateCardCode).subscribe((data) => {
+         rateCardValue = data['rateCardValue'];
+         if (band == 'Exec' || band == 'Apprentice' || band == 'Graduate') {
+          costCardCode = gpUserPositionLocation+" - "+userLOB+" - "+band
+         } else {
+          costCardCode = gpUserPositionLocation+" - "+userLOB+" - Band-"+band
+         }
+         console.log("CostCardCode ** : ",costCardCode);
+         this.openPositionService.readCostCardsByCostCardCode(costCardCode).subscribe((data) => {
+           costCardValue = data['costCardValue'];
+           if (costCardValue == null || rateCardValue == null) {
+              window.alert("Candidate location and line of business are not compatible, please check the data and calculate GP again.");
+              return false;
+           } else {
+              GP = Math.round(((rateCardValue-costCardValue)/costCardValue)*100)
+           }
+           if (this.gpCount == 0) {
+             this.grossProfit  = GP;
+           }
+           this.gpCount = this.gpCount+1;
+           this.myOpenPositionGroup.get('grossProfit').setValue(GP);
+           this.gp = GP;
+        })
+     })
+  }
+
 }

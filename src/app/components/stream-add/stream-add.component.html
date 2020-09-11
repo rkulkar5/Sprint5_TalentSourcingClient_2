@@ -1,80 +1,30 @@
-<nav class="navbar navbar-expand-lg navbar-light table-success" style="background-color:powderblue">
-    <div class="collapse navbar-collapse" id="navbarNavDropdown">
-      <ul class="navbar-nav">
-        <li class="nav-item dropdown">
-          <a class="nav-link dropdown-toggle" routerLink="/candidates-list" [state]="{username:this.userName}" routerLinkActive="active" id="navbarDropdownMenuLink" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-           <b> Manage Candidate</b><span class="sr-only">(current)</span>
-          </a>
-          <div class="dropdown-menu" aria-labelledby="navbarDropdownMenuLink">
-            <a class="dropdown-item" routerLink="/create-candidate" [state]="{username:this.userName}" routerLinkActive="active">Add Candidate</a>
-            <a class="dropdown-item" routerLink="/candidates-list" [state]="{username:this.userName}" routerLinkActive="active">View Candidate</a>
-          </div>
-        </li>
-        <li class="nav-item dropdown">
-          <a class="nav-link dropdown-toggle" routerLink="/manage-questionbank" routerLinkActive="active" id="navbarDropdownMenuLink" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-          <b> Manage Questions</b>
-          </a>
-          <div class="dropdown-menu" aria-labelledby="navbarDropdownMenuLink">
-            <a class="dropdown-item" routerLink="/manage-questionbank" routerLinkActive="active">Add Question</a>
-            <a class="dropdown-item" routerLink="/manage-questionbank-bulk" routerLinkActive="active">Add Bulk Question</a>
-          </div>
-        </li>
-        <li class="nav-item dropdown active">
-          <a class="nav-link dropdown-toggle" id="navbarDropdownMenuLink" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-          <b> Manage Metadata</b><span class="sr-only">(current)</span>
-          </a>
-          <div class="dropdown-menu" aria-labelledby="navbarDropdownMenuLink">
-            <a class="dropdown-item" routerLink="/jrss-create" routerLinkActive="active">Add Job Role</a>
-            <a class="dropdown-item" routerLink="/stream-create" routerLinkActive="active">Add Technology Stream</a>
-            <a class="dropdown-item" routerLink="/testconfig-add" routerLinkActive="active">Add Test Configuration</a>
+<app-navigation></app-navigation>
+<br/>
+<div>
+	<h4 class="my-0 mr-md-auto font-weight-normal">Add New Technology Stream</h4>
+	<br/>
+</div>
+<!-- form Test Config -->
+<mat-card class="login-card">
+	<mat-card-header>
+	</mat-card-header>
+	<mat-card-content>
+		<form [formGroup]="streamForm" (ngSubmit)="onSubmit()">
+		  <table class="open-full-width" cellspacing="0">  
+          <mat-form-field class="question-full-width">
+            <input matInput placeholder="Technology Stream" formControlName="technologyStream" name="technologyStream" required [ngClass]="{ 'is-invalid': submitted && myForm.technologyStream.errors }">
+            <div *ngIf="submitted && myForm.technologyStream.errors" class="invalid-feedback">
+              <div *ngIf="myForm.technologyStream.errors.required">Technology Stream is required</div>
             </div>
-        </li>
-        <li class="nav-item">
-          <a class="nav-link" routerLink="/workflow-config"routerLinkActive="active"><b>Manage Workflow</b></a>
-        </li>
-        <li class="nav-item">
-          <a class="nav-link" routerLink="/view-testresults"routerLinkActive="active"><b>View Test Results</b></a>
-        </li>
-        <li class="nav-item">
-          <a class="nav-link" routerLink="/adminuser-create"routerLinkActive="active"><b>Manage User</b></a>
-        </li>
-      </ul>
-    </div>
-    <div>
-      <ul class="navbar-nav navbar-right">
-        <li class="nav-item">
-          <a class="nav-link" routerLink="/login-component" routerLinkActive="active"><b>Logout</b></a>
-        </li>
-      </ul>
-    </div>
-  </nav>
-  <br/>
-  <div>
-    <h4 class="my-0 mr-md-auto font-weight-normal">Add New Technology Stream</h4>
-    <br/>
-  </div>
-        <!-- form add jrss -->
-    <div class="card">
-        <div class="card-body">
-          <form [formGroup]="streamForm" (ngSubmit)="onSubmit()">
-  
-              <div class="form-group row">
-                  <label for="inputStream" class="col-sm-2 col-form-label">Technology Stream</label>
-                  <div class="col-sm-6">
-                  <input class="form-control" type="text" formControlName="technologyStream" id="inputStream" [ngClass]="{ 'is-invalid': submitted && myForm.technologyStream.errors }">
-                    <div *ngIf="submitted && myForm.technologyStream.errors" class="invalid-feedback">
-                      <div *ngIf="myForm.technologyStream.errors.required">Technology Stream is required</div>
-                    </div>
-                  </div>
-                </div>
-
-            <div class="row justify-content-center">
-              <button style="background-color:#0043CE;" class="btn btn-success btn-lg float-center" type="submit">Save</button>&nbsp;&nbsp;
-              <button style="background-color:#0043CE;" type="button" class="btn btn-success btn-lg" (click)="cancelForm()">Cancel</button>
-            </div>
-            <div *ngIf="error" class="alert alert-danger mt-3 mb-0">{{error}}</div>
-        &nbsp;&nbsp;&nbsp;
-          </form>
-        </div>
-      </div><!-- form add technology stream -->
+          </mat-form-field>          
+        </table> 
+      </form>
+  </mat-card-content>
+    <mat-card-actions>
+      <div class="row justify-content-center">
+        <button mat-raised-button color="primary" (click)="onSubmit()">Save</button>
+        <button mat-raised-button color="primary" (click)="cancelForm()">Cancel</button>
+     </div>
+    </mat-card-actions>
+</mat-card>
   

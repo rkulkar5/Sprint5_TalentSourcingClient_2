@@ -1,4 +1,4 @@
-import { Component, OnInit, NgZone } from '@angular/core';
+import { Component, OnInit, NgZone,ViewChild } from '@angular/core';
 import { ActivatedRoute,Router } from '@angular/router';
 import { FormGroup, FormBuilder, Validators } from "@angular/forms";
 import { TestConfigService } from './../../service/testconfig.service';
@@ -6,6 +6,9 @@ import { ApiService } from './../../service/api.service';
 import { TestConfig } from './../../model/testConfig';
 import { browserRefresh } from '../../app.component';
 import { appConfig } from './../../model/appConfig';
+import {MatTableDataSource} from '@angular/material/table';
+import {MatPaginator} from '@angular/material/paginator'
+import {MatSort} from '@angular/material/sort';
 
 @Component({
   selector: 'app-test-config-add',
@@ -24,7 +27,15 @@ export class TestConfigAddComponent implements OnInit {
   TestConfigs:any = [];
   TestConfigDetails:any = [];
   userName: String = "admin";
+  account: any;
+  accessLevel:any;
   testConfigID: String = "";
+  formReset = false;
+  dataSource = new MatTableDataSource<TestConfig>();
+  displayedColumns = ['Action','JRSS', 'noOfQuestions','testDuration','passingScore'];
+
+  @ViewChild(MatPaginator) paginator: MatPaginator;
+  @ViewChild(MatSort) sort: MatSort;
 
   constructor(
       public fb: FormBuilder,
@@ -34,21 +45,24 @@ export class TestConfigAddComponent implements OnInit {
       private testconfigService: TestConfigService,
       private apiService: ApiService
     ) {
-    this.config = {
-            currentPage: appConfig.currentPage,
-            itemsPerPage: appConfig.itemsPerPage,
-            totalItems: appConfig.totalItems
-          };
-      actRoute.queryParams.subscribe(
-            params => this.config.currentPage= params['page']?params['page']:1 );
       this.browserRefresh = browserRefresh;
+      if (!this.browserRefresh) {
+          this.userName = this.router.getCurrentNavigation().extras.state.username;
+          this.account = this.router.getCurrentNavigation().extras.state.account;
+          this.accessLevel = this.router.getCurrentNavigation().extras.state.accessLevel;
+      }
       this.mainForm();
       this.readJrss();
-      this.getAllTestConfigs();
     }
 
     ngOnInit() {
       this.browserRefresh = browserRefresh;
+      this.getAllTestConfigs();
+    }
+
+    ngAfterViewInit (){
+      this.dataSource.sort = this.sort;
+      this.dataSource.paginator = this.paginator;
     }
 
     mainForm() {
@@ -73,9 +87,6 @@ export class TestConfigAddComponent implements OnInit {
         onlySelf: true
       })
     }
-    pageChange(newPage: number) {
-          this.router.navigate(['/testconfig-add'], { queryParams: { page: newPage } });
-    }
     onSelectionChange(testConfigId) {
       this.testConfigID = testConfigId;
     }
@@ -84,7 +95,7 @@ export class TestConfigAddComponent implements OnInit {
       if (this.testConfigID == "") {
         alert("Please select the test configuration record");
       } else {
-        this.router.navigate(['/testconfig-edit/', this.testConfigID]);
+        this.router.navigate(['/testconfig-edit/', this.testConfigID], {state: {username:this.userName,accessLevel:this.accessLevel,account:this.account}});
       }
     }
 
@@ -92,6 +103,7 @@ export class TestConfigAddComponent implements OnInit {
     getAllTestConfigs(){
       this.testconfigService.getAllTestConfigs().subscribe((data) => {
        this.TestConfigs = data;
+       this.dataSource.data = data as TestConfig[];
       })
     }
 
@@ -103,7 +115,8 @@ export class TestConfigAddComponent implements OnInit {
 
 
     onSubmit() {
-        this.submitted = true;        
+        this.submitted = true;
+        this.formReset = false;
         if (!this.testConfigAddForm.valid) {          
           return false;
         } else {
@@ -121,7 +134,7 @@ export class TestConfigAddComponent implements OnInit {
                   this.testconfigService.updateTestConfig(id, testConfig)
                      .subscribe(res => {
                        this.router.navigateByUrl('/', {skipLocationChange: true}).then(() =>
-                       this.router.navigate(['/testconfig-add']));
+                       this.router.navigate(['/testconfig-add'], {state: {username:this.userName,accessLevel:this.accessLevel,account:this.account}}));
                        console.log('Content updated successfully!')
                      }, (error) => {
                        console.log(error)
@@ -131,7 +144,7 @@ export class TestConfigAddComponent implements OnInit {
                      (res) => {
                       console.log('Test Config successfully saved!')
                       this.router.navigateByUrl('/', {skipLocationChange: true}).then(() =>
-                      this.router.navigate(['/testconfig-add']));
+                      this.router.navigate(['/testconfig-add'], {state: {username:this.userName,accessLevel:this.accessLevel,account:this.account}}));
                      }, (error) => {
                        console.log(error);
                   });
@@ -141,5 +154,9 @@ export class TestConfigAddComponent implements OnInit {
 
     }
 
+    clearForm() {
+      this.formReset = true;
+      this.testConfigAddForm.reset();
+    }
 
 }

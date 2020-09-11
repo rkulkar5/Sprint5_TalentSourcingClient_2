@@ -5,7 +5,6 @@ import { HttpClient, HttpHeaders, HttpErrorResponse } from '@angular/common/http
 import { appConfig } from './../model/appConfig';
 import { UserResult} from './../model/userResult';
 
-//var passport = require('passport');
 @Injectable({
   providedIn: 'root'
 })
@@ -23,6 +22,8 @@ export class ApiService {
   headers = new HttpHeaders().set('Content-Type', 'application/json');
   baseUserroleUri:string = appConfig.baseUri + '/api/userrole';
   techStreamUri:string = appConfig.baseUri + '/techStream';
+  sendEmailUri:string = appConfig.baseUri + '/sendEmail';
+  baseAccountUri:string = appConfig.baseUri + '/api/account';
 
   constructor(private http: HttpClient) { }
 // Get all JRSS
@@ -33,14 +34,12 @@ getJRSS() {
 // http://localhost:4000/api/preTechForm/getPreTechQuestionanire/Java%20Technical%20Assessment/candidate12@ibm.com
 getpreTechQuestions(jrss) {
   let url = `${this.basePreTechQuestionnaireUri}/${jrss}/admin`;
-  console.log("the url is "+ url);
   return this.http.get(`${this.basePreTechQuestionnaireUri}/${jrss}/admin`);
 }
- 
+
 // Get all JRSS
 getJRSSPreTech(jrssName) {
   let url = `${this.baseJrssUri}/getJrssPreTech/${jrssName}`;
-  console.log("the url 2 is "+ url);
   return this.http.get(`${this.baseJrssUri}/getJrssPreTech/${jrssName}`);
 }
 // Create Candidate
@@ -65,6 +64,43 @@ getPreTechniaclQuestions(jrss,userName): Observable<any> {
   )
   }
 
+
+    // Get questions based on username
+getQuestions(account): Observable<any> {
+  let url = `${this.baseQuestionUri}/getQuestionanire/${account}`;
+
+  return this.http.get(url, {headers: this.headers}).pipe(
+    map((res: Response) => {
+      return res || {}
+    }),
+    catchError(this.errorMgmt)
+  )
+  }
+
+
+  //Update Question
+  updateQuestion(id, data): Observable<any> {
+    let url = `${this.baseUri}/quiz/updatequestion/${id}`;
+    console.log("The URL is "+url);
+    return this.http.put(url, data, { headers: this.headers }).pipe(
+      catchError(this.errorMgmt)
+    )
+  }
+
+  checkForQuestions(technologyStream): Observable<any> {
+    let url = `${this.baseQuestionUri}/Count/Questions/${technologyStream}`;
+
+    console.log("The Url1 is "+url);
+
+    return this.http.get(url, {headers: this.headers}).pipe(
+     map((res: Response) => {
+        return res || {}
+      }),
+      catchError(this.errorMgmt)
+    )
+    }
+
+
   // GET Candidate JRSS
   getCandidateJrss(username): Observable<any> {
     let url = `${this.baseUri}/candidatejrss/${username}`;
@@ -87,7 +123,6 @@ getPreTechniaclQuestions(jrss,userName): Observable<any> {
 
   // Create Question
   createQuestion(data): Observable<any> {
-    console.log('create question apiservice');
     let url = `${this.baseUri}/createquestion`;
     return this.http.post(url, data)
       .pipe(
@@ -95,9 +130,21 @@ getPreTechniaclQuestions(jrss,userName): Observable<any> {
       )
   }
 
+    // Get Question
+  getQuestion(id): Observable<any> {
+    let url = `${this.baseUri}/quiz/read/${id}`;
+    console.log(">>> URL Is"+ url);
+    return this.http.get(url, {headers: this.headers}).pipe(
+      map((res: Response) => {
+        return res || {}
+      }),
+      catchError(this.errorMgmt)
+    )
+  }
+
+
     // get max Question
     getQuestionID(): Observable<any> {
-      console.log('get question ID apiservice');
       let url = `${this.baseUri}/getMaxQuestionID`;
       return this.http.get(url, {headers: this.headers}).pipe(
         map((res: Response) => {
@@ -117,7 +164,6 @@ getPreTechniaclQuestions(jrss,userName): Observable<any> {
 
   // Create user
   createUser(data): Observable<any> {
-
     let url = `${this.baseloginUri}/login`;
     return this.http.post(url, data)
       .pipe(
@@ -176,6 +222,17 @@ getPreTechniaclQuestions(jrss,userName): Observable<any> {
   )
 }
 
+ // Get Users by access Level
+ getUserByAccessLevel(accessLevel): Observable<any> {
+  let url = `${this.baseloginUri}/readUserByAccessLevel/${accessLevel}`;
+  return this.http.get(url, {headers: this.headers}).pipe(
+    map((res: Response) => {
+      return res || {}
+    }),
+    catchError(this.errorMgmt)
+  )
+}
+
  // Get User by Username and DateOfJoining
  getUserByIdAndDOJ(id, doj): Observable<any> {
   let url = `${this.baseloginUri}/getUserDOJ/${id}/${doj}`;
@@ -184,7 +241,7 @@ getPreTechniaclQuestions(jrss,userName): Observable<any> {
       return res || {}
     }),
     catchError(this.errorMgmt)
-  )
+    )
 }
 
 // Get Users table records based on username
@@ -224,10 +281,25 @@ getUserByUserName(id): Observable<any> {
   // Update candidate
   updateCandidate(id, data): Observable<any> {
     let url = `${this.baseUri}/update/${id}`;
+    console.log("The URL is "+url);
     return this.http.put(url, data, { headers: this.headers }).pipe(
       catchError(this.errorMgmt)
     )
   }
+
+
+
+// http://localhost:4000/api/preTechForm/getPreTechQuestionanire/Java%20Technical%20Assessment/candidate12@ibm.com
+
+//Update Pre-technical Question.
+updatePreTechQuestion(id, data): Observable<any> {
+    let url = `${this.baseUri}/preTechForm/updatePreTechQuestion/admin/${id}`;
+    return this.http.put(url, data, { headers: this.headers }).pipe(
+      catchError(this.errorMgmt)
+    )
+  }
+
+
 
   //Update Candidate Resume from Pre-Tech Form.
   updateCandidateResume(username, data): Observable<any> {
@@ -278,6 +350,17 @@ getUserByUserName(id): Observable<any> {
       )
     }
 
+    // Get bands by lob name
+    readBandsByLOB(lob): Observable<any> {
+    let url = `${this.baseBandUri}/readBandsByLOB/${lob}`;
+    return this.http.get(url, {headers: this.headers}).pipe(
+      map((res: Response) => {
+        return res || {}
+      }),
+      catchError(this.errorMgmt)
+    )
+  }
+
     // Update band
     updateBand(id, data): Observable<any> {
       let url = `${this.baseBandUri}/updateBand/${id}`;
@@ -316,8 +399,6 @@ return this.http.put(url, status).pipe(
  catchError(this.errorMgmt)
 )
 }
-
-
 //Start JRSS:
 
 // Create jrss
@@ -375,20 +456,12 @@ deleteJrss(id): Observable<any> {
 // Update Workflow by JRSS name
  updateWorkflow(id, data): Observable<any> {
   let url = `${this.baseJrssUri}/updateWorkflow/${id}`;
+  console.log("The url is "+url);
   return this.http.put(url, data, { headers: this.headers }).pipe(
     catchError(this.errorMgmt)
   )
 }
 
-
-/**
- *
- * getCandidateAssessmentDetails
- * @param username
- * @author A.George
- * 29May2020
- *
- */
 getCandidateAssessmentDetails(username,quizNumber): Observable<any> {
   let url = `${this.userResultUri}/quizDetailsByUser/${username}/${quizNumber}`;
   return this.http.get(url, {headers: this.headers}).pipe(
@@ -432,6 +505,17 @@ getPartnerInterviewList(): Observable<any> {
   )
 }
 
+//getPartnerInterviewAccountList
+getPartnerInterviewAccountList(account): Observable<any> {
+  let url = `${this.userResultUri}/getPartnerInterviewAccountList/${account}`;
+return this.http.get(url, {headers: this.headers}).pipe(
+      map((res: Response) => {
+        return res || {}
+      }),
+      catchError(this.errorMgmt)
+)
+}
+
 //readPartnerInterviewDetails
 readPartnerInterviewDetails(userName): Observable<any> {
   let url = `${this.userResultUri}/readPartnerInterviewDetails/${userName}`;
@@ -445,13 +529,23 @@ readPartnerInterviewDetails(userName): Observable<any> {
 
 //savePartnerFeedBack
   savePartnerFeedBack(id,data): Observable<any> {
-  console.log('savePartnerFeedBack API update method',data);
     let url = `${this.userResultUri}/updatePartnerDetails/${id}`;
     return this.http.post(url, data)
       .pipe(
         catchError(this.errorMgmt)
       )
   }
+
+//get Operations Account Candidate List
+getOperationsAccountCandidateList(account): Observable<any> {
+  let url = `${this.userResultUri}/getOperationsAccountCandidateList/${account}`;
+  return this.http.get(url, {headers: this.headers}).pipe(
+        map((res: Response) => {
+          return res || {}
+        }),
+        catchError(this.errorMgmt)
+  )
+}
 
   //get Operations Candidate List
   getOperationsCandidateList(): Observable<any> {
@@ -503,6 +597,17 @@ getTechnicalInterviewList(): Observable<any> {
         catchError(this.errorMgmt)
   )
 }
+
+  //getTechnicalInterviewAccountList
+  getTechnicalInterviewAccountList(account): Observable<any> {
+   let url = `${this.userResultUri}/getTechnicalInterviewAccountList/${account}`;
+   return this.http.get(url, {headers: this.headers}).pipe(
+      map((res: Response) => {
+        return res || {}
+      }),
+      catchError(this.errorMgmt)
+  )
+ }
 
 getResultByUser(username: string,quiznumber:number){
   let url = `${this.userResultUri}/getResultByUser/${username}/${quiznumber}`;
@@ -577,6 +682,17 @@ findAllUser(): Observable<any> {
     )
 }
 
+//Get all admin users and check if any user already present with the same email id in Users table
+findSectorAdminAndAccountUsers(): Observable<any> {
+  let url = `${this.baseUserroleUri}/findAllAdminUser`;
+  return this.http.get(url, {headers: this.headers}).pipe(
+    map((res: Response) => {
+      return res || {}
+    }),
+    catchError(this.errorMgmt)
+    )
+}
+
 
 // Delete a user
 deleteUser(username): Observable<any> {
@@ -600,5 +716,83 @@ createTechStream(data): Observable<any> {
     )
 }
 
+
+getCandidateInterviewStatus(): Observable<any> {
+  let url = `${this.userResultUri}/getCandidateInterviewStatus`;
+  return this.http.get(url, {headers: this.headers}).pipe(
+        map((res: Response) => {
+          return res || {}
+        }),
+        catchError(this.errorMgmt)
+  )
+}
+
+viewCandidateInterviewStatus(id): Observable<any> {
+  let url = `${this.userResultUri}/viewCandidateInterviewStatus/${id}`;
+  return this.http.get(url, {headers: this.headers}).pipe(
+        map((res: Response) => {
+          return res || {}
+        }),
+        catchError(this.errorMgmt)
+  )
+}
+
+// Send Email
+sendEmail(data): Observable<any> {
+  let url = `${this.sendEmailUri}/sendEmail`;
+  return this.http.post(url, data)
+    .pipe(
+      catchError(this.errorMgmt)
+    )
+}
+
+// Get Users table records based on role
+getUserByRole(id): Observable<any> {
+  let url = `${this.baseloginUri}/getUserByRole/${id}`;
+  return this.http.get(url, {headers: this.headers}).pipe(
+    map((res: Response) => {
+      return res || {}
+    }),
+    catchError(this.errorMgmt)
+    )
+  }
+
+// Get all accounts
+getAccounts() {
+  return this.http.get(`${this.baseAccountUri}`);
+
+}
+
+// Get all questions based on account
+viewQuizQuestions(userName,account) {
+  let url = `${this.baseQuestionUri}/${userName}/${account}`;
+  console.log('url----'+url);
+  return this.http.get(url, {headers: this.headers}).pipe(
+    map((res: Response) => {
+    return res || {}
+    }),
+    catchError(this.errorMgmt)
+  )
+}
+
+
+ // Get all accounts
+ getfewAccounts(): Observable<any> {
+   let url = `${this.userResultUri}/fewAccounts`;
+   return this.http.get(url, {headers: this.headers}).pipe(
+        map((res: Response) => {
+          return res || {}
+        }),
+        catchError(this.errorMgmt)
+   )
+ }
+
+ // Delete Question
+ deleteQuestion(id): Observable<any> {
+  let url = `${this.baseQuestionUri}/delete/${id}`;
+  return this.http.delete(url, { headers: this.headers }).pipe(
+    catchError(this.errorMgmt)
+  )
+}
 
 }

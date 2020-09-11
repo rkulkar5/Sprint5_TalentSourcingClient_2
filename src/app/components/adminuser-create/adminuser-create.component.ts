@@ -2,12 +2,16 @@ import { Router } from '@angular/router';
 import { ApiService } from './../../service/api.service';
 import { Candidate } from './../../model/candidate';
 import { UserDetails } from './../../model/userDetails';
-import { Component, OnInit, NgZone } from '@angular/core';
+import { Component, OnInit, NgZone,ViewChild } from '@angular/core';
 import { FormGroup, FormBuilder, Validators } from "@angular/forms";
 import { appConfig } from './../../model/appConfig';
+import { User } from './../../model/user';
 import { browserRefresh } from '../../app.component';
 import * as CryptoJS from 'crypto-js';
 import { SpecialUser } from './../../model/specialUser';
+import {MatTableDataSource} from '@angular/material/table';
+import {MatPaginator} from '@angular/material/paginator'
+import {MatSort} from '@angular/material/sort';
 
 @Component({
   selector: 'app-adminuser-create',
@@ -18,11 +22,14 @@ export class AdminuserCreateComponent implements OnInit {
   error = '';
   public browserRefresh: boolean;
   submitted = false;
+  formReset = false;
   candidateForm: FormGroup;
   JRSS:any = []
   Band:any = [];
   quizNumber: number;
   userName: String = "admin";
+  account: any;
+  accessLevel:any;
   password: String = "";
   currDate: Date ;
   technologyStream:any= [];
@@ -34,6 +41,14 @@ export class AdminuserCreateComponent implements OnInit {
   index;
   docid;
   isRowSelected = false;
+  Account:any = [];
+
+  loading = true;
+  dataSource = new MatTableDataSource<User>();
+  displayedColumns = ['Action','name', 'username','accessLevel','account'];
+
+  @ViewChild(MatPaginator) paginator: MatPaginator;
+  @ViewChild(MatSort) sort: MatSort;
 
   constructor(
     public fb: FormBuilder,
@@ -41,12 +56,18 @@ export class AdminuserCreateComponent implements OnInit {
     private ngZone: NgZone,
     private apiService: ApiService
   ) {
-    
+    this.browserRefresh = browserRefresh;
+    if (!this.browserRefresh) {
+        this.userName = this.router.getCurrentNavigation().extras.state.username;
+        this.account = this.router.getCurrentNavigation().extras.state.account;
+        this.accessLevel = this.router.getCurrentNavigation().extras.state.accessLevel;
+    }
     this.password = appConfig.defaultPassword;
     this.quizNumber = 1;
     this.mainForm();
     this.readUserrole();    
     this.getAllSpecialUsers();
+    this.readAccount();
   }
 
   ngOnInit() {
@@ -57,12 +78,17 @@ export class AdminuserCreateComponent implements OnInit {
         }
     }
   }
+  ngAfterViewInit(): void {
+    this.dataSource.sort = this.sort;
+    this.dataSource.paginator = this.paginator;
+  }
 
   mainForm() {
     this.candidateForm = this.fb.group({
       employeeName: ['', [Validators.required]],
       email: ['', [Validators.required, Validators.pattern('[A-z0-9._%+-]+@[A-z0-9.-]+\.[A-z]{2,3}$')]],
       userrole: ['', [Validators.required]],
+      account: ['', [Validators.required]],
     })
   }
 
@@ -72,6 +98,13 @@ export class AdminuserCreateComponent implements OnInit {
       this.Userrole = data;
       })
    }
+
+    // Choose account with select dropdown
+    updateAccountProfile(e){
+       this.candidateForm.get('account').setValue(e, {
+       onlySelf: true
+       })
+    }
 
    // Choose userrole with select dropdown
    updateUserroleProfile(e){
@@ -89,8 +122,16 @@ export class AdminuserCreateComponent implements OnInit {
   getAllSpecialUsers(){
     this.apiService.findAllUser().subscribe((data) => {
     this.AdminUsers = data;
+    this.dataSource.data = data as User[];
     })
 }
+
+    // Get all Acconts
+    readAccount(){
+      this.apiService.getAccounts().subscribe((data) => {
+      this.Account = data;
+      })
+    }
 
 // Delete the selected user
   //To remove candidate
@@ -133,12 +174,13 @@ export class AdminuserCreateComponent implements OnInit {
     if(this.isRowSelected == false){
       alert("Please select the user");
       }else{
-      this.router.navigate(['/edit-user/', this.docid]);
+      this.router.navigate(['/edit-user/', this.docid],{state:{username:this.userName,accessLevel:this.accessLevel,account:this.account}});
       }
     }
 
   onSubmit() {
-    this.submitted = true; 
+    this.submitted = true;
+    this.formReset = false;
     // Encrypt the password
     var base64Key = CryptoJS.enc.Base64.parse("2b7e151628aed2a6abf7158809cf4f3c");
     var ivMode = CryptoJS.enc.Base64.parse("3ad77bb40d7a3660a89ecaf32466ef97");
@@ -157,7 +199,8 @@ export class AdminuserCreateComponent implements OnInit {
      new Date(),
      this.candidateForm.value.dateOfJoining,
      "false",
-     this.candidateForm.value.employeeName
+     this.candidateForm.value.employeeName,
+     this.candidateForm.value.account
      );
 
 
@@ -165,14 +208,11 @@ export class AdminuserCreateComponent implements OnInit {
      
     if (!this.candidateForm.valid) {
       return false;
-    } else  {
-        console.log("in candidate-create.ts");
+    } else  {        
         this.apiService.findUniqueUserEmail(this.candidateForm.value.email).subscribe(
-          (res) => {
-            console.log('res.count inside response ' + res.count)
+          (res) => {            
            if (res.count > 0)
-           {
-              console.log('res.count inside if ' + res.count)
+           {              
               window.confirm("Please use another Email ID");
             } 
             else 
@@ -183,7 +223,7 @@ export class AdminuserCreateComponent implements OnInit {
                           console.log('User successfully created!')
                           alert('User successfully created!');
                           this.router.navigateByUrl('/', {skipLocationChange: true}).then(() =>
-                          this.router.navigate(['/adminuser-create']));
+                          this.router.navigate(['/adminuser-create'],{state:{username:this.userName,accessLevel:this.accessLevel,account:this.account}}));
                        }, (error) => {
                           console.log(error);
                        });
@@ -196,5 +236,11 @@ export class AdminuserCreateComponent implements OnInit {
   }
   
 }
+
+
+  clearForm() {
+      this.formReset = true;
+      this.candidateForm.reset();
+  }
 
 }

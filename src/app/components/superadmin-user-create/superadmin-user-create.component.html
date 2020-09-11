@@ -1,0 +1,127 @@
+<app-navigation></app-navigation>
+<br/>
+<div>
+  <h4 class="my-0 mr-md-auto font-weight-normal">Add User</h4>
+  <br/>
+</div>
+<mat-card class="login-card">
+  <mat-card-header>
+  </mat-card-header>
+  <mat-card-content>
+    <form [formGroup]="candidateForm">
+      <table class="open-full-width" cellspacing="0">
+        <tr>
+          <td>
+            <mat-form-field class="open-full-width">
+              <input matInput placeholder="Name" type="text" formControlName="employeeName" id="employeeName" [ngClass]="{ 'is-invalid': !formReset && submitted && myForm.employeeName.errors }">
+              <div *ngIf="!formReset && submitted && myForm.employeeName.errors" class="invalid-feedback">
+                <div *ngIf="myForm.employeeName.errors.required">Name is required</div>
+              </div>
+            </mat-form-field>
+          </td>
+          <td>
+            <mat-form-field class="open-full-width">
+              <input matInput placeholder="Email [This field is used as username.]" type="text" formControlName="email" id="inputEmail3" [ngClass]="{ 'is-invalid': !formReset && submitted && myForm.email.errors }">
+              <div *ngIf="!formReset && submitted && myForm.email.errors" class="invalid-feedback">
+                <div *ngIf="myForm.email.errors.required">Email is required</div>
+                <div *ngIf="myForm.email.errors.pattern">Invalid Email</div>
+              </div>
+              <div class="col-sm-8">
+                <i><b><font style="font-size:12px"></font></b></i>
+              </div>
+            </mat-form-field>
+          </td>
+        </tr>
+        <tr>
+          <td>
+            <mat-form-field class="open-full-width">
+              <mat-select placeholder="User Role" (selectionChange)="updateUserroleProfile($event.value)"
+                      formControlName="userrole" id="userrole" [ngClass]="{ 'is-invalid': !formReset && submitted && myForm.userrole.errors }">
+                <mat-option disabled value="">Choose...</mat-option>
+                <mat-option *ngFor="let userrole of Userrole" value="{{userrole.userrole}}">{{userrole.userrole}}
+                </mat-option>
+              </mat-select>
+              <div *ngIf="!formReset && submitted && myForm.userrole.errors" class="invalid-feedback">
+                <div *ngIf="myForm.userrole.errors.required">User role is required</div>
+              </div>
+            </mat-form-field>
+          </td>
+          <td>
+            <mat-form-field class="open-full-width">
+              <mat-select multiple  placeholder="Account"  formControlName="account" id="account" [ngClass]="{ 'is-invalid': !formReset && submitted && myForm.account.errors }">
+                <mat-option disabled value="">Choose...</mat-option>
+                <mat-option *ngFor="let account of AccountList" [value]="account" (onSelectionChange)="updateAccountProfile($event)" >{{account.account}}
+                </mat-option>
+              </mat-select>
+              <div *ngIf="!formReset && submitted && myForm.account.errors" class="invalid-feedback">
+                <div *ngIf="myForm.account.errors.required">Account is required</div>
+              </div>
+            </mat-form-field>
+          </td>
+        </tr>
+      </table>
+    </form>
+  </mat-card-content>
+  <mat-card-actions>
+    <div class="row justify-content-center">
+      <button mat-raised-button color="primary" (click)="onSubmit()">Register</button>
+      <button mat-raised-button color="primary" (click)="clearForm()">Clear</button>
+    </div>
+  </mat-card-actions>
+  <div *ngIf="error" class="alert alert-danger mt-3 mb-0">{{error}}</div>
+  &nbsp;&nbsp;&nbsp;
+</mat-card>
+<br/>
+<h4 class="my-0 mr-md-auto font-weight-normal">Users List</h4>
+<br/>
+<!-- No data message -->
+<p *ngIf="AdminUsers.length <= 0" class="no-data text-center">There are no records added yet!</p>
+
+<div class="mat-elevation-z8">
+  <table mat-table [dataSource]="dataSource" matSort class="mat-elevation-z8">
+
+    <!-- ID Column -->
+    <ng-container matColumnDef="Action">
+      <th mat-header-cell *matHeaderCellDef> Action </th>
+      <td mat-cell *matCellDef="let row;let i = index"> <mat-radio-button (change)="onSelectionChange(row.username,row._id,i)"></mat-radio-button>
+      </td>
+    </ng-container>
+    <!-- ID Column -->
+    <ng-container matColumnDef="name">
+      <th mat-header-cell *matHeaderCellDef mat-sort-header> Name </th>
+      <td mat-cell *matCellDef="let row"> {{row.name}} </td>
+    </ng-container>
+
+    <!-- Progress Column -->
+    <ng-container matColumnDef="username">
+      <th mat-header-cell *matHeaderCellDef mat-sort-header> Email </th>
+      <td mat-cell *matCellDef="let row"> {{row.username}}</td>
+    </ng-container>
+
+    <!-- Name Column -->
+    <ng-container matColumnDef="accessLevel">
+      <th mat-header-cell *matHeaderCellDef mat-sort-header> Role </th>
+      <td mat-cell *matCellDef="let row"> {{row.accessLevel}} </td>
+    </ng-container>
+
+    <!-- Color Column -->
+    <ng-container matColumnDef="account">
+      <th mat-header-cell *matHeaderCellDef mat-sort-header> Account </th>
+      <td mat-cell *matCellDef="let row"> {{row.account}} </td>
+    </ng-container>
+
+    <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+    <tr mat-row *matRowDef="let row; columns: displayedColumns;"></tr>
+  </table>
+  <mat-paginator [length]="this.AdminUsers.length" [pageSize]="5" [pageSizeOptions]="[5,10,15,25,50,100]"></mat-paginator>
+</div>
+<br/>
+<div  class="float-right text-right" *ngIf="AdminUsers.length > 0">
+  <a class="edit"  (click)="invokeEdit()">
+    <button mat-raised-button color="primary">Edit</button>&nbsp;
+  </a>
+  <a class="delete" (click)="removeUser(username,index)">
+    <button mat-raised-button color="primary">Delete</button>&nbsp;
+  </a>
+</div>
+

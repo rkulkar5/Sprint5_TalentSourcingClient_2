@@ -2,6 +2,7 @@ import { Router } from '@angular/router';
 import { ApiService } from './../../service/api.service';
 import { Component, OnInit, NgZone } from '@angular/core';
 import { FormGroup, FormBuilder, Validators } from "@angular/forms";
+import { browserRefresh } from '../../app.component';
 import * as XLSX from 'xlsx';
 
 
@@ -11,26 +12,37 @@ import * as XLSX from 'xlsx';
   styleUrls: ['./questions-add-bulk.component.css']
 })
 export class QuestionsAddBulkComponent implements OnInit {
+  public browserRefresh: boolean;
   submitted = false;
   formReset = false;
   questionForm: FormGroup;
   userName: String = "admin";
+  account: any;
+  accessLevel:any;
   JRSS:any = [];
   technologyStream:any = [];
   QuestionTypes:any = ['SingleSelect','MultiSelect'];
+  ComplexityLevels:any = ['Complex','Medium','Simple'];
   answerArray:Array<String>=[];
   optionsArray:Array<Object>=[];
   questionID:any;
   validQuestionType:any;
+  validComplexityLevel:any;
   bulkUploadQuestions:number=0;
   totalBulkQuestions:number=0;
   file: File;
   arrayBuffer: any;
   filelist: any;
-  constructor(public fb: FormBuilder,
-                  private router: Router,
-                  private ngZone: NgZone,
-                  private apiService: ApiService) { this.readJRSS();this.mainForm();}
+  constructor(public fb: FormBuilder,private router: Router,private ngZone: NgZone, private apiService: ApiService) {
+    this.browserRefresh = browserRefresh;
+    if (!this.browserRefresh) {
+        this.userName = this.router.getCurrentNavigation().extras.state.username;
+        this.account = this.router.getCurrentNavigation().extras.state.account;
+        this.accessLevel = this.router.getCurrentNavigation().extras.state.accessLevel;
+    }
+      this.readTechStream();
+      this.mainForm();
+  }
 
   ngOnInit() {this.apiService.getQuestionID().subscribe(
     (res) => {
@@ -44,6 +56,7 @@ export class QuestionsAddBulkComponent implements OnInit {
       this.questionForm = this.fb.group({
         technologyStream: ['', [Validators.required]],
         questionType: ['', [Validators.required]],
+        complexityLevel: ['', [Validators.required]],
         question: ['', [Validators.required]],
         option1: ['', [Validators.required]],
         option2: ['', [Validators.required]],
@@ -55,6 +68,7 @@ export class QuestionsAddBulkComponent implements OnInit {
         option4checkbox:[],
         answerID:[],
         questionID:[],
+        account:[]
        
       })
     }
@@ -94,19 +108,12 @@ export class QuestionsAddBulkComponent implements OnInit {
       }
 
 
-    // Get all Bands
-    readJRSS(){
-      this.apiService.getJRSS().subscribe((data) => {
-        this.JRSS = data;
-        this.technologyStream = [];
-      for (var jrss of this.JRSS){
-         for (var skill of jrss.technologyStream){
-           this.technologyStream.push(skill);
-         }
-       }
-            console.log("Technical Stream getjrss: "+ JSON.stringify(this.technologyStream));
-     })
-   
+    // Get all Tech Stream
+    readTechStream(){
+       this.apiService.getTechStream().subscribe((data) => {
+           this.technologyStream = data;
+       });
+       console.log("Master technologyStream: "+ JSON.stringify(this.technologyStream));
     }
 
     // Choose QuestionType with select dropdown
@@ -119,6 +126,7 @@ export class QuestionsAddBulkComponent implements OnInit {
       let templateFileName= "Bulk_Upload_Template.xlsx";
       let templateExcel: any = [{
         QuestionType: '',
+        ComplexityLevel: '',
         Question: '',
         Option1: '',
         Option2: '',
@@ -176,7 +184,7 @@ export class QuestionsAddBulkComponent implements OnInit {
       this.totalBulkQuestions=jsonQuestionObj.length;
       console.log("File length: "+jsonQuestionObj.length);
       //Check if first row in file is empty.
-      let firstRowEmpty = ((!(jsonQuestionObj[0]["QuestionType"])) && (!(jsonQuestionObj[0]["Question"])) && (!(jsonQuestionObj[0]["Option1"])) && (!(jsonQuestionObj[0]["Option2"])) && (!(jsonQuestionObj[0]["Option3"])) && (!(jsonQuestionObj[0]["Option4"])) 
+      let firstRowEmpty = ((!(jsonQuestionObj[0]["QuestionType"])) && (!(jsonQuestionObj[0]["ComplexityLevel"])) && (!(jsonQuestionObj[0]["Question"])) && (!(jsonQuestionObj[0]["Option1"])) && (!(jsonQuestionObj[0]["Option2"])) && (!(jsonQuestionObj[0]["Option3"])) && (!(jsonQuestionObj[0]["Option4"]))
       && (!(jsonQuestionObj[0]["AnswerID"])));
       console.log("First Row Empty: "+firstRowEmpty);
       //Check if File uploaded is Empty      
@@ -190,6 +198,7 @@ export class QuestionsAddBulkComponent implements OnInit {
       this.answerArray=[];  
       this.optionsArray=[];   
       this.validQuestionType=false;
+      this.validComplexityLevel=false;
       
       //Check Valid QuestionType And update
       for(var j = 0; j<this.QuestionTypes.length; j++){
@@ -201,6 +210,19 @@ export class QuestionsAddBulkComponent implements OnInit {
       if(!this.validQuestionType)
       {
         console.log("Not a valid Question Type "+jsonQuestionObj[i]["QuestionType"]+" on row "+(i+2));
+        continue;
+      }
+      //Check Valid ComplexityLevel And update
+      console.log("this.ComplexityLevels.length",this.ComplexityLevels.length);
+      for(var j = 0; j<this.ComplexityLevels.length; j++){
+        if(jsonQuestionObj[i]["ComplexityLevel"] == this.ComplexityLevels[j]){
+          this.questionForm.value.complexityLevel = jsonQuestionObj[i]["ComplexityLevel"];
+          this.validComplexityLevel = true;
+        }
+      }
+      if(!this.validComplexityLevel)
+      {
+        console.log("Not a valid Complexity Level "+jsonQuestionObj[i]["ComplexityLevel"]+" on row "+(i+2));
         continue;
       }
       
@@ -293,6 +315,7 @@ export class QuestionsAddBulkComponent implements OnInit {
     }      
     this.questionID++;    
     this.questionForm.value.questionID=this.questionID;
+    this.questionForm.value.account=this.account;
 
     this.apiService.createQuestion(this.questionForm.value).subscribe(
       (res) => {
@@ -316,6 +339,10 @@ export class QuestionsAddBulkComponent implements OnInit {
     this.questionForm.reset();
     this.file = null;
     (<HTMLInputElement>document.getElementById('fileName')).value = "";
+  }
+
+  cancelForm(){
+    this.ngZone.run(() => this.router.navigateByUrl('/view-questionbank',{state:{username:this.userName,accessLevel:this.accessLevel,account:this.account}}));
   }
 }
 

@@ -7,6 +7,14 @@ import { DatePipe } from '@angular/common';
 import { saveAs } from 'file-saver';
 import { Injectable } from '@angular/core';
 import { appConfig } from './../../model/appConfig';
+import {MatTableDataSource} from '@angular/material/table';
+import {MatPaginator} from '@angular/material/paginator'
+import {MatSort} from '@angular/material/sort'
+import { Candidate } from './../../model/candidate';
+import { ViewResult } from './../../model/viewResult';
+
+
+declare var $: any;
 
 @Component({
   selector: 'app-technical-interview-list',
@@ -24,6 +32,7 @@ export class TechnicalInterviewListComponent implements OnInit {
   TechnicalInterviewList: any = [];
   config: any;
   emailSelected = "";
+  account: String = "";
   quizNumber;
   technicalInterviewCandidateList: any = [];
   filteredUsers: any[] = [];
@@ -45,33 +54,73 @@ export class TechnicalInterviewListComponent implements OnInit {
   displayContractorUIFields: Boolean = false;
   displayRegularUIFields: Boolean = true;
   candidateDetails: any = [];
+  AccountData:any = [];
+  AccountList:any=[];
+  filterObj = {};
+  nameFilter: string;
+  accountFilter: string;
+  jrssFilter: string;
+  loading = true;
+  dataSource = new MatTableDataSource<ViewResult>();
+  showCalendar: boolean = false;
+  calEmployeeName = "";
 
+  displayedColumns = ['Action','result_users[0].employeeName', 'result_users[0].JRSS','userScore','preTechForm','cvDownload'];
+  displayedColumnsSector = ['Action','result_users[0].employeeName', 'result_users[0].JRSS','result_users[0].account','userScore','preTechForm','cvDownload'];
+
+
+  @ViewChild(MatPaginator) paginator: MatPaginator;
+  @ViewChild(MatSort) sort: MatSort;
 
   constructor(private datePipe: DatePipe, private route: ActivatedRoute, private router: Router, private apiService: ApiService, private ngZone: NgZone, private fb: FormBuilder) {
-    this.config = {
-      currentPage: appConfig.currentPage,
-      itemsPerPage: appConfig.itemsPerPage,
-      totalItems: appConfig.totalItems
-    };
-    
     this.browserRefresh = browserRefresh;
     if (!this.browserRefresh) {
       this.userName = this.router.getCurrentNavigation().extras.state.username;
       this.accessLevel = this.router.getCurrentNavigation().extras.state.accessLevel;
+      this.account = this.router.getCurrentNavigation().extras.state.account;
     }
     this.form = this.fb.group({
       employeeName: new FormControl(''),
-      JRSS: new FormControl('')
+      JRSS: new FormControl(''),
+      account: new FormControl('')
     });
-    route.queryParams.subscribe(
-      params => this.config.currentPage = params['page'] ? params['page'] : 1);
+
     this.getTechnicalInterviewList();
     this.mainForm();
+    this.readAccount();
   }
 
   @ViewChild('content') content: any;
+  @ViewChild('calendarContent') calendarContent: any;
   ngOnInit(): void {
-    
+      this.browserRefresh = browserRefresh;
+  this.dataSource.filterPredicate = (data: any, filter) => {
+        const dataStr =JSON.stringify(data).toLowerCase();
+        return dataStr.indexOf(filter) != -1;
+  }
+
+  this.dataSource.sortingDataAccessor = (item, property) => {
+      switch(property) {
+        case 'result_users[0].employeeName': return item.result_users[0].employeeName;
+        case 'result_users[0].JRSS': return item.result_users[0].JRSS;
+        case 'userScore': return item.userScore;
+        case 'result_users[0].account': return item.result_users[0].account;
+        default: return item[property];
+      }
+   }
+  }
+
+  ngAfterViewInit (){
+    this.dataSource.sort = this.sort;
+    this.dataSource.paginator = this.paginator;
+  }
+
+  applyFilter(filterValue: string,key: string) {
+    this.filterObj = {
+          value: filterValue.trim().toLowerCase(),
+          key: key
+    }
+    this.dataSource.filter = filterValue.trim().toLowerCase();
   }
 
 
@@ -88,7 +137,25 @@ export class TechnicalInterviewListComponent implements OnInit {
     alert('Stage skipped');
   }
 
+  // Get all Accounts
+  readAccount(){
+    this.apiService.getAccounts().subscribe((data) => {
+    this.AccountData = data;
+    //Remove 'sector' from Account collection
+    for (var accValue of this.AccountData){
+        if(accValue.account.toLowerCase() !== 'sector' ) {
+          this.AccountList.push(accValue.account);
+        }
+    }
+    })
+  }
 
+    // Choose account result with select dropdown
+    updateAccountDetails(e) {
+      this.form.get('account').setValue(e, {
+      onlySelf: true
+      })
+    }
 
 
   //To read candidate details
@@ -105,11 +172,11 @@ export class TechnicalInterviewListComponent implements OnInit {
          }
     })
 }
-  
+
   //To download candidate's CV if uploaded
   downloadCandidateResume(id) {
     this.apiService.getCandidateJrss(id).subscribe(data => {
-      //Get resume Data    
+      //Get resume Data
       this.resumeName1 = data['resumeName'];
       let resumeData1: String = data['resumeData'];
 
@@ -136,64 +203,80 @@ export class TechnicalInterviewListComponent implements OnInit {
     });
   }
 
-  pageChange(newPage: number) {
-    this.router.navigate(['/technical-interview-list'], { queryParams: { page: newPage } });
-  }
-
-
   //submit
   onSubmit() {
     this.submitted = true;
-    
     this.apiService.updateExceptionalApproval(this.emailSelected, this.quizNumber,  this.smeFeedbackForm.value.smeFeedback).subscribe(res => {
       window.alert('Successfully moved candidate to next stage');
       this.showModal = false;
-      window.location.reload();
+      this.getTechnicalInterviewList();
+      $("#myModal").modal("hide");
     }, (error) => {
       console.log(error);
     })
-
   }
-  exceptionalApproval() {
 
+  exceptionalApproval() {
     if (this.emailSelected == "") {
-      alert("please select the candidate")
+      alert("Please select the candidate");
+      return false;
     }
     else {
-      if (window.confirm("Are you sure you want to provide exemption approval?")) {
+      if (window.confirm("Are you sure you want to provide exception approval?")) {
         this.showModal = true;
         this.content.open();
-
-      }
-      else {
+      } else {
         this.showModal = false;
       }
     }
   }
+
+
+
+
+  scheduleInterview() {
+    if (this.emailSelected == "") {
+      alert("Please select a candidate")
+      return false;
+    }
+
+  }
   initiateInterview() {
     if (this.emailSelected == "") {
-      alert("please select the candidate")
+      alert("Please select the candidate")
     }
     else {
-      this.router.navigate(['/technical-list/', this.emailSelected], { state: { username: this.userName, quizId: this.quizNumber, accessLevel: this.accessLevel } })
+      this.router.navigate(['/technical-list/', this.emailSelected], { state: { username: this.userName, quizId: this.quizNumber, accessLevel: this.accessLevel, account: this.account } })
     }
   }
 
-  onSelectionChange(value, quizNumber) {
+  onSelectionChange(value, calEmployeeName, quizNumber) {
     this.emailSelected = value;
+    this.calEmployeeName = calEmployeeName;
     this.quizNumber = quizNumber;
+
 
   }
 
   getTechnicalInterviewList() {
+    if(this.account.toLocaleLowerCase() !=='sector'){
+      this.apiService.getTechnicalInterviewAccountList(this.account).subscribe((data) => {
+        this.TechnicalInterviewList = data;
+        this.technicalInterviewCandidateList = data;
+        this.dataSource.data = data as ViewResult[];
+      })
+    }
+    else{
     this.apiService.getTechnicalInterviewList().subscribe((data) => {
       this.TechnicalInterviewList = data;
       this.technicalInterviewCandidateList = data;
+      this.dataSource.data = data as ViewResult[];
     })
+   }
   }
 
   search(filters: any): void {
-    Object.keys(filters).forEach(key => filters[key] === '' ? delete filters[key] : key);
+    Object.keys(filters).forEach(key => (filters[key] === '' || filters[key] ===  null) ? delete filters[key] : key);
     this.filterUserList(filters, this.technicalInterviewCandidateList);
   }
 
@@ -205,7 +288,7 @@ export class TechnicalInterviewListComponent implements OnInit {
 
     const filterUser = user => {
       let result = keys.map(key => {
-        if (key == "employeeName" || key == "JRSS") {
+        if (key == "employeeName" || key == "JRSS" || key == "account") {
           if (user.result_users[0][key]) {
             return String(user.result_users[0][key]).toLowerCase().startsWith(String(filters[key]).toLowerCase())
           }
@@ -240,4 +323,13 @@ export class TechnicalInterviewListComponent implements OnInit {
 
     })
   }
+
+ clearFilters() {
+        this.dataSource.filter = '';
+        this.nameFilter = '';
+        this.accountFilter = '';
+        this.jrssFilter = '';
+ }
+
+
 }

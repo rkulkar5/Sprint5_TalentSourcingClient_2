@@ -1,4 +1,4 @@
-import { Component, OnInit, NgZone } from '@angular/core';
+import { Component, OnInit, NgZone,ViewChild } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import { FormGroup, FormBuilder, Validators } from "@angular/forms";
 import { TestConfigService } from './../../service/testconfig.service';
@@ -6,6 +6,9 @@ import { ApiService } from './../../service/api.service';
 import { TestConfig } from './../../model/testConfig';
 import { browserRefresh } from '../../app.component';
 import { appConfig } from './../../model/appConfig';
+import {MatTableDataSource} from '@angular/material/table';
+import {MatPaginator} from '@angular/material/paginator'
+import {MatSort} from '@angular/material/sort';
 
 @Component({
   selector: 'app-test-config-edit',
@@ -23,8 +26,16 @@ export class TestConfigEditComponent implements OnInit {
   passingScore:number;
   TestConfigs:any = [];
   userName: String = "admin";
+  account: any;
+  accessLevel:any;
   oldJRSS: String = "";
   testConfigID: String = "";
+
+  dataSource = new MatTableDataSource<TestConfig>();
+  displayedColumns = ['Action','JRSS', 'noOfQuestions','testDuration','passingScore'];
+
+  @ViewChild(MatPaginator) paginator: MatPaginator;
+  @ViewChild(MatSort) sort: MatSort;
 
   constructor(
       public fb: FormBuilder,
@@ -34,14 +45,12 @@ export class TestConfigEditComponent implements OnInit {
       private testconfigService: TestConfigService,
       private apiService: ApiService
     ) {
-      this.config = {
-                currentPage: appConfig.currentPage,
-                itemsPerPage: appConfig.itemsPerPage,
-                totalItems: appConfig.totalItems
-      };
-    actRoute.queryParams.subscribe(
-          params => this.config.currentPage= params['page']?params['page']:1 );
       this.browserRefresh = browserRefresh;
+      if (!this.browserRefresh) {
+          this.userName = this.router.getCurrentNavigation().extras.state.username;
+          this.account = this.router.getCurrentNavigation().extras.state.account;
+          this.accessLevel = this.router.getCurrentNavigation().extras.state.accessLevel;
+      }
       this.getAllJRSS();
       let id = this.actRoute.snapshot.paramMap.get('id');
       this.getTestConfig(id);
@@ -64,6 +73,11 @@ export class TestConfigEditComponent implements OnInit {
       })
     }
 
+    ngAfterViewInit (){
+      this.dataSource.sort = this.sort;
+      this.dataSource.paginator = this.paginator;
+    }
+
      // Get all Jrss
      getAllJRSS(){
       this.apiService.getJRSS().subscribe((data) => {
@@ -79,7 +93,7 @@ export class TestConfigEditComponent implements OnInit {
       if (this.testConfigID == "") {
         alert("Please select the test configuration record")
       } else {
-        this.router.navigate(['/testconfig-edit/', this.testConfigID]);
+        this.router.navigate(['/testconfig-edit/', this.testConfigID], {state: {username:this.userName,accessLevel:this.accessLevel,account:this.account}});
       }
     }
 
@@ -88,10 +102,6 @@ export class TestConfigEditComponent implements OnInit {
       this.testConfigEditForm.get('JRSS').setValue(e, {
         onlySelf: true
       })
-    }
-
-    pageChange(newPage: number) {
-          this.router.navigate(['/testconfig-add'], { queryParams: { page: newPage } });
     }
 
     getTestConfig(id) {
@@ -119,6 +129,7 @@ export class TestConfigEditComponent implements OnInit {
     getAllTestConfigs(){
         this.testconfigService.getAllTestConfigs().subscribe((data) => {
         this.TestConfigs = data;
+        this.dataSource.data = data as TestConfig[];
         })
     }
 
@@ -127,6 +138,10 @@ export class TestConfigEditComponent implements OnInit {
       return this.testConfigEditForm.controls;
     }
 
+    //Cancel
+    cancelForm(){
+      this.ngZone.run(() => this.router.navigateByUrl('/testconfig-add', {state: {username:this.userName,accessLevel:this.accessLevel,account:this.account}}))
+    }
 
     onSubmit() {
         this.submitted = true;
@@ -145,7 +160,7 @@ export class TestConfigEditComponent implements OnInit {
               this.testconfigService.updateTestConfig(id, testConfig)
                   .subscribe(res => {
                     this.router.navigateByUrl('/', {skipLocationChange: true}).then(() =>
-                    this.router.navigate(['/testconfig-add']));
+                    this.router.navigate(['/testconfig-add'], {state: {username:this.userName,accessLevel:this.accessLevel,account:this.account}}));
                     console.log('Content updated successfully!')
                   }, (error) => {
                     console.log(error)

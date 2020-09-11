@@ -1,9 +1,12 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit,ViewChild } from '@angular/core';
 import { ApiService } from './../../service/api.service';
 import { FormGroup, FormBuilder, Validators } from "@angular/forms";
 import { ActivatedRoute, Router } from '@angular/router';
 import { browserRefresh } from '../../app.component';
-import { appConfig } from './../../model/appConfig';
+import { CandidateDetails } from './../../model/candidateDetails';
+import {MatTableDataSource} from '@angular/material/table';
+import {MatPaginator} from '@angular/material/paginator'
+import {MatSort} from '@angular/material/sort';
 
 @Component({
   selector: 'app-candidate-list',
@@ -14,6 +17,8 @@ import { appConfig } from './../../model/appConfig';
 export class CandidateListComponent implements OnInit {
   public browserRefresh: boolean;
   Candidate:any = [];
+  candidateDetails: any = [];
+  mode: any;
   config: any;
   state = "Activate";
   error = "";
@@ -25,50 +30,69 @@ export class CandidateListComponent implements OnInit {
   candidateUserName;
   index;
   isRowSelected = false;
+  account: any;
+  accessLevel:any;
+  displayContractorUIFields: Boolean = false;
+  displayRegularUIFields: Boolean = true;
+
+  filterObj = {};
+  nameFilter: string;
+  emailFilter: string;
+  bandFilter: string;
+  jrssFilter: string;
+  loading = true;
+  dataSource = new MatTableDataSource<CandidateDetails>();
+
+  displayedColumns = ['Action','employeeName', 'username','band','JRSS','phoneNumber','status','quizNumber','Action1'];
+
+  @ViewChild(MatPaginator) paginator: MatPaginator;
+  @ViewChild(MatSort) sort: MatSort;
 
   constructor(private route: ActivatedRoute, private router: Router, private apiService: ApiService) {
-    this.config = {
-      currentPage: appConfig.currentPage,
-      itemsPerPage: appConfig.itemsPerPage,
-      totalItems:appConfig.totalItems
-    };
+
     this.browserRefresh = browserRefresh;
     if (!this.browserRefresh) {
         this.userName = this.router.getCurrentNavigation().extras.state.username;
+        this.account = this.router.getCurrentNavigation().extras.state.account;
+        this.accessLevel = this.router.getCurrentNavigation().extras.state.accessLevel;
     }
-    route.queryParams.subscribe(
-    params => this.config.currentPage= params['page']?params['page']:1 );
-    this.readCandidate();
+
   }
 
   ngOnInit() {
     this.browserRefresh = browserRefresh;
-    // if (this.browserRefresh) {
-    //     if (window.confirm('Your account will be deactivated. You need to contact administrator to login again. Are you sure?')) {
-    //       this.router.navigate(['/login-component']);
-    //     }
-    // }
+    this.dataSource.filterPredicate = (data, filter) => {
+        if(data[this.filterObj['key']] && this.filterObj['key']) {
+            return data[this.filterObj['key']].toLowerCase().includes(this.filterObj['value']);
+        }
+        return false;
+    }
+    this.readCandidate();
+    setTimeout(() => {
+        this.loading = false;
+    }, 2000);
   }
-
-  pageChange(newPage: number) {
-        this.router.navigate(['/candidates-list'], { queryParams: { page: newPage } });
+  ngAfterViewInit (){
+    this.dataSource.sort = this.sort;
+    this.dataSource.paginator = this.paginator;
   }
 
   // To Read the Candidate
   readCandidate(){
-    this.apiService.getCandidates().subscribe((data) => {
-     this.Candidate = data;
-      
+    return (this.apiService.getCandidates().subscribe((data) => {
+      this.Candidate = data;
+      this.dataSource.data = data as CandidateDetails[];
       this.Candidate.forEach(candidate => {
         candidate.candidate_users.forEach(user => {
-          if (user.status == 'Active' && user.userLoggedin === 'true' ){ candidate.state='Clear\xa0Session'; } 
-		      else if (user.status == 'Active' )  { candidate.state='Disable'; } 
+          if (user.status == 'Active' && user.userLoggedin === 'true' ){ candidate.state='Clear\xa0Session'; }
+		      else if (user.status == 'Active' )  { candidate.state='Disable'; }
           else {candidate.state='Enable'; }
 	       });
-      }); 
+      });
 
-      
+
     })
+    )
   }
 
   //To remove candidate
@@ -91,7 +115,7 @@ export class CandidateListComponent implements OnInit {
     if (this.isRowSelected == false){
       alert("Please select the user");
       }else{
-      this.router.navigate(['/edit-candidate/', this.candidateId, this.candidateUsersId], {state: {username:this.userName}});
+      this.router.navigate(['/edit-candidate/', this.candidateId, this.candidateUsersId], {state: {username:this.userName,accessLevel:this.accessLevel,account:this.account}});
       }
     } 
 	
@@ -161,5 +185,36 @@ export class CandidateListComponent implements OnInit {
           console.log("Error found while fetching records from Users table - " + error);
       });      
 } // End of updateCandidateStatus
+
+  applyFilter(filterValue: string,key: string) {
+    this.filterObj = {
+          value: filterValue.trim().toLowerCase(),
+          key: key
+    }
+    this.dataSource.filter = filterValue.trim().toLowerCase();
+  }
+
+   //To read candidate details
+   getCandidateDetails(username) {
+       this.mode="displayModalBody";
+       this.apiService.getCandidateDetails(username).subscribe((data) => {
+            this.candidateDetails = data;
+            if (this.candidateDetails[0].employeeType == 'Contractor') {
+                 this.displayContractorUIFields = true;
+                 this.displayRegularUIFields = false;
+            } else {
+                 this.displayContractorUIFields = false;
+                 this.displayRegularUIFields = true;
+            }
+       })
+   }
+
+   clearFilters() {
+      this.dataSource.filter = '';
+      this.nameFilter = '';
+      this.emailFilter = '';
+      this.bandFilter = '';
+      this.jrssFilter = '';
+   }
 
 }

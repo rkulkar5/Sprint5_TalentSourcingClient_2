@@ -1,0 +1,118 @@
+<app-navigation></app-navigation>
+<br/>
+  <div class="float-left text-left">
+    <h4 class="my-0 mr-md-auto font-weight-normal">Add Open Position/Seat</h4></div>
+  <br/><br>
+  <mat-card class="login-card">
+    <mat-card-header>
+    </mat-card-header>
+    <mat-card-content>
+    <form [formGroup]="openPositionForm">
+        <table class="open-full-width" cellspacing="0">
+          <tr>
+            <td>
+              <mat-form-field class="open-full-width">
+                <input matInput placeholder="Open Position Name" formControlName="positionName" name="positionName" required [ngClass]="{ 'is-invalid': !formReset && submitted && myForm.positionName.errors }">
+                <div *ngIf="!formReset && submitted && myForm.positionName.errors" class="invalid-feedback">
+                  <div *ngIf="myForm.positionName.errors.required">Position Name is required</div>
+                </div>
+              </mat-form-field>
+            </td>
+            <td>
+              <mat-form-field class="open-full-width">
+              <mat-select placeholder="Account"  (selectionChange)="updateAccountProfile($event)"
+                      formControlName="account" required id="account" [ngClass]="{ 'is-invalid': !formReset && submitted && myForm.account.errors }" >
+                <mat-option value="">Choose...</mat-option>
+                <mat-option *ngFor="let account of AccountArray" value="{{account}}">{{account}}
+                </mat-option>
+              </mat-select>
+              <div *ngIf="!formReset && submitted && myForm.account.errors" class="invalid-feedback" >
+                <div *ngIf="myForm.account.errors.required">Account is required</div>
+              </div>
+              </mat-form-field>
+            </td>
+          </tr>
+          <tr>
+            <td>
+              <mat-form-field class="open-full-width">
+                <mat-select placeholder="Job Role" (selectionChange)="updateJobRoleProfile($event)"
+                        formControlName="JRSS" required name="JRSS" [ngClass]="{ 'is-invalid': !formReset && submitted && myForm.JRSS.errors }">
+                  <mat-option value="">Choose...</mat-option>
+                  <mat-option *ngFor="let jrss of JRSS" value="{{jrss.jrss}}">{{jrss.jrss}}
+                  </mat-option>
+                </mat-select>
+                <div *ngIf="!formReset && submitted && myForm.JRSS.errors" class="invalid-feedback">
+                  <div *ngIf="myForm.JRSS.errors.required">Job Role is required</div>
+                </div>
+              </mat-form-field>
+            </td>
+            <td>
+              <mat-form-field class="open-full-width">
+                <mat-select placeholder="Line Of Business" (selectionChange)="updateLineOfBusinessProfile($event)"
+                        name="lineOfBusiness" required formControlName="lineOfBusiness" [ngClass]="{ 'is-invalid': !formReset && submitted && myForm.lineOfBusiness.errors }">
+                  <mat-option value="">Choose...</mat-option>
+                  <mat-option *ngFor="let data of LineOfBusiness" value="{{data.lob}}" >{{data.lob}}</mat-option>
+                </mat-select>
+                <div *ngIf="!formReset && submitted && myForm.lineOfBusiness.errors" class="invalid-feedback">
+                  <div *ngIf="myForm.lineOfBusiness.errors.required">Line Of Business is required</div>
+                </div>
+              </mat-form-field>
+            </td>
+          </tr>
+
+          <tr>
+            <td>
+              <mat-form-field class="open-full-width">
+                <mat-select placeholder="Position Location"  (selectionChange)="updatePositionLocationProfile($event)"
+                        name="positionLocation" required formControlName="positionLocation" [ngClass]="{ 'is-invalid': !formReset && submitted && myForm.positionLocation.errors }">
+                  <mat-option value="">Choose...</mat-option>
+                  <mat-option *ngFor="let data of PositionLocation" value="{{data.positionLocation}}" >{{data.positionLocation}}</mat-option>
+                </mat-select>
+                <div *ngIf="!formReset && submitted && myForm.positionLocation.errors" class="invalid-feedback">
+                  <div *ngIf="myForm.positionLocation.errors?.required">Position Location is required</div>
+                </div>
+              </mat-form-field>
+            </td>
+            <td>
+              <mat-form-field class="open-full-width">
+                <mat-select placeholder="Rate Card Job Role" (selectionChange)="updateRateCardJobRoleProfile($event)"
+                        formControlName="rateCardJobRole" required name="rateCardJobRole" [ngClass]="{ 'is-invalid': !formReset && submitted && myForm.rateCardJobRole.errors }">
+                  <mat-option value="">Choose...</mat-option>
+                  <mat-option *ngFor="let data of RateCardJobRole" value="{{data.rateCardJobRole}}">{{data.rateCardJobRole}}
+                  </mat-option>
+                </mat-select>
+                <div *ngIf="!formReset && submitted && myForm.rateCardJobRole.errors" class="invalid-feedback">
+                  <div *ngIf="myForm.rateCardJobRole.errors.required">Rate Card Job Role is required</div>
+                </div>
+              </mat-form-field>
+            </td>
+          </tr>
+          <tr>
+            <td>
+              <mat-form-field class="open-full-width">
+                <mat-select placeholder="Competency Level" (selectionChange)="updateCompetencyLevelProfile($event)"
+                        name="inputCompetencyLevel" required formControlName="competencyLevel" [ngClass]="{ 'is-invalid': !formReset && submitted && myForm.competencyLevel.errors }">
+                  <mat-option value="">Choose...</mat-option>
+                  <mat-option *ngFor="let data of CompetencyLevel" value="{{data.competencyLevel}}" >{{data.competencyLevel}}</mat-option>
+                </mat-select>
+                <div *ngIf="!formReset && submitted && myForm.competencyLevel.errors" class="invalid-feedback">
+                  <div *ngIf="myForm.competencyLevel.errors.required">Competency Level is required</div>
+                </div>
+              </mat-form-field>
+            </td>
+          </tr>
+        </table>
+    </form>
+    </mat-card-content>
+    <br/>
+    <mat-card-actions>
+      <div class="row justify-content-center">
+        <button mat-raised-button color="primary" (click)="onSubmit()">Save</button>
+        <button mat-raised-button color="primary" (click)="resetForm()">Reset</button>
+        <button mat-raised-button color="primary" (click)="cancelForm()">Cancel</button>
+      </div>
+    </mat-card-actions>
+  </mat-card>
+
+
+

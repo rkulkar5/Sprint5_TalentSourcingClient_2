@@ -1,10 +1,13 @@
-import { Component, Input, OnChanges, ChangeDetectorRef } from '@angular/core';
+import { Component, Input, OnChanges, ChangeDetectorRef, ViewChild } from '@angular/core';
 import { ApiService } from './../../../service/api.service';
 import { FormGroup, FormBuilder, Validators } from "@angular/forms";
 import { ActivatedRoute, Router } from '@angular/router';
 import { browserRefresh } from '../../../app.component';
 import { Dashboard } from './../../../model/dashboard';
 import { appConfig } from './../../../model/appConfig';
+import {MatTableDataSource} from '@angular/material/table';
+import {MatPaginator} from '@angular/material/paginator'
+import {MatSort} from '@angular/material/sort';
 
 
 @Component({
@@ -16,11 +19,17 @@ export class DashboardListComponent implements OnChanges {
 
   @Input() groupFilters: Object;
   @Input() searchByKeyword: string;
+  
+  @ViewChild(MatPaginator) paginator: MatPaginator;
+  @ViewChild(MatSort) sort: MatSort;
+
   users: any[] = [];
   searchText: string;
   filters: Object;
   filteredUsers: any[] = [];
   Result: any = [];
+  
+  dataSource = new MatTableDataSource<any>();
 
   public browserRefresh: boolean;
   DashboardList: any = [];
@@ -42,6 +51,8 @@ export class DashboardListComponent implements OnChanges {
   displayContractorUIFields: Boolean = false;
   displayRegularUIFields: Boolean = true;
   filterKey : string = "";
+  account: String = "";
+displayedColumns = ['Action','employeeName', 'JRSS','userResult','smeResult','managementResult','stage5_status'];
 
 
   constructor(private route: ActivatedRoute, private router: Router, private apiService: ApiService) {
@@ -54,6 +65,7 @@ export class DashboardListComponent implements OnChanges {
         if (!this.browserRefresh) {
             this.userName = this.router.getCurrentNavigation().extras.state.username;
             this.accessLevel = this.router.getCurrentNavigation().extras.state.accessLevel;
+            this.account = this.router.getCurrentNavigation().extras.state.account;
         }
         route.queryParams.subscribe(
         params => this.config.currentPage= params['page']?params['page']:1 );
@@ -73,6 +85,25 @@ export class DashboardListComponent implements OnChanges {
               this.router.navigate(['/login-component']);
         }
         this.readResult();
+
+
+        this.dataSource.filterPredicate = (data: any, filter) => {
+          const dataStr =JSON.stringify(data).toLowerCase();
+          return dataStr.indexOf(filter) != -1;
+    }
+  
+    this.dataSource.sortingDataAccessor = (item, property) => {
+        switch(property) {
+          case 'employeeName': return item.result_users[0].employeeName;
+          case 'JRSS': return item.result_users[0].JRSS;
+          case 'userResult': return item.userScore;
+          case 'smeResult': return item.smeResult;
+          case 'managementResult': return item.managementResult;
+          case 'stage5_status': return item.stage5_status;
+          default: return item[property];
+        }
+     }
+
     }
 
     filterUserList(filters: any, users: any): void {
@@ -104,6 +135,7 @@ export class DashboardListComponent implements OnChanges {
       }
       this.filteredUsers = this.users.filter(filterUser);
       this.Result = this.filteredUsers
+	  this.dataSource.data = this.Result;
     }
 
 
@@ -121,6 +153,7 @@ export class DashboardListComponent implements OnChanges {
     readResult() {
       this.apiService.getDashboardList().subscribe((data) => {
         this.Result = data;
+		this.dataSource.data = this.Result;
         this.users = data
         this.filteredUsers = this.filteredUsers.length > 0 ? this.filteredUsers : this.users;
       })
@@ -184,5 +217,23 @@ export class DashboardListComponent implements OnChanges {
      })
   }
 
+
+
+  @ViewChild(MatSort) set matSort(ms: MatSort) {
+    this.sort = ms;
+    this.setDataSourceAttributes();
+  }
+
+  @ViewChild(MatPaginator) set matPaginator(mp: MatPaginator) {
+    this.paginator = mp;
+    this.setDataSourceAttributes();
+  }
+
+  setDataSourceAttributes() {
+    this.dataSource.paginator = this.paginator;
+    this.dataSource.sort = this.sort;
+
+  }
+  
 
   }

@@ -4,6 +4,7 @@ import { Component, OnInit, NgZone } from '@angular/core';
 import { FormGroup, FormArray,FormBuilder, Validators } from "@angular/forms";
 import { Question } from 'src/app/model/questions';
 import { ResourceLoader } from '@angular/compiler';
+import { browserRefresh } from '../../app.component';
 import * as XLSX from 'xlsx';
 
 
@@ -13,24 +14,34 @@ import * as XLSX from 'xlsx';
   styleUrls: ['./questions-add.component.css']
 })
 export class QuestionsAddComponent implements OnInit {
+  public browserRefresh: boolean;
   submitted = false;
   formReset = false;
   questionForm: FormGroup;
   uploadFile: String = "Please select a file";
   userName: String = "admin";
+  account:any;
+  accessLevel:any;
   JRSS:any = [];
   technologyStream:any = [];
   QuestionTypes:any = ['SingleSelect','MultiSelect'];
+  ComplexityLevel:any = ['Complex','Medium','Simple'];
   answerArray:Array<String>=[];
   optionsArray:Array<Object>=[];
   questionID:any;
   file: File;
   arrayBuffer: any;
   filelist: any;
-  constructor(public fb: FormBuilder,
-                  private router: Router,
-                  private ngZone: NgZone,
-                  private apiService: ApiService) { this.readJRSS();this.mainForm();}
+  constructor(public fb: FormBuilder,private router: Router,private ngZone: NgZone,private apiService: ApiService) {
+      this.browserRefresh = browserRefresh;
+      if (!this.browserRefresh) {
+          this.userName = this.router.getCurrentNavigation().extras.state.username;
+          this.account = this.router.getCurrentNavigation().extras.state.account;
+          this.accessLevel = this.router.getCurrentNavigation().extras.state.accessLevel;
+      }
+      this.readTechStream();
+      this.mainForm();
+  }
 
   ngOnInit() {this.apiService.getQuestionID().subscribe(
     (res) => {  
@@ -47,6 +58,7 @@ export class QuestionsAddComponent implements OnInit {
       this.questionForm = this.fb.group({
         technologyStream: ['', [Validators.required]],
         questionType: ['', [Validators.required]],
+        complexityLevel: ['', [Validators.required]],
         question: ['', [Validators.required]],
         option1: ['', [Validators.required]],
         option2: ['', [Validators.required]],
@@ -58,6 +70,7 @@ export class QuestionsAddComponent implements OnInit {
         option4checkbox:[],
         answerID:[],
         questionID:[],
+        account: []
         
        
       })
@@ -85,23 +98,22 @@ export class QuestionsAddComponent implements OnInit {
 
 
     // Get all Technology streams of all JRSS
-    readJRSS(){
-       this.apiService.getJRSS().subscribe((data) => {
-       this.JRSS = data;
-       this.technologyStream = [];
-     for (var jrss of this.JRSS){
-        for (var skill of jrss.technologyStream){
-          this.technologyStream.push(skill);
-        }
-      }
-           console.log("Technical Stream getjrss: "+ JSON.stringify(this.technologyStream));
-    })
-  
-    }
+    readTechStream(){
+       this.apiService.getTechStream().subscribe((data) => {
+           this.technologyStream = data;
+       });
+       console.log("Master technologyStream: "+ JSON.stringify(this.technologyStream));
+     }
   
     // Choose QuestionType with select dropdown
     updateQuestionTypes(e){
       this.questionForm.get('questionType').setValue(e, {
+      onlySelf: true
+      })
+    }
+    // Choose QuestionType with select dropdown
+    updateComplexityLevel(e){
+      this.questionForm.get('complexityLevel').setValue(e, {
       onlySelf: true
       })
     }
@@ -165,6 +177,7 @@ export class QuestionsAddComponent implements OnInit {
               }       
               this.questionID++;                
               this.questionForm.value.questionID=this.questionID;
+              this.questionForm.value.account=this.account;
               
           this.apiService.createQuestion(this.questionForm.value).subscribe(
             (res) => {
@@ -172,13 +185,21 @@ export class QuestionsAddComponent implements OnInit {
               window.confirm('Succesfully added to QuestionBank');
               this.formReset = true;
               this.questionForm.reset();
-              this.ngZone.run(() => this.router.navigateByUrl('/manage-questionbank'))
+              this.ngZone.run(() => this.router.navigateByUrl('/manage-questionbank',{state:{username:this.userName,accessLevel:this.accessLevel,account:this.account}}))
             }, (error) => {
               console.log(error);
             }); 
           }
         }
-      } 
+      }
+
+    cancelForm(){
+      this.ngZone.run(() => this.router.navigateByUrl('/view-questionbank',{state:{username:this.userName,accessLevel:this.accessLevel,account:this.account}}));
+    }
+     resetForm() {
+        this.formReset = true;
+        this.questionForm.reset();
+     }
 }
 
 

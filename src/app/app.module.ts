@@ -1,4 +1,5 @@
 import { BrowserModule } from '@angular/platform-browser';
+import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { NgModule } from '@angular/core';
 import { NgxPaginationModule } from 'ngx-pagination';
 import { FormsModule }   from '@angular/forms';
@@ -26,10 +27,9 @@ import { TestConfigAddComponent } from './components/test-config-add/test-config
 import { TestConfigEditComponent } from './components/test-config-edit/test-config-edit.component';
 import { JrssCreateComponent } from './components/jrss-create/jrss-create.component';
 import { StreamCreateComponent } from './components/stream-create/stream-create.component';
-import { UserModule} from './components/view-testresults/user.module';
 import { DashboardUserModule } from './components/dashboard/dashboard-user.module';
 import { OperationsUserModule } from './components/operations-candidate-list/operations-user.module';
-import { PartnerUserModule } from './components/partner-interview/partner-user.module';
+import { PartnerInterviewComponent } from './components/partner-interview/partner-interview.component';
 import { PartnerInterviewInitiateComponent } from './components/partner-interview-initiate/partner-interview-initiate.component';
 import { OperationsProjectInitiateComponent } from './components/operations-project-initiate/operations-project-initiate.component';
 import { TechnicalInterviewListComponent } from './components/technical-interview-list/technical-interview-list.component';
@@ -43,9 +43,40 @@ import { StreamDeleteComponent } from './components/stream-delete/stream-delete.
 import { ReportComponent } from './components/report/report.component';
 import { UserEditComponent } from './components/user-edit/user-edit.component';
 import { StreamAddComponent } from './components/stream-add/stream-add.component';
-
+import { ViewInterviewStatusComponent } from './components/view-interview-status/view-interview-status.component';
+import { ViewInterviewStatusExceptionComponent } from './components/view-interview-status-exception/view-interview-status-exception.component';
+import { OpenpositionsListComponent } from './components/openpositions-list/openpositions-list.component';
+import { OpenpositionsCreateComponent } from './components/openpositions-create/openpositions-create.component';
+import { OpenpositionsEditComponent } from './components/openpositions-edit/openpositions-edit.component';
+import { ProjectAssignmentComponent } from './components/project-assignment/project-assignment.component';
+import { OpenPositionsListComponent } from './components/open-positions-list/open-positions-list.component';
+import { EligibleCandidatesComponent } from './components/eligible-candidates/eligible-candidates.component';
+import { EligibleCandidatesFilterPipe } from './components/eligible-candidates/filterByJRSS.pipe';
+import { QuestionAddBulkSectorsmeComponent } from './components/question-add-bulk-sectorsme/question-add-bulk-sectorsme.component';
+import { QuestionsAddSectorsmeComponent } from './components/questions-add-sectorsme/questions-add-sectorsme.component';
+import { ViewTestresultsComponent } from './components/view-testresults/view-testresults.component';
+import { TATMaterialModule } from  './material.module';
+import { SuperadminUserCreateComponent } from './components/superadmin-user-create/superadmin-user-create.component';
+import { TechIntSchedulerComponent } from './components/tech-int-scheduler/tech-int-scheduler.component';
+import { ViewQuestionComponent } from './components/view-question/view-question.component';
+import {FullCalendarModule} from '@fullcalendar/angular';
+import dayGridPlugin from '@fullcalendar/daygrid';
+import interactionPlugin from '@fullcalendar/interaction';
+import timeGridPlugin from '@fullcalendar/timegrid';
+import listPlugin from '@fullcalendar/list';
+import { QuestionEditComponent } from './components/question-edit/question-edit.component';
+import { NavigationComponent } from './components/navigation/navigation.component';
+import {SuperadminUserEditComponent} from './components/superadmin-user-edit/superadmin-user-edit.component'
 
 export let browserRefresh = false;
+
+FullCalendarModule.registerPlugins([ 
+  dayGridPlugin,
+  interactionPlugin,
+  timeGridPlugin,
+  listPlugin
+
+]);
 
 @NgModule({
   declarations: [
@@ -66,8 +97,9 @@ export let browserRefresh = false;
     TestConfigAddComponent,
     TestConfigEditComponent,
     JrssCreateComponent,
-    StreamCreateComponent,   
-    PartnerInterviewInitiateComponent,   
+    StreamCreateComponent,
+    PartnerInterviewComponent,
+    PartnerInterviewInitiateComponent,
     OperationsProjectInitiateComponent,
     TechnicalInterviewListComponent,
     PreTechFormComponent,
@@ -79,19 +111,39 @@ export let browserRefresh = false;
     StreamDeleteComponent,
     ReportComponent,
     UserEditComponent,
-    StreamAddComponent   
+    StreamAddComponent,
+    ViewInterviewStatusComponent,
+    ViewInterviewStatusExceptionComponent,
+    OpenpositionsListComponent,
+    OpenpositionsCreateComponent,
+    OpenpositionsEditComponent,
+	  ProjectAssignmentComponent,
+    OpenPositionsListComponent,
+    EligibleCandidatesComponent,
+    EligibleCandidatesFilterPipe,
+    QuestionAddBulkSectorsmeComponent,
+    QuestionsAddSectorsmeComponent,
+    ViewTestresultsComponent,
+    SuperadminUserCreateComponent,
+    TechIntSchedulerComponent,
+    ViewQuestionComponent,
+    QuestionEditComponent,
+    NavigationComponent,
+    SuperadminUserEditComponent
+
     ],
   imports: [
     BrowserModule,
+    FullCalendarModule,
+    BrowserAnimationsModule,
+    TATMaterialModule,
     NgxPaginationModule,
 	  FormsModule,
     AppRoutingModule,
     ReactiveFormsModule,
     HttpClientModule,
-    UserModule,
     DashboardUserModule,
     OperationsUserModule,
-    PartnerUserModule,
     [ NgxPaginationModule ],
     BackButtonDisableModule.forRoot({
       preserveScrollPosition: true

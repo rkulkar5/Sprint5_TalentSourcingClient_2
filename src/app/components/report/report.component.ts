@@ -1,10 +1,13 @@
 import { ActivatedRoute, Router } from '@angular/router';
-import { Component, OnInit, NgZone } from '@angular/core';
+import { Component, OnInit, NgZone,ViewChild } from '@angular/core';
 import { ReportService } from './report.service';
 import { browserRefresh } from '../../app.component';
 import { DatePipe } from '@angular/common'
 import { appConfig } from './../../model/appConfig';
-
+import { ReportStats } from './../../model/reportStats';
+import {MatTableDataSource} from '@angular/material/table';
+import {MatPaginator} from '@angular/material/paginator'
+import {MatSort} from '@angular/material/sort';
 
 @Component({
   selector: 'app-report',
@@ -20,6 +23,7 @@ export class ReportComponent implements OnInit {
   reportResponse: any = [];
   reportData: any = [];
   reportObj = {};
+  account : String ="";
 
   itemsPerPage = appConfig.itemsPerPage;
   page=1;
@@ -27,7 +31,13 @@ export class ReportComponent implements OnInit {
   from_Date: any;
   to_Date: any;
   searchJrss: string;
+  dataSource = new MatTableDataSource<ReportStats>();
 
+  displayedColumns = ['row[0][1]', 'row[1][1]','row[2][1]', 'row[3][1]','row[4][1]','row[5][1]'];
+  filterObj: { value: string; key: string; };
+
+  @ViewChild(MatPaginator) paginator: MatPaginator;
+  @ViewChild(MatSort) sort: MatSort;
 
   constructor(
     private router: Router,
@@ -39,6 +49,7 @@ export class ReportComponent implements OnInit {
     if (!this.browserRefresh) {
       this.userName = this.router.getCurrentNavigation().extras.state.username;
       this.accessLevel = this.router.getCurrentNavigation().extras.state.accessLevel;
+      this.account = this.router.getCurrentNavigation().extras.state.account;
     }
   }
 
@@ -81,13 +92,30 @@ export class ReportComponent implements OnInit {
       });
      
       this.reportData = reportDataByJrss;
+      this.dataSource.data = this.reportData as ReportStats[];
     } 
   }
 // ****************************** end of getter and setter methods **********************************
 
 
   ngOnInit(): void {
+    this.dataSource.sortingDataAccessor = (item, property) => {
+        switch(property) {
+          case 'row[0][1]': return item[0][1];
+          case 'row[1][1]': return item[1][1];
+          case 'row[2][1]': return item[2][1];
+          case 'row[3][1]': return item[3][1];
+          case 'row[4][1]': return item[4][1];
+          default: return property;
+        }
+     };
     this.loadReportData();
+    
+  }
+
+  ngAfterViewInit (){
+    this.dataSource.sort = this.sort;
+    this.dataSource.paginator = this.paginator;
   }
 
 
@@ -111,7 +139,7 @@ export class ReportComponent implements OnInit {
 
   //*************** Filter by from Date and To Date method ************* 
   searchFilter() {
-
+    console.log("search filter");
     let stage1Count = 0;
     let stage3Count = 0;
     let stage4Count = 0;
@@ -128,11 +156,13 @@ export class ReportComponent implements OnInit {
     } else {
       fromDate = Date.parse(this.from_Date);
     }
+        console.log("fromDate filter",fromDate);
     if (!this.to_Date) {
       toDate = Date.parse("9999-01-01");
     } else {
       toDate = Date.parse(this.to_Date);
     }
+            console.log("toDate filter",toDate);
     //this.datepipe.transform(new Date("9999-01-01"),'yyyy-MM-dd');
 
     this.reportResponse.forEach((item) => {
@@ -141,6 +171,7 @@ export class ReportComponent implements OnInit {
 
       if (registeredDate >= fromDate && registeredDate <= toDate) {
         if (this.reportObj[item.JRSS]) {
+         console.log("JRSS filter",item.JRSS);
           stage1Count = this.reportObj[item.JRSS].stage1Count;
           stage3Count = this.reportObj[item.JRSS].stage3Count;
           stage4Count = this.reportObj[item.JRSS].stage4Count;
@@ -171,9 +202,18 @@ export class ReportComponent implements OnInit {
 
     Object.keys(this.reportObj).forEach((key) => {
       this.reportData.push(Object.entries(this.reportObj[key]));
+      this.dataSource.data = this.reportData as ReportStats[];
+      console.log("Datasource data"  +this.dataSource.data);
     });
   }
 
+  applyFilter(filterValue: string,key: string) {
+    this.filterObj = {
+          value: filterValue.trim().toLowerCase(),
+          key: key
+    }
+    this.dataSource.filter = filterValue.trim().toLowerCase();
+  }
 
 }
 

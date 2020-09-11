@@ -1,9 +1,13 @@
 import { ActivatedRoute, Router } from '@angular/router';
 import { ApiService } from './../../service/api.service';
-import { Component, OnInit, NgZone } from '@angular/core';
+import { Component, OnInit, NgZone,ViewChild } from '@angular/core';
 import { FormGroup, FormBuilder, Validators } from "@angular/forms";
 import { browserRefresh } from '../../app.component';
 import { appConfig } from './../../model/appConfig';
+import { JRSS } from './../../model/jrss';
+import {MatTableDataSource} from '@angular/material/table';
+import {MatPaginator} from '@angular/material/paginator'
+import {MatSort} from '@angular/material/sort';
 
 @Component({
   selector: 'app-jrss-create',
@@ -16,10 +20,20 @@ export class JrssCreateComponent implements OnInit {
   public nullJrss : boolean;
   public browserRefresh: boolean;
   submitted = false;
+  formReset = false;
   jrssForm: FormGroup;
   Jrss:any = [];
   userName: String = "admin";
+  account: any;
+  accessLevel:any;
   config: any;
+
+  loading = true;
+  dataSource = new MatTableDataSource<JRSS>();
+  displayedColumns = ['Action','jrss'];
+
+  @ViewChild(MatPaginator) paginator: MatPaginator;
+  @ViewChild(MatSort) sort: MatSort;
 
   constructor(
       public fb: FormBuilder,
@@ -28,19 +42,23 @@ export class JrssCreateComponent implements OnInit {
       private ngZone: NgZone,
       private apiService: ApiService
     ) {
-      this.config = {
-                currentPage: appConfig.currentPage,
-                itemsPerPage: appConfig.itemsPerPage,
-                totalItems: appConfig.totalItems
-      };
-      actRoute.queryParams.subscribe(
-            params => this.config.currentPage= params['page']?params['page']:1 );
-      this.readJrss();
+      this.browserRefresh = browserRefresh;
+      if (!this.browserRefresh) {
+          this.userName = this.router.getCurrentNavigation().extras.state.username;
+          this.account = this.router.getCurrentNavigation().extras.state.account;
+          this.accessLevel = this.router.getCurrentNavigation().extras.state.accessLevel;
+      }
       this.mainForm();
     }
 
   ngOnInit() { 
-    this.browserRefresh = browserRefresh;      
+    this.browserRefresh = browserRefresh;
+    this.readJrss();
+   }
+
+   ngAfterViewInit(): void {
+         this.dataSource.sort = this.sort;
+         this.dataSource.paginator = this.paginator;
    }
 
   getJrss(id) {
@@ -54,6 +72,7 @@ export class JrssCreateComponent implements OnInit {
   readJrss(){
       this.apiService.getJrsss().subscribe((data) => {
        this.Jrss = data;
+       this.dataSource.data = data as JRSS[];
       })
     }
 
@@ -109,6 +128,7 @@ export class JrssCreateComponent implements OnInit {
 
     onSubmit() {
         this.submitted = true;
+        this.formReset = false;
         this.duplicateJrss = false;
         this.nullJrss = false;
         this.checkDuplicateJrss();
@@ -124,10 +144,15 @@ export class JrssCreateComponent implements OnInit {
             (res) => {
               console.log('JRSS successfully saved!')
              this.router.navigateByUrl('/', {skipLocationChange: true}).then(() =>
-             this.router.navigate(['/jrss-create']));
+             this.router.navigate(['/jrss-create'], {state: {username:this.userName,accessLevel:this.accessLevel,account:this.account}}));
             }, (error) => {
               console.log(error);
             });
         }
       }
+
+    clearForm() {
+        this.formReset = true;
+        this.jrssForm.reset();
+    }
 }

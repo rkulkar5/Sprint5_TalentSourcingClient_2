@@ -1,0 +1,118 @@
+<mat-toolbar>
+  <mat-toolbar-row>
+    <a mat-button routerLink="#" routerLinkActive="active">Exceptional Approval</a>
+    <span class="flexExpand">
+    <a mat-button routerLink="/login-component" routerLinkActive="active">Logout</a>
+    </span>
+  </mat-toolbar-row>
+</mat-toolbar>
+  <br/>
+
+  <div class="card">
+    <div class="modal-header" style="background-color:#2554C7;color:white;font-size:10pt" >View Candidate Details</div>
+    <div class="card-body">
+      <mat-card>
+        <mat-card-content>
+      <table>
+        <tbody>
+        <tr>
+          <td><mat-label>Name:</mat-label></td>
+          <td>{{this.candidateDetails[0].employeeName}}</td>
+          <td><mat-label>Job Role:</mat-label></td>
+          <td>{{this.candidateDetails[0].JRSS}}</td>
+        </tr>
+        <tr>
+          <td><mat-label>Technology Stream:</mat-label></td>
+          <td>{{this.candidateDetails[0].technologyStream}}</td>
+          <td *ngIf="displayResultFields"><mat-label>Online Test Result:</mat-label></td>
+          <td *ngIf="displayResultFields">{{this.candidateDetails[0].candidate_results[0].userScore}}</td>
+        </tr>
+        <tr>
+          <td><mat-label>You can download CV here:</mat-label></td>
+          <td><a href="#"  routerLinkActive="active"  data-toggle="modal">Click here</a></td>
+          <td><mat-label>You can access the Pre-Technical-Interview form here:</mat-label></td>
+          <td><a href="#"  routerLinkActive="active"  data-toggle="modal">Click here</a></td>
+        </tr>
+        <tr *ngIf="displayResultFields">
+          <td><mat-label>Technical Interview Score:</mat-label></td>
+          <td>{{this.candidateDetails[0].candidate_results[0].avgTechScore}}</td>
+          <td><mat-label>Technical Interview Result:</mat-label></td>
+          <td>{{this.candidateDetails[0].candidate_results[0].smeResult}}</td>
+        </tr>
+        <tr *ngIf="displayResultFields">
+          <td><mat-label>Technical Interview Feedback:</mat-label></td>
+          <td  colspan="3" width="75%"><textarea type="textArea" maxlength="3000" cols="90" disabled readonly value="{{this.candidateDetails[0].candidate_results[0].smeFeedback}}"></textarea></td>
+        </tr>
+        </tbody>
+      </table>
+        </mat-card-content>
+      </mat-card>
+    </div>
+  </div>
+  <div class="card">
+    <div  style="background-color:#2554C7;color:white;font-size:10pt"  class="card-header" >Provide exceptional approval for : </div>
+    <div class="card-body">
+      <form [formGroup]="workFlowForm" (ngSubmit)="exceptionSubmit()">
+        <div  *ngIf="!(stage1Completed && stage2Completed && stage3Completed && stage4Completed)">
+        <mat-card>
+          <mat-card-content>
+        <table class="open-full-width">
+          <tr>
+            <td></td>
+            <td>
+            <div *ngIf="!stage1Completed">
+              <mat-checkbox  formControlName="stage1OnlineTechAssessment" id="stage1OnlineTechAssessmentCheck1">
+              Online Technical Assessment
+              </mat-checkbox>
+            </div>
+            </td>
+          </tr>
+          <tr>
+            <td></td>
+            <td>
+            <div *ngIf="!stage2Completed">
+              <mat-checkbox  (change)="preTechQuestionCheck($event)" formControlName="stage2PreTechAssessment" id="stage2PreTechAssessmentCheck2">
+              Pre-technical Interview Assessment Form
+              </mat-checkbox>
+            </div>
+            </td>
+          </tr>
+          <tr>
+            <td></td>
+            <td>
+            <div *ngIf="!stage3Completed">
+              <mat-checkbox  formControlName="stage3TechAssessment" id="stage3TechAssessmentCheck3">
+              Technical Interview
+              </mat-checkbox>
+            </div>
+            </td>
+          </tr>
+          <tr>
+            <td></td>
+            <td>
+            <div *ngIf="!stage4Completed">
+              <mat-checkbox  formControlName="stage4ManagementInterview" id="stage4ManagementInterviewCheck4">
+              Partner Interview
+              </mat-checkbox>
+            </div>
+            </td>
+          </tr>
+        </table>
+          </mat-card-content>
+          <mat-card-actions>
+            <div class="text-center" style="width: 1000px">
+              <button mat-raised-button color="primary" type="submit">Save</button>
+              &nbsp;&nbsp;&nbsp;&nbsp;
+              <button mat-raised-button color="primary" type="button" (click)="cancelForm()">Cancel</button>
+            </div>
+          </mat-card-actions>
+        </mat-card>
+        </div>
+         <div class="text-center" style="width: 1000px" *ngIf="stage1Completed && stage2Completed && stage3Completed && stage4Completed">
+          <p style="font-size:10pt">All the workflow stages are completed, please click on the <b>Project Assignment</b> tab to assign the candidate to project.</p>
+          <button type="button" mat-raised-button color="primary" (click)="cancelForm()">Cancel</button>
+        </div>
+        <br/>
+      </form>
+    </div>
+  </div>

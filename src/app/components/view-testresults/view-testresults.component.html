@@ -1,63 +1,237 @@
-<nav class="navbar navbar-expand-lg navbar-light table-success" style="background-color:powderblue">
-  <div class="collapse navbar-collapse" id="navbarNavDropdown">
-    <ul class="navbar-nav">
-      <li class="nav-item dropdown">
-        <a class="nav-link dropdown-toggle" routerLink="/candidates-list" [state]="{username:this.userName}" routerLinkActive="active" id="navbarDropdownMenuLink" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-          <b>Manage Candidate</b>
-        </a>
-        <div class="dropdown-menu" aria-labelledby="navbarDropdownMenuLink">
-          <a class="dropdown-item" routerLink="/create-candidate" [state]="{username:this.userName}" routerLinkActive="active">Add Candidate</a>
-          <a class="dropdown-item" routerLink="/candidates-list" [state]="{username:this.userName}" routerLinkActive="active">View Candidate</a>
-        </div>
-      </li>
-      <li class="nav-item dropdown">
-        <a class="nav-link dropdown-toggle" routerLink="/manage-questionbank" routerLinkActive="active" id="navbarDropdownMenuLink" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-        <b>Manage Questions</b><span class="sr-only">(current)</span>
-        </a>
-        <div class="dropdown-menu" aria-labelledby="navbarDropdownMenuLink">
-          <a class="dropdown-item" routerLink="/manage-questionbank" routerLinkActive="active">Add Question</a>
-          <a class="dropdown-item" routerLink="/manage-questionbank-bulk" routerLinkActive="active">Add Bulk Question</a>
-        </div>
-      </li>
-      <li class="nav-item dropdown">
-        <a class="nav-link dropdown-toggle" routerLink="/jrss-create" routerLinkActive="active" id="navbarDropdownMenuLink" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-        <b>Manage Metadata</b>
-        </a>
-        <div class="dropdown-menu" aria-labelledby="navbarDropdownMenuLink">
-          <a class="dropdown-item" routerLink="/jrss-create" routerLinkActive="active">Add Job Role</a>
-          <a class="dropdown-item" routerLink="/stream-create" routerLinkActive="active">Add Technology Stream</a>
-          <a class="dropdown-item" routerLink="/testconfig-add" routerLinkActive="active">Add Test Configuration</a>
-        </div>
-      </li>
-      <li class="nav-item">
-        <a class="nav-link" routerLink="/workflow-config"routerLinkActive="active"><b>Manage Workflow</b></a>
-      </li>
-      <li class="nav-item active">
-        <a class="nav-link" routerLink="/view-testresults"routerLinkActive="active"><b>View Test Results</b></a>
-      </li>
-	  <li class="nav-item">
-      <a class="nav-link" routerLink="/adminuser-create"routerLinkActive="active"><b>Manage User</b></a>
-      </li>
-    </ul>
-  </div>
-  <div>
-    <ul class="navbar-nav navbar-right">
-      <li class="nav-item">
-        <a class="nav-link" routerLink="/login-component" routerLinkActive="active"><b>Logout</b></a>
-      </li>
-    </ul>
-  </div>
-</nav>
+<app-navigation></app-navigation>
 <br/>
-<div>
-  
-  <app-search (groupFilters)="filters = $event"
-              ></app-search>
+<div class="float-left text-left">
+  <h4 class="my-0 mr-md-auto font-weight-normal">View Results</h4></div>
+<br/><br>
+<mat-card class="login-card">
+  <mat-card-header>
+    <mat-card-title class="example-card-title">Search</mat-card-title>
+  </mat-card-header>
+  <table>
+    <tr>
+      <td>
+        <mat-form-field>
+          <input matInput [(ngModel)]="nameFilter" #ctrl="ngModel" (keyup)="applyFilter($event.target.value,'employeeName')" placeholder="Name">
+        </mat-form-field>
+      </td>
+      <td>
+        <mat-form-field>
+          <input matInput [(ngModel)]="emailFilter" #ctrl="ngModel"  (keyup)="applyFilter($event.target.value,'userName')" placeholder="Email">
+        </mat-form-field>
+      </td>
+      <td>
+        <mat-form-field>
+          <input matInput [(ngModel)]="jrssFilter" #ctrl="ngModel" (keyup)="applyFilter($event.target.value,'JRSS')" placeholder="Job Role">
+        </mat-form-field>
+      </td>
+    </tr>
+  </table>
+  <mat-card-actions>
+    <div class="row justify-content-center">
+      <button mat-raised-button color="primary" aria-label="Clear" (click)="clearFilters()">Clear</button>
+    </div>
+  </mat-card-actions>
+</mat-card>
+<br>
+<div class="mat-elevation-z8">
+  <table mat-table [dataSource]="dataSource" matSort class="mat-elevation-z8">
 
-  <br/>
+    <!-- ID Column -->
+    <ng-container matColumnDef="result_users[0].employeeName">
+      <th mat-header-cell *matHeaderCellDef mat-sort-header> Candidate Name </th>
+      <td mat-cell *matCellDef="let row"><a href="#myModal" (click)="getCandidateDetails(row.userName)" class="col-4 cursor-pointer" data-toggle="modal" >{{row.result_users[0].employeeName}}</a>
+      </td>
+    </ng-container>
 
-  <app-view-testresults-list [groupFilters]="filters"
-                 [searchByKeyword]="searchText"></app-view-testresults-list>    
+    <!-- ID Column -->
+    <ng-container matColumnDef="userName">
+      <th mat-header-cell *matHeaderCellDef mat-sort-header> Email ID </th>
+      <td mat-cell *matCellDef="let row">{{row.userName}}</td>
+    </ng-container>
+
+    <!-- ID Column -->
+    <ng-container matColumnDef="result_users[0].band">
+      <th mat-header-cell *matHeaderCellDef mat-sort-header> Band </th>
+      <td mat-cell *matCellDef="let row">{{row.result_users[0].band}} </td>
+    </ng-container>
+
+    <!-- ID Column -->
+    <ng-container matColumnDef="result_users[0].userPositionLocation">
+      <th mat-header-cell *matHeaderCellDef mat-sort-header> Location </th>
+      <td mat-cell *matCellDef="let row;let i = index">{{row.result_users[0].userPositionLocation}}</td>
+    </ng-container>
+
+    <!-- ID Column -->
+    <ng-container matColumnDef="result_users[0].JRSS">
+      <th mat-header-cell *matHeaderCellDef mat-sort-header> Job Role </th>
+      <td mat-cell *matCellDef="let row">{{row.result_users[0].JRSS}}</td>
+    </ng-container>
+
+    <!-- ID Column -->
+    <ng-container matColumnDef="quizNumber">
+      <th mat-header-cell *matHeaderCellDef mat-sort-header> Attempt No. </th>
+      <td mat-cell *matCellDef="let row"> {{row.quizNumber}}</td>
+    </ng-container>
+
+    <!-- ID Column -->
+    <ng-container matColumnDef="userScore">
+      <th mat-header-cell *matHeaderCellDef mat-sort-header> Result </th>
+      <td mat-cell *matCellDef="let row">
+        <div *ngIf="row.userResult==='Pass'">
+        <a href="#assessmentModal"  (click)="getCandidateAssessmentDetails(row.userName,row.quizNumber,row.result_users[0].employeeName,row.userScore,row.createdDate)"
+           class="col-4 cursor-pointer" data-toggle="modal"  style="color:rgb(0, 128, 43);" >{{row.userScore}}%</a>
+        </div>
+        <div *ngIf="row.userResult==='Fail'">
+        <a href="#assessmentModal"  (click)="getCandidateAssessmentDetails(row.userName,row.quizNumber,row.result_users[0].employeeName,row.userScore,row.createdDate)"
+           class="col-4 cursor-pointer" data-toggle="modal" style="color:red;" >{{row.userScore}}%</a>
+        </div>
+        <div  *ngIf="row.userScore==null">
+          <p >&nbsp;&nbsp;&nbsp;&nbsp;N/A</p>
+        </div>
+      </td>
+    </ng-container>
+    <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+    <tr mat-row *matRowDef="let row; let even = even; columns: displayedColumns;" [ngClass]="{gray: even}"></tr>
+  </table>
+  <mat-paginator [length]="this.Result.length" [pageSize]="5" [pageSizeOptions]="[5, 10, 25, 100]" showFirstLastButtons></mat-paginator>
 </div>
+<!-- code Start -->
+<div id="myModal" class="modal fade" role="dialog">
+  <div class="modal-dialog modal-lg modal-dialog-scrollable">
+
+    <!-- Modal content-->
+    <div class="modal-content" >
+      <div class="modal-header table-success" style="background-color:#f5f5f5;color:black">
+        <h4 class="modal-title">View Candidate Details</h4>
+        <button type="button"  class="close" data-dismiss="modal">&times;</button>
+      </div>
+      <div class="modal-body" *ngIf="mode=='displayModalBody'">
+        <mat-card>
+          <mat-card-content>
+            <table>
+              <tr>
+                <td><mat-label>Name:</mat-label></td>
+                <td>&nbsp;{{this.candidateDetails[0].employeeName}}</td>
+                <td><mat-label>Email:</mat-label></td>
+                <td>&nbsp;{{this.candidateDetails[0].email}}</td>
+              </tr>
+              <tr *ngIf="displayRegularUIFields">
+                <td><mat-label>Band:</mat-label></td>
+                <td>&nbsp;{{this.candidateDetails[0].band}}</td>
+                <td><mat-label>Job Role:</mat-label></td>
+                <td>&nbsp;{{this.candidateDetails[0].JRSS}}</td>
+              </tr>
+              <tr>
+                <td><mat-label>Technology Stream:</mat-label></td>
+                <td>&nbsp;{{this.candidateDetails[0].technologyStream}}</td>
+                <td><mat-label>Phone Number:</mat-label></td>
+                <td>&nbsp;{{this.candidateDetails[0].phoneNumber}}</td>
+              </tr>
+              <tr>
+                <td><mat-label>Status:</mat-label></td>
+                <td>&nbsp;{{this.candidateDetails[0].candidate_users[0].status}}</td>
+                <td><mat-label>Quiz Attempts:</mat-label></td>
+                <td>&nbsp;{{this.candidateDetails[0].candidate_users[0].quizNumber}}</td>
+              </tr>
+              <tr *ngIf="displayRegularUIFields">
+                <td><mat-label>Date of Joining:</mat-label></td>
+                <td>&nbsp;{{this.candidateDetails[0].dateOfJoining.split('T')[0]}}</td>
+              </tr>
+              <tr *ngIf="displayContractorUIFields">
+                <td><mat-label>Date of Birth:</mat-label></td>
+                <td>&nbsp;{{this.candidateDetails[0].dateOfJoining.split('T')[0]}}</td>
+                <td><mat-label>Job Role:</mat-label></td>
+                <td>&nbsp;{{this.candidateDetails[0].JRSS}}</td>
+              </tr>
+            </table>
+          </mat-card-content>
+        </mat-card>
+      </div>
+      <div class="modal-footer table-success" style="background-color:#f5f5f5;color:black">
+        <button mat-raised-button color="primary" data-dismiss="modal">Close</button>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+
+
+<!-- Below Candidate Assessment Details added by A.George on 29May2020.-->
+
+<!-- Modal Code starts. -->
+<div id="assessmentModal" class="modal fade" role="dialog">
+  <div class="modal-dialog modal-lg modal-dialog-scrollable">
+    <!-- Modal content-->
+    <div class="modal-content">
+      <!-- <div *ngIf="assessmentDetails.quizNumber == this.quizNumber"> -->
+      <div class="modal-header table-success" style="background-color:#f5f5f5;color:black">
+        <h4 class="modal-title">Candidate Assessment Details</h4>
+        <button type="button"  class="close" data-dismiss="modal">&times;</button>
+      </div>
+      <div class="modal-body" *ngIf="mode=='displayAssessmentModalBody'">
+        <mat-card>
+          <mat-card-content>
+        <table style="table-layout: fixed; width: 100%">
+          <thead>
+          <tr>
+            <td scope="col" width="10%">{{this.userName}}'s answers</td>
+            <td scope="col" width="10%">Attempt No : {{this.quizNumber}}</td>
+            <td scope="col" width="10%"> Date : {{ this.assesmentDate.substring(0,10) }}</td>
+            <td scope="col" width="10%"> Score : {{ this.userScore }}%</td>
+          </tr>
+          </thead>
+          <tbody>
+          <tr>
+            <td colspan="4" scope="col" style="color:black;font-style: italic;">
+              You have correctly answered {{this.correctAnswerCount}} questions out of  {{this.questionCount}}
+            </td>
+          </tr>
+          </tbody>
+        </table>
+        </mat-card-content>
+        </mat-card>
+      <br/>
+      <div *ngFor="let answer of this.candidateAssessmentDetails.results;let i=index">
+        <div *ngFor="let questions of answer.userAttemptedQs" >
+          <mat-card>
+            <mat-card-content>
+          <table  style="table-layout: fixed; width: 100%">
+            <tbody>
+            <tr>
+              <td width="2%">
+                <div  *ngIf="answer.userAnswerID==questions.answerID">
+                  <img src="assets/images/success.jpg" width="20" height="20"/>
+                </div>
+                <div  *ngIf="answer.userAnswerID!= questions.answerID">
+                  <img src="assets/images/failure.jpg" width="20" height="20"/>
+                </div>
+              </td><td><b>{{i+1}}){{questions.question}}?</b></td>
+            </tr>
+            <tr></tr>
+            <tr  *ngFor="let questionOption of questions.options;let k=index">
+              <td  width="2%"></td>
+              <td>{{k+1}}){{questionOption.option}} </td>
+            </tr>
+            <tr><td  width="2%"></td>
+              <td style="color:black">Candidate Answer: {{answer.userAnswerID}}    Correct Answer:  {{questions.answerID}}
+              </td></tr>
+            <tr></tr>
+            </tbody>
+          </table>
+          </mat-card-content>
+        </mat-card>
+        </div>
+      </div>
+      </div>
+      <div class="modal-footer table-success" style="background-color:#f5f5f5;color:black">
+        <button mat-raised-button color="primary" data-dismiss="modal">Close</button>
+      </div>
+    </div>
+
+  </div>
+</div>
+<!-- Code Ends.-->
+
 
 

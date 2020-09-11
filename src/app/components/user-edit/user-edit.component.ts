@@ -21,6 +21,8 @@ export class UserEditComponent implements OnInit {
   Band:any = [];
   quizNumber: number;
   userName: String = "admin";
+  account: any;
+  accessLevel:any;
   password: String = "";
   currDate: Date ;
   technologyStream:any= [];
@@ -38,6 +40,7 @@ export class UserEditComponent implements OnInit {
   UpdatedBy: String = "";
   userLoggedin: String = "";
   email: String = "";
+  Account:any = [];
   
   constructor(
     public fb: FormBuilder,
@@ -50,8 +53,15 @@ export class UserEditComponent implements OnInit {
     this.password = appConfig.defaultPassword;
     this.quizNumber = 1;
     //this.mainForm();
+    this.browserRefresh = browserRefresh;
+    if (!this.browserRefresh) {
+        this.userName = this.router.getCurrentNavigation().extras.state.username;
+        this.account = this.router.getCurrentNavigation().extras.state.account;
+        this.accessLevel = this.router.getCurrentNavigation().extras.state.accessLevel;
+    }
     this.readUserrole();    
     this.getAllSpecialUsers();
+    this.readAccount();
   }
 
   ngOnInit() {
@@ -69,10 +79,8 @@ export class UserEditComponent implements OnInit {
       employeeName: ['', [Validators.required]],
       email: ['', [Validators.required, Validators.pattern('[A-z0-9._%+-]+@[A-z0-9.-]+\.[A-z]{2,3}$')]],
       userrole: ['', [Validators.required]],
-    })
-
-
-    
+      account: ['', [Validators.required]],
+    })    
   }
 
   mainForm() {
@@ -80,6 +88,7 @@ export class UserEditComponent implements OnInit {
       employeeName: ['', [Validators.required]],
       email: ['', [Validators.required, Validators.pattern('[A-z0-9._%+-]+@[A-z0-9.-]+\.[A-z]{2,3}$')]],
       userrole: ['', [Validators.required]],
+      account: ['', [Validators.required]]
     })
   }
 
@@ -90,10 +99,24 @@ export class UserEditComponent implements OnInit {
       })
    }
 
+   // Get all Acconts
+   readAccount(){
+     this.apiService.getAccounts().subscribe((data) => {
+      this.Account = data;
+     })
+   }
+
    // Choose userrole with select dropdown
    updateUserroleProfile(e){
     this.editForm.get('userrole').setValue(e, {
     onlySelf: true
+    })
+  }
+
+  // Choose account with select dropdown
+  updateAccountProfile(e){
+    this.editForm.get('account').setValue(e, {
+      onlySelf: true
     })
   }
 
@@ -126,7 +149,8 @@ getUser(id) {
     this.editForm.setValue({
       employeeName: data['name'],
       email: data['username'],
-      userrole: data['accessLevel']
+      userrole: data['accessLevel'],
+      account: data['account']
     });
     this.email = data['username'];
     this.password = data['password'];
@@ -135,19 +159,17 @@ getUser(id) {
     this.createdBy = data['createdBy'];
     this.CreatedDate = data['CreatedDate'];
     this.UpdatedBy = data['UpdatedBy'];
-    //this.UpdatedDate
     this.userLoggedin=data['userLoggedin'];
   });
-
-
 }
 
+//Cancel
+cancelForm(){
+  this.ngZone.run(() => this.router.navigateByUrl('/adminuser-create',{state:{username:this.userName,accessLevel:this.accessLevel,account:this.account}}));
+}
 
 onSubmit() {
   this.submitted = true; 
-  // Encrypt the password
-
-
   let updatedUser = new SpecialUser(this.editForm.value.email,
     this.password,
     this.quizNumber,
@@ -159,13 +181,11 @@ onSubmit() {
     new Date(),
     new Date(),
     this.userLoggedin,
-    this.editForm.value.employeeName
+    this.editForm.value.employeeName,
+    this.editForm.value.account
     );
-
     let user_id = this.actRoute.snapshot.paramMap.get('docid');
-
-
-   this.currDate = new Date();
+    this.currDate = new Date();
    
   if (!this.editForm.valid) {
     return false;
@@ -182,7 +202,7 @@ onSubmit() {
                         console.log('User successfully updated!')
                         alert('User successfully updated!');
                         this.router.navigateByUrl('/', {skipLocationChange: true}).then(() =>
-                        this.router.navigate(['/adminuser-create']));
+                        this.router.navigate(['/adminuser-create'],{state:{username:this.userName,accessLevel:this.accessLevel,account:this.account}}));
                      }, (error) => {
                         console.log(error);
                      });
@@ -195,6 +215,4 @@ onSubmit() {
 }
 
 }
-
-
 }
