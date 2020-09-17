@@ -44,7 +44,11 @@ ngOnInit() {
 
 //Cancel
 cancelForm(){
+  if(this.accessLevel=='admin')
   this.ngZone.run(() => this.router.navigateByUrl('/stream-create',{state: {username:this.userName,accessLevel:this.accessLevel,account:this.account}}))
+  else if(this.accessLevel=='sme')
+  this.ngZone.run(() => this.router.navigateByUrl('/manage-questionbank-sectorsme',{state: {username:this.userName,accessLevel:this.accessLevel,account:this.account}}))
+  
 }
 
 // Read data from techStream table
@@ -69,8 +73,8 @@ get myForm(){
 checkDuplicateStream(){
   for (var stream of this.techStreamArray){
     if(stream.technologyStream.toLowerCase().trim() == this.streamForm.value.technologyStream.toLowerCase().trim()
-      || stream.technologyStream.toLowerCase().replace(/\s/g, "").replaceAll("-", "").trim() == this.streamForm.value.technologyStream.toLowerCase().replace(/\s/g, "").replaceAll("-", "").trim()
-      || stream.technologyStream.toLowerCase().replace(/\s/g, "").trim() == this.streamForm.value.technologyStream.toLowerCase().replace(/\s/g, "").trim()      
+      // || stream.technologyStream.toLowerCase().replace(/\s/g, "").replaceAll("-", "").trim() == this.streamForm.value.technologyStream.toLowerCase().replace(/\s/g, "").replaceAll("-", "").trim()
+      // || stream.technologyStream.toLowerCase().replace(/\s/g, "").trim() == this.streamForm.value.technologyStream.toLowerCase().replace(/\s/g, "").trim()      
     ) {
       this.duplicateStream = true;
     } else if (this.streamForm.value.technologyStream.toLowerCase().trim() === 'null'
@@ -98,10 +102,19 @@ onSubmit() {
         (res) => {
             console.log('New Technology Stream added successfully!');
             alert('New Technology Stream added successfully!');
+            if(this.accessLevel=='admin')
+            {                       
             this.router.navigateByUrl('/', {skipLocationChange: true}).then(() =>
             this.router.navigate(['/stream-create'], {state: {username:this.userName,accessLevel:this.accessLevel,account:this.account}}));
-        }, (error) => {
+            }
+            else if(this.accessLevel=='sme')
+            {
+              this.router.navigateByUrl('/', {skipLocationChange: true}).then(() =>
+              this.router.navigate(['//manage-questionbank-sectorsme'], {state: {username:this.userName,accessLevel:this.accessLevel,account:this.account}}));
+            }
+      }, (error) => {
             console.log(error);
+        
       });
   }
 }

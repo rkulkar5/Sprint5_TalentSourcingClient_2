@@ -16,6 +16,7 @@ export class ApiService {
   baseloginUri:string = appConfig.baseUri + '/api/login';
   baseBandUri:string = appConfig.baseUri + '/api/band';
   baseJrssUri:string = appConfig.baseUri + '/api/jrss';
+  baseJrssUriByAccount:string = appConfig.baseUri + '/api/jrss/byAccount';
   basePreTechQuestionnaireUri:string = appConfig.baseUri + '/api/preTechForm/getPreTechQuestionanire';
   baseQuestionUri:string = appConfig.baseUri +'/api/quiz';
   projectAllocUri:string = appConfig.baseUri + '/projectAlloc';
@@ -30,6 +31,10 @@ export class ApiService {
 getJRSS() {
   return this.http.get(`${this.baseJrssUri}`);
   }
+
+  getJRSSByAccount(accountValue) {
+    return this.http.get(`${this.baseJrssUriByAccount}/${accountValue}`);
+    }
 
 // http://localhost:4000/api/preTechForm/getPreTechQuestionanire/Java%20Technical%20Assessment/candidate12@ibm.com
 getpreTechQuestions(jrss) {
@@ -415,6 +420,17 @@ getJrsss() {
   return this.http.get(`${this.baseJrssUri}`);
 }
 
+// Get all jrss by account
+getJrsssByAccount(account) {
+  let url = `${this.baseJrssUri}/getJrsssByAccount/${account}`;
+    return this.http.get(url, {headers: this.headers}).pipe(
+      map((res: Response) => {
+        return res || {}
+      }),
+      catchError(this.errorMgmt)
+    )
+}
+
 // Get jrss by id
 getJrssById(id): Observable<any> {
   let url = `${this.baseJrssUri}/readJrssById/${id}`;
@@ -447,8 +463,10 @@ deleteJrss(id): Observable<any> {
 //End of JRSS:
 
 // Update technology stream by ID
- updateTechStream(id, data): Observable<any> {
+ updateTechStream(id,  data): Observable<any> {
   let url = `${this.baseJrssUri}/updateTechStream/${id}`;
+  console.log("data******** ",data);
+  
   return this.http.put(url, data, { headers: this.headers }).pipe(
     catchError(this.errorMgmt)
   )
@@ -761,6 +779,15 @@ getUserByRole(id): Observable<any> {
 getAccounts() {
   return this.http.get(`${this.baseAccountUri}`);
 
+}
+
+// Create account
+createAccount(data): Observable<any> {
+  let url = `${this.baseAccountUri}/createAccount`;
+  return this.http.post(url, data)
+    .pipe(
+      catchError(this.errorMgmt)
+    )
 }
 
 // Get all questions based on account
