@@ -3,7 +3,7 @@ import { UserDetails } from './../../model/userDetails'
 import { Component, OnInit,NgZone } from '@angular/core';
 import { ActivatedRoute, Router } from "@angular/router";
 import { ApiService } from './../../service/api.service';
-import { OpenPositionService } from './../../service/openposition.service';
+import { OpenPositionService } from './../../service/openPosition.service';
 import { FormGroup, FormBuilder, FormControl, Validators } from "@angular/forms";
 import { DatePipe } from '@angular/common';
 import { browserRefresh } from '../../app.component';
@@ -199,15 +199,7 @@ export class CandidateEditComponent implements OnInit {
 
     // Get all Acconts
     readAccount(){
-      this.apiService.getAccounts().subscribe((data) => {
-      this.Account = data;
-      //Remove 'sector' from Account collection
-      for (var accValue of this.Account){
-         if(accValue.account.toLowerCase() !== 'sector') {
-            this.AccountArray.push(accValue.account);
-          }
-      }
-      })
+      this.AccountArray = this.account.split(",");
     }
   // Getter to access form control
   get myForm() {

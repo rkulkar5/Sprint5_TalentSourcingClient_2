@@ -3,7 +3,7 @@
 export const appConfig = {
   defaultPassword: 'welcome',
   defaultEncryptedPassword: 'tcIq8+z=rk=PHcxPzQAdpMUXA==',  
-  baseUri:'https://tatapi.mybluemix.net',
+  baseUri:'http://localhost:4000',
   currentPage: 1,
   itemsPerPage: 10,
   totalItems:0

@@ -38,13 +38,14 @@ export class AdminuserCreateComponent implements OnInit {
   UserRoleList:any = [];
   userrole: String = "";
   AdminUsers:any = [];
+  filteredUsers:any = [];
   username;
   index;
   docid;
   isRowSelected = false;
   Account:any = [];
   AccountList:any = [];
-  accountArray:any = [];
+  accounts:any=[];
   loading = true;
   dataSource = new MatTableDataSource<User>();
   displayedColumns = ['Action','name', 'username','accessLevel','account'];
@@ -63,6 +64,7 @@ export class AdminuserCreateComponent implements OnInit {
         this.userName = this.router.getCurrentNavigation().extras.state.username;
         this.account = this.router.getCurrentNavigation().extras.state.account;
         this.accessLevel = this.router.getCurrentNavigation().extras.state.accessLevel;
+        this.accounts = this.account.split(",");
     }
     this.password = appConfig.defaultPassword;
     this.quizNumber = 1;
@@ -128,21 +130,30 @@ export class AdminuserCreateComponent implements OnInit {
   getAllSpecialUsers(){
     this.apiService.findAllUser().subscribe((data) => {
     this.AdminUsers = data;
-    this.dataSource.data = data as User[];
+    for (let k=0; k<this.AdminUsers.length; k++){
+       var item = this.AdminUsers[k].account;
+        let accountExists =  false;
+        for (var i = 0; i < this.accounts.length; i++) {
+
+          if ( item.toLowerCase().indexOf(this.accounts[i].toLowerCase()) == -1) {
+           // accountExists =  false;
+          } else {
+            accountExists =  true;
+            break;
+          }
+        }
+
+        if (accountExists == true) {
+          this.filteredUsers.push(this.AdminUsers[k]);
+        }
+    }
+    this.dataSource.data = this.filteredUsers as User[];
     })
 }
 
     // Get all Acconts
     readAccount(){
-      this.apiService.getAccounts().subscribe((data) => {
-        this.Account = data;
-        this.AccountList.length=0;
-        for (var accValue of this.Account){
-          if(accValue.account != 'SECTOR' ) {
-            this.AccountList.push(accValue);
-          }
-        }
-      })
+      this.AccountList = this.account.split(",");
     }
 
 // Delete the selected user
@@ -198,14 +209,7 @@ export class AdminuserCreateComponent implements OnInit {
     var ivMode = CryptoJS.enc.Base64.parse("3ad77bb40d7a3660a89ecaf32466ef97");
     this.password = CryptoJS.AES.encrypt(appConfig.defaultPassword.trim(),base64Key,{ iv: ivMode }).toString();
     this.password = this.password.replace("/","=rk=");    
-     
-      this.accountArray = [];
-      for (var account of this.candidateForm.value.account)  {
-        if(this.accountArray.indexOf(account.account == -1)){
-            this.accountArray.push(account.account);
-        }
-      }
-      this.candidateForm.value.account = this.accountArray.join(',');
+      this.candidateForm.value.account = this.candidateForm.value.account.join(',');
       console.log("account val", this.candidateForm.value.account);
         //Remove the leading comma if any
       if (this.candidateForm.value.account.substr(0,1) == ",") {
