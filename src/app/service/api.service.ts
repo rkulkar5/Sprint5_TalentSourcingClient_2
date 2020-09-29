@@ -47,6 +47,13 @@ getJRSSPreTech(jrssName) {
   let url = `${this.baseJrssUri}/getJrssPreTech/${jrssName}`;
   return this.http.get(`${this.baseJrssUri}/getJrssPreTech/${jrssName}`);
 }
+
+// Get all JRSS
+getJRSSPreTechByAccountAndJrssName(jrssName,account) {
+  let url = `${this.baseJrssUri}/getJRSSPreTechByAccountAndJrssName/${jrssName}/${account}`;
+  return this.http.get(`${this.baseJrssUri}/getJrssPreTech/${jrssName}/${account}`);
+}
+
 // Create Candidate
   createCandidate(data): Observable<any> {
     let url = `${this.baseUri}/create`;
@@ -239,8 +246,8 @@ getQuestions(account): Observable<any> {
 }
 
  // Get Users by access Level
- getUserByAccessLevel(accessLevel): Observable<any> {
-  let url = `${this.baseloginUri}/readUserByAccessLevel/${accessLevel}`;
+ getUserByAccessLevel(accessLevel,account): Observable<any> {
+  let url = `${this.baseloginUri}/readUserByAccessLevel/${accessLevel}/${account}`;
   return this.http.get(url, {headers: this.headers}).pipe(
     map((res: Response) => {
       return res || {}
@@ -751,8 +758,9 @@ createTechStream(data): Observable<any> {
 }
 
 
-getCandidateInterviewStatus(): Observable<any> {
-  let url = `${this.userResultUri}/getCandidateInterviewStatus`;
+getCandidateInterviewStatus(acct): Observable<any> {
+  let url = `${this.userResultUri}/getCandidateInterviewStatus/${acct}`;
+  console.log("url",url);
   return this.http.get(url, {headers: this.headers}).pipe(
         map((res: Response) => {
           return res || {}
@@ -790,6 +798,19 @@ getUserByRole(id): Observable<any> {
     catchError(this.errorMgmt)
     )
   }
+
+
+    // Get Users table records based on role and account
+getUserByRoleAndAccount(id,account): Observable<any> {
+  let url = `${this.baseloginUri}/getUserByRoleAndAccount/${id}/${account}`;
+  return this.http.get(url, {headers: this.headers}).pipe(
+    map((res: Response) => {
+      return res || {}
+    }),
+    catchError(this.errorMgmt)
+    )
+  }
+  
 
 // Get all accounts
 getAccounts() {
@@ -837,5 +858,14 @@ viewQuizQuestions(userName,account) {
     catchError(this.errorMgmt)
   )
 }
+
+  // Get Unique Result
+  findResult(email,qNumber): Observable<any> {
+    let url = `${this.userResultUri}/findResult/${email}/${qNumber}`;
+    return this.http.get(url, {headers: this.headers}).pipe(
+      map((res: Response) => {
+        return res || {}
+      }), catchError(this.errorMgmt))
+  }
 
 }

@@ -42,7 +42,9 @@ export class TechnicalInterviewComponent implements OnInit {
   candidateName: String = "";
   account: String = "";
   displayTechInterviewDetails: boolean = false;
+
   techStreamObj: any = {};
+  candidateAccount: String = "";
 
   constructor(private cv:TechnicalInterviewListComponent,private fb:FormBuilder, private actRoute: ActivatedRoute, private router: Router,private ngZone: NgZone,
     private apiService: ApiService) {
@@ -50,9 +52,6 @@ export class TechnicalInterviewComponent implements OnInit {
     this.userName =this.actRoute.snapshot.paramMap.get('id');
     this.quizNumber =this.router.getCurrentNavigation().extras.state.quizId;
     this.account = this.router.getCurrentNavigation().extras.state.account; 
-    /*console.log("loginUser==="+this.loginUser);
-    console.log("userName==="+this.userName);
-    console.log("quizNumber==="+this.quizNumber);*/
     this.accessLevel = this.router.getCurrentNavigation().extras.state.accessLevel;
     this.readCandidateTechnicalInterviewDetails(this.userName,this.quizNumber);
     this.techskillForm = this.fb.group({
@@ -66,8 +65,8 @@ export class TechnicalInterviewComponent implements OnInit {
   }
   ngOnInit(): void {
     this.getTechnicalStreamFromJRSS();
-    this.readPartnerUserDet();
     this.readCandidateNameAndJrss();
+    //this.readPartnerUserDet();
   }
   techStream() : FormArray {
       return this.techskillForm.get("techStream") as FormArray
@@ -85,20 +84,11 @@ export class TechnicalInterviewComponent implements OnInit {
   //Read candidate details
   readCandidateTechnicalInterviewDetails(id,quizId) {
     this.apiService.readTechInterviewDetails(id,quizId).subscribe(data => {
-    console.log("readTechInterviewDetails data ="+JSON.stringify(data));
+    
     this.candidateInterviewDetails=data;
- for (var i of this.candidateInterviewDetails[0].smeScores){
-    this.techStreamObj = [i.technologyStream,i.score];
-    this.scoreArray.push(this.techStreamObj);
-    console.log("Score array" +JSON.stringify(this.scoreArray));
-}
-  
-    this.techskillForm.setValue({
-      finalscore: this.candidateInterviewDetails[0].avgTechScore,
-      finalResult: this.candidateInterviewDetails[0].smeResult,
-      feedback: this.candidateInterviewDetails[0].smeFeedback,
-      techStream: this.scoreArray
-    });
+
+ 
+
   }, (error) => {
       console.log(error);
     });
@@ -110,6 +100,15 @@ export class TechnicalInterviewComponent implements OnInit {
     return this.fb.group({
       technologyStream:this.getTechnologyStream(),
       score: '0'
+    })
+
+  }
+
+  createstandByTechStream(technologyStream:string,score:string): FormGroup {
+   
+    return this.fb.group({
+      technologyStream:technologyStream,
+      score: score
     })
 
   }
@@ -130,13 +129,28 @@ export class TechnicalInterviewComponent implements OnInit {
       }
       this.newDynamic =this.technologyStreamArray;
       this.dynamicArray.push(this.newDynamic);
-      this.techStream().push(this.createTechStream());
-      //console.log("Technical Stream getjrss: "+ JSON.stringify(this.technologyStreamArray));
-      //console.log(this.technologyStreamArray.get("key"));
+     
+      //this.techStream().push(this.createTechStream());
+      if (this.candidateInterviewDetails[0].smeScores ==  undefined  ) {
+        this.techStream().push(this.createTechStream());
+      } else  if ( this.candidateInterviewDetails[0].smeResult == "StandBy" ) {
+        this.techskillForm = this.fb.group({
+          finalscore:this.candidateInterviewDetails[0].avgTechScore,
+          finalResult:[this.candidateInterviewDetails[0].smeResult,Validators. required],
+          feedback:[this.candidateInterviewDetails[0].smeFeedback,Validators. required],
+          // smeName:['',Validators. required],
+          techStream: this.fb.array([]) ,
+        });
+        this.addStandByTechStreamAndScores(this.candidateInterviewDetails[0].smeScores);
+      }
+      
     })
   }
 
+
+
   getTechnologyStream() {
+   // console.log("this.technologyStreamArray  ***** ", this.technologyStreamArray)
     return this.technologyStreamArray;
   }
 
@@ -151,7 +165,27 @@ export class TechnicalInterviewComponent implements OnInit {
      }
   }
 
+  //Mymethod
+  mode ="";
+  addStandByTechStreamAndScores(standByTechStreamAndScores:any[]) {
+     this.selectedTechStream=[];
+     this.techStream().clear;
+     this.mode ="Edit";
+   
+     var k =0;
+     for(var standbyTechstream of standByTechStreamAndScores){
+       this.techStream().push(this.createstandByTechStream(standbyTechstream.technologyStream, standbyTechstream.score));
+       this.addTechStream(k);
+       k++;
+     }
+     this.removeTechStream(k);
+     this.mode ="";
+ }
+
+
+  // return this.techskillForm.get("techStream") as FormArray
   addTechStream(i:number) {
+
     if(i<(this.newDynamic.length-1)){
      this.selectedTechStream=[];
      var selectedStream:any=[]=this.techskillForm.value.techStream;
@@ -161,8 +195,12 @@ export class TechnicalInterviewComponent implements OnInit {
       }
       this.newDynamic =this.getTechnologyStream();
       this.dynamicArray.push(this.newDynamic);
-      this.techStream().push(this.createTechStream());
+      if(this.mode == ""){
+        this.techStream().push(this.createTechStream());
+      }
+     
     }
+
   }
 
   removeTechStream(i:number) {
@@ -182,7 +220,7 @@ export class TechnicalInterviewComponent implements OnInit {
     this.totalScore=0;
     this.scoreValueArray=this.techskillForm.value.techStream;
     var scoreCount:number=0;
-    for(var sc of this.scoreValueArray){
+    for(var sc of this.scoreValueArray) {
      var score:number=parseInt(sc.score);
       if(score>0){
         this.totalScore= this.totalScore + score;
@@ -242,8 +280,8 @@ export class TechnicalInterviewComponent implements OnInit {
    }
  }
 
- readPartnerUserDet(){
-	this.apiService.getUserByRole('partner').subscribe((data) => {
+ readPartnerUserDet(candidateAccount){
+	this.apiService.getUserByRoleAndAccount('partner', candidateAccount).subscribe((data) => {
   this.partnerUserList = data;
   for (var partnerEmail of this.partnerUserList){
     if(this.partnerUsersEmail == ""){
@@ -260,6 +298,8 @@ export class TechnicalInterviewComponent implements OnInit {
           (res) => {      
           this.jrss=res['JRSS'];
           this.candidateName = res['employeeName'];
+          this.candidateAccount = res['account'];
+          this.readPartnerUserDet(res['account']);
                }, (error) => {
                console.log(error);
                });
@@ -298,13 +338,13 @@ export class TechnicalInterviewComponent implements OnInit {
 
       //Send email notification to partner when 'Recommended' or 'Strongly Recommended'	
       if(this.stage3_status == 'Completed'){
-        let fromAddress = "Talent.Sourcing@in.ibm.com";
+        let fromAddress = "talent.sourcing@in.ibm.com";
         let toAddress = this.partnerUsersEmail;    
         let emailSubject = "Candidate assignment notification in Talent Sourcing Tool: Partner evaluation pending";
         let emailMessage = "Dear Team,<br><br> \
         We would like to notify that the candidate "+this.candidateName+" is added to the queue for the job role " +this.jrss+".<br>\
         Please assess the candidate for the new project assignment.<br>\
-         <p>Regards, <br>DWP Operations Team</p>"; 
+        <p>Regards, <br>"+this.candidateAccount+" Operations Team</p>"; 
          	// Send notification to the SME user
 				   let sendEmailObject2 = new SendEmail(fromAddress, toAddress, emailSubject, emailMessage);
 				   this.apiService.sendEmail(sendEmailObject2).subscribe(
@@ -334,13 +374,15 @@ export class TechnicalInterviewComponent implements OnInit {
           this.apiService.updateExceptionalApproval(emailSelected,quizNumber,this.techskillForm.value.feedback).subscribe(res => {
             window.alert('Successfully moved candidate to next stage');
             //Send email notification to partner when 'Recommended' or 'Strongly Recommended'	
-        let fromAddress = "Talent.Sourcing@in.ibm.com";
+        let fromAddress = "talent.sourcing@in.ibm.com";
         let toAddress = this.partnerUsersEmail;    
         let emailSubject = "Candidate assignment notification in Talent Sourcing Tool: Partner evaluation pending";
         let emailMessage = "Dear Team,<br><br> \
         We would like to notify that the candidate "+this.candidateName+" is added to the queue for the job role " +this.jrss+".<br>\
         Please assess the candidate for the new project assignment.<br>\
-         <p>Regards, <br>DWP Operations Team</p>"; 
+         <p>Regards, <br>"+this.candidateAccount+" Operations Team</p>"; 
+         console.log('exceptionalApproval, before sending email, emailMessage == '+emailMessage);
+         console.log('exceptionalApproval, before sending email, toAddress == '+toAddress);
          	// Send notification to the SME user
 				   let sendEmailObject2 = new SendEmail(fromAddress, toAddress, emailSubject, emailMessage);
 				   this.apiService.sendEmail(sendEmailObject2).subscribe(
