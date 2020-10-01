@@ -46,10 +46,15 @@ export class SuperadminUserCreateComponent implements OnInit {
   AccountList:any=[];
   accountArray:any= [];
   selectedUserrole: String = "";
-
+  displayMessage = false;
   loading = true;
   dataSource = new MatTableDataSource<User>();
   displayedColumns = ['Action','name', 'username','accessLevel','account'];
+
+  filterObj = {};
+  nameFilter: string;
+  emailFilter: string;
+  roleFilter: string;
 
   @ViewChild(MatPaginator) paginator: MatPaginator;
   @ViewChild(MatSort) sort: MatSort;
@@ -81,6 +86,14 @@ export class SuperadminUserCreateComponent implements OnInit {
            this.router.navigate(['/login-component']);
         }
     }
+    this.dataSource.filterPredicate = (data, filter) => {
+     if(data[this.filterObj['key']] && this.filterObj['key']) {
+         if (data[this.filterObj['key']].toLowerCase().startsWith(this.filterObj['value'])) {
+            return data[this.filterObj['key']].toLowerCase().includes(this.filterObj['value']);
+         }
+     }
+     return false;
+    }
   }
 
   ngAfterViewInit(): void {
@@ -101,6 +114,10 @@ export class SuperadminUserCreateComponent implements OnInit {
     readUserrole(){
       this.apiService.getUserroles().subscribe((data) => {
       this.Userrole = data;
+      if (this.AccountList.length == 0) {
+         console.log("this.AccountList.length",this.AccountList.length);
+         this.displayMessage = true;
+      }
       })
    }
 
@@ -116,6 +133,7 @@ export class SuperadminUserCreateComponent implements OnInit {
       this.AccountList.length=0;
       for (var accValue of this.Account){
       if(accValue.account.toLowerCase() !== 'sector' ) {
+        this.displayMessage = false;
         this.AccountList.push(accValue);
       }
     }
@@ -123,6 +141,7 @@ export class SuperadminUserCreateComponent implements OnInit {
     this.AccountList.length=0;
     for (var accValue of this.Account){
       if(accValue.account.toLowerCase() === 'sector' ) {
+        this.displayMessage = false;
         this.AccountList.push(accValue);
       }
     }
@@ -274,5 +293,20 @@ export class SuperadminUserCreateComponent implements OnInit {
   clearForm() {
       this.formReset = true;
       this.candidateForm.reset();
+  }
+
+  applyFilter(filterValue: string,key: string) {
+       this.filterObj = {
+             value: filterValue.trim().toLowerCase(),
+             key: key
+       }
+       this.dataSource.filter = filterValue.trim().toLowerCase();
+  }
+
+  clearFilters() {
+      this.dataSource.filter = '';
+      this.nameFilter = '';
+      this.emailFilter = '';
+      this.roleFilter = '';
   }
 }
