@@ -97,7 +97,7 @@ export class ViewQuestionComponent implements OnInit {
       if(this.account === 'SECTOR') {
          this.filteredQuestion = [];
          for (let k=0; k<this.Questions.length; k++){
-          this.smeQuestionObj = [this.Questions[k]._id, this.Questions[k].question, this.Questions[k].account, this.Questions[k].technologyStream];
+          this.smeQuestionObj = [this.Questions[k]._id, this.Questions[k].question, this.Questions[k].account, this.Questions[k].technologyStream,this.Questions[k].questionID];
           this.filteredQuestion.push(this.smeQuestionObj);
         }
       } else {
@@ -106,11 +106,18 @@ export class ViewQuestionComponent implements OnInit {
           var item = this.Questions[k].account;
            let questionExists =  false;
            for (var i = 0; i < this.accountArr.length; i++) {
-             if ( item.toLowerCase().indexOf(this.accountArr[i].toLowerCase()) == -1 && item.toLowerCase().indexOf("sector") == -1) {
-              // accountExists =  false;
-             } else {
+             if (item.toLowerCase() === this.accountArr[i].toLowerCase()) {
                questionExists =  true;
                break;
+             }
+             if (item.indexOf(",") !== -1) {
+                let items = item.split(",");
+                if (items.length <= this.accountArr.length) {
+                  if (item.toLowerCase().indexOf(this.accountArr[i].toLowerCase()) !== -1) {
+                    questionExists =  true;
+                    break;
+                  }
+                }
              }
            }
            if (questionExists == true) {
@@ -124,6 +131,22 @@ export class ViewQuestionComponent implements OnInit {
     })
   }
 
+  invokeView(){
+    if (this.isRowSelected == false) {
+      alert("Please select the Question");
+      return false;
+    } else {
+      this.apiService.findUserAnswer(this.qID).subscribe((res) => {
+        console.log("res:" +res);
+       if (res.count > 0 || res.count == 0) {
+         this.isRowSelected = false;
+         this.router.navigate(['/question-view/',this.questionID], {state: {username:this.userName,accessLevel:this.accessLevel,account:this.account}});
+       }
+     }, (error) => {
+         console.log("Error  - " + error);
+     });  
+    }
+  }
 
 invokeEdit(){
 
@@ -131,13 +154,17 @@ invokeEdit(){
     alert("Please select the Question");
     return false;
   } else {
+    console.log("Inside else");
      this.apiService.findUserAnswer(this.qID).subscribe((res) => {
+       console.log("res:" +JSON.stringify(res));
          if (res.count > 0) {
           alert("You can not edit this question as this is already appeared in online test.");
           return false;
         } else if (res.count > 0 || res.count == 0) {
+          console.log("Question id:" +this.qID  );
           this.isRowSelected = false;
           this.router.navigate(['/question-edit/',this.questionID], {state: {username:this.userName,accessLevel:this.accessLevel,account:this.account}});
+        console.log("On click of edit");
         }
       }, (error) => {
           console.log("Error  - " + error);

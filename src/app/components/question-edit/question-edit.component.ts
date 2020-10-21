@@ -51,6 +51,7 @@ export class QuestionEditComponent implements OnInit {
 ​
   ngOnInit() {
     this.question_id = this.actRoute.snapshot.paramMap.get('id');
+    console.log("question id: " +this.question_id);
     this.apiService.getQuestion(this.question_id).subscribe( res => {
     console.log("Account ngOnInit = " + res['account']);
     for (var i of res['options']){
@@ -59,8 +60,13 @@ export class QuestionEditComponent implements OnInit {
   
     this.AccountsArr = res['account'].split(",");
     console.log("Account from response = " + this.AccountsArr);
-​
-    this.editquestionForm.setValue({        
+​    if (this.options[2] == null || this.options[2] == undefined) {
+        this.options[2] = '';
+    }
+    if (this.options[3] == null || this.options[3] == undefined) {
+            this.options[3] = '';
+    }
+    this.editquestionForm.setValue({
         technologyStream: res['technologyStream'],
         questionType: res['questionType'],
         complexityLevel: res['complexityLevel'],
@@ -145,6 +151,7 @@ export class QuestionEditComponent implements OnInit {
       smeAccount = data;     
       for (var account of smeAccount){             
         this.loginAccounts.push(account.account);
+        console.log("account details:" +this.loginAccounts);
       }​
     })
   } // end of else
