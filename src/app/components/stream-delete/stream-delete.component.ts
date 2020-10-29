@@ -7,6 +7,7 @@ import { browserRefresh } from '../../app.component';
 import {MatTableDataSource} from '@angular/material/table';
 import {MatPaginator} from '@angular/material/paginator'
 import {MatSort} from '@angular/material/sort';
+import {appConfig} from './../../model/appConfig';
 
 @Component({
   selector: 'app-stream-delete',
@@ -31,7 +32,8 @@ export class StreamDeleteComponent implements OnInit {
   jrssId = '';  
   currentJrssArray:any = [];
   dataSource = new MatTableDataSource<JRSS>();
-  displayedColumns = ['jrss', 'technologyStream'];
+  displayedColumns = ['Action','jrss', 'technologyStream'];
+  jrssAccountData:any=[];
 
   @ViewChild(MatPaginator) paginator: MatPaginator;
   @ViewChild(MatSort) sort: MatSort;
@@ -114,25 +116,35 @@ export class StreamDeleteComponent implements OnInit {
   }
 
   
-  getJrss(id) {     
-    this.apiService.getJrssById(id).subscribe(data => {        
+  getJrss(id) { 
+    this.apiService.getJrssById(id).subscribe(data => {  
+      this.jrssAccountData = data;      
       this.streamDeleteForm.setValue({
         JRSS: data['jrss'],
         technologyStream: data['technologyStream']        
       }); 
 
       // Get technologyStream from JRSS
-      for (var jrss of this.JRSS){
-        if(jrss.jrss == data['jrss']){
+      //for (var jrss of this.JRSS){
+        if(this.jrssAccountData.jrss == data['jrss']){         
           this.technologyStream = [];
-          for (var skill of jrss.technologyStream){
-            this.technologyStream.push(skill);
+          for (var skill of this.jrssAccountData.technologyStream){
+            this.technologyStream.push(skill);           
           }
         }
-      }    
+     // }    
       
     });
   }
+
+  /** this method is to print the serial numners on all the pagination pages */
+  currentPages=appConfig.currentPage;
+  pageSize=appConfig.itemsPerPage;
+  public handlePage(e: any) {
+    this.currentPages = e.pageIndex;
+    this.pageSize = e.pageSize;
+  }
+  //End of Pagination serial number method
 
 pageChange(newPage: number) {
   this.router.navigate(['/delete-stream',this.jrssId], { queryParams: { page: newPage } });
@@ -184,12 +196,13 @@ cancelForm(){
 }
 
 readJrssDocId(){
-  for (var jrss of this.JRSS){    
-    if(jrss.jrss == this.streamDeleteForm.value.JRSS){
-      this.jrssDocId = jrss._id;
-      this.currentJrssArray = jrss;      
+  //for (var jrss of this.JRSS){ 
+    //if(this.jrssAccountData.jrss == data['jrss']){   
+    if(this.jrssAccountData.jrss == this.streamDeleteForm.value.JRSS){
+      this.jrssDocId = this.jrssAccountData._id;
+      this.currentJrssArray = this.jrssAccountData;      
     }
-  }
+  //}
 }
 
 onSubmit() {
