@@ -43,6 +43,7 @@ export class StreamCreateComponent implements OnInit {
   jrssAccountData:any=[];
   accounts:any=[];
   streamFlag:boolean = false;
+  filteredJRSS:any=[];
 
   @ViewChild(MatPaginator) paginator: MatPaginator;
   @ViewChild(MatSort) sort: MatSort;
@@ -99,42 +100,39 @@ export class StreamCreateComponent implements OnInit {
    readJrss(){
     this.apiService.getJRSS().subscribe((data) => {
     this.JRSS = data;
+    this.filteredJRSS = data;
+    //Remove duplicate entries from the array[]
+    this.filteredJRSS = Array.from(this.filteredJRSS.reduce((m, t) => m.set(t.jrss, t), new Map()).values());
+
     if(this.AccountList == 0){
-      //this.JRSS.length = 0;
       this.displayMessage  = true;
-      this.JRSS.lenght = 0;
+      this.filteredJRSS.length = 0;
     }
-    //this.dataSource.data=data as JRSS[];
+
     // Get technologyStream from JRSS
     for (var jrss of this.JRSS) {     
         this.techStreamArray = [];
         for (var skill of jrss.technologyStream){          
           this.techStreamArray.push(skill.value);  
         }   
-        
-        //var item = jrss.account;
+
         let accountExists =  false;
         for (var i = 0; i < this.accounts.length; i++) {
-         
           if ( jrss.account.toLowerCase().indexOf(this.accounts[i].toLowerCase()) == -1) {
-           // accountExists =  false;
            console.log("Account existance");
-          } else { accountExists =  true; 
-            break; }
+          } else {
+            accountExists =  true;
+            break;
+          }
         }
 
         if (accountExists == true) {
-
           this.jrssObject = [jrss._id,jrss.jrss, this.techStreamArray, jrss.account];
           this.jrssObjectArray.push(this.jrssObject);
-          console.log('jrssObjectArray****', this.jrssObjectArray);
         }
-      
     }  
-    this.dataSource.data=this.jrssObjectArray as JRSS[]; 
-    console.log("TECH stream list:" +this.dataSource.data);
-    
-    });        
+    this.dataSource.data=this.jrssObjectArray as JRSS[];
+    });
   }
   // Get all TechStream
   readTechStream(){
@@ -148,7 +146,7 @@ onSelectionChange(jrssId,jrssName) {
 }
  deleteTechStream() {
     if (this.jrssId == undefined) {
-      alert("Please select the technology stream record");
+      alert("Please select the technology stream record.");
     } else {
       // Check for job role stream
       this.apiService.getJrssById(this.jrssId).subscribe(data => { 
@@ -159,7 +157,7 @@ onSelectionChange(jrssId,jrssName) {
         if (this.streamFlag) {
           this.router.navigate(['/delete-stream/', this.jrssId], {state: {username:this.userName,accessLevel:this.accessLevel,account:this.account}});
         } else {
-          alert("You can't perform this action as there is no technology stream mapped for selected job role");
+          alert("You can't perform this action as there is no technology stream mapped for selected job role.");
         }        
       });      
     }
@@ -193,19 +191,16 @@ listJrssByAccount(accountValue){
   readJrssByAccount(accountValue){
     this.apiService.getJrsssByAccount(accountValue).subscribe((data) => {
     this.JRSS = data;
+    this.filteredJRSS = data;
     this.displayMessage = false;
-    //this.dataSource.data=data as JRSS[];
     // Get technologyStream from JRSS
-    for (var jrss of this.JRSS){     
+    for (var jrss of this.filteredJRSS){
         this.techStreamArray = [];
         for (var skill of jrss.technologyStream){          
           this.techStreamArray.push(skill.value);        
-        }        
-       // this.jrssObject = [jrss._id, jrss.jrss, this.techStreamArray];
-       // this.jrssObjectArray.push(this.jrssObject);  
-       // this.dataSource.data=this.jrssObjectArray as JRSS[];         
+        }
     }  
-    });        
+    });
   }
   
 
