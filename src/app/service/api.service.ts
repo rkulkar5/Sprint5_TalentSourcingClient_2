@@ -101,8 +101,8 @@ getQuestions(account): Observable<any> {
   }
 
 
-  checkForQuestions(technologyStream): Observable<any> {
-    let url = `${this.baseQuestionUri}/Count/Questions/${technologyStream}`;
+  checkForQuestions(technologyStream,account): Observable<any> {
+    let url = `${this.baseQuestionUri}/Count/Questions/${technologyStream}/${account}`;
 
     console.log("The Url1 is "+url);
 
@@ -530,8 +530,8 @@ getCandidateAssessmentDetails(username,quizNumber): Observable<any> {
 }
 
 //getDashboardList
-getDashboardList(): Observable<any> {
-  let url = `${this.userResultUri}/getDashboardList`;
+getDashboardList(account): Observable<any> {
+  let url = `${this.userResultUri}/getDashboardList/${account}`;
   return this.http.get(url, {headers: this.headers}).pipe(
         map((res: Response) => {
           return res || {}
