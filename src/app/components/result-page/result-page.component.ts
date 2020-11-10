@@ -71,16 +71,13 @@ export class ResultPageComponent implements OnInit {
         }
         this.userAnswers = res;
         this.userAnswers.forEach((userAns) => {
-          console.log("userAns.userAnswerID ", userAns.userAnswerID, "  userAns.answerID ", userAns.answerID);
           if (userAns.userAnswerID == userAns.answerID) {
             this.numberOfCorrectAns = this.numberOfCorrectAns + 1;
           }
         }, (error) => {
           console.log(error);
         });
-        this.scorePercentage = (Math.round(this.numberOfCorrectAns * 100) / this.userAnswers.length).toFixed(2);
-        this.numberOfCorrectAns = Math.round(this.numberOfCorrectAns * 100) / this.userAnswers.length;
-
+       
 
         //Sprint2: Save the quiz results for the user into 'Results' collection
         // Read the candidate JRSS by username
@@ -93,6 +90,12 @@ export class ResultPageComponent implements OnInit {
             this.testconfigService.findTestConfigByJRSS(this.jrss,this.candidateAccount).subscribe(
               (data) => {
                 this.passingScore = data['passingScore']
+                var totalNoOfQuestions = data['noOfQuestions']
+
+                this.scorePercentage = (Math.round(this.numberOfCorrectAns * 100) / totalNoOfQuestions).toFixed(2);
+                this.numberOfCorrectAns = Math.round(this.numberOfCorrectAns * 100) / totalNoOfQuestions;
+
+                
                 if (this.numberOfCorrectAns >= this.passingScore) {
                   this.displayMsg = "Congratulations on completing the exam."
                 } else {
