@@ -47,6 +47,7 @@ export class PreTechFormComponent implements OnInit {
     private apiService: ApiService) {
 this.userName = this.router.getCurrentNavigation().extras.state.userName;
 this.mode = this.router.getCurrentNavigation().extras.state.mode;
+this.candidateAccount = this.router.getCurrentNavigation().extras.state.candidateAccount;
 
 	}
 	
@@ -91,7 +92,7 @@ this.preTechService.getStageStatusByUserName(this.userName,this.userResult).subs
 	  this.jrss=res['JRSS'];
 	  this.candidateName = res['employeeName'];
      
-         this.preTechService.getPreTechAssessmentQuestions(this.jrss, this.userName).subscribe(res => {
+         this.preTechService.getPreTechAssessmentQuestions(this.jrss, this.userName, this.candidateAccount).subscribe(res => {
 		 
 		 
 		 this.preTechAssmntQuestions = res;

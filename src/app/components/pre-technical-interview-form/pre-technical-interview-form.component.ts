@@ -43,8 +43,9 @@ export class PreTechnicalInterviewFormComponent implements OnInit {
           console.log("quizNumber-----*",this.quizNumber);
       let jrss =this.route.snapshot.paramMap.get('jrss');
       let username =this.route.snapshot.paramMap.get('username');
+      let candidateAccount =this.route.snapshot.paramMap.get('candidateAccount');
       this.access = this.router.getCurrentNavigation().extras.state.access;
-      this.getPreTechnicalAssessmentDetails(jrss,username,this.access);
+      this.getPreTechnicalAssessmentDetails(jrss,username,this.access,candidateAccount);
   }
 
   ngOnInit(): void {    
@@ -69,9 +70,9 @@ export class PreTechnicalInterviewFormComponent implements OnInit {
   }
 
 
-   getPreTechnicalAssessmentDetails(jrss,username,access) {
+   getPreTechnicalAssessmentDetails(jrss,username,access, candidateAccount) {
      this.preTechQuesAndAns = [];    
-     this.preTechService.getPreTechAssessmentQuestions(jrss,username).subscribe(res => {
+     this.preTechService.getPreTechAssessmentQuestions(jrss,username,candidateAccount).subscribe(res => {
      this.preTechAssmntQuestions = res;
      this.preTechAssmntQuestions.forEach((quesAndAnswer) => { 
      var answer = "";
