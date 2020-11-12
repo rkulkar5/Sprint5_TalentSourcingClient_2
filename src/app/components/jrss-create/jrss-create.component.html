@@ -58,11 +58,11 @@
   
     <!-- JRSS list -->
 <div class="mat-elevation-z8"  *ngIf="this.accounts.length <= 1">
-  <table mat-table [dataSource]="dataSource" matSort class="mat-elevation-z8">
+  <table mat-table [dataSource]="dataSource" matSort class="fixedTable">
     <!-- ID Column -->
     <ng-container matColumnDef="Action">
-      <th mat-header-cell *matHeaderCellDef> No. </th>
-      <td mat-cell *matCellDef="let row;let i = index"> {{pageSize*currentPage + i + 1}}</td>
+      <th style="width:90px" mat-header-cell *matHeaderCellDef> No. </th>
+      <td style="width:60px" mat-cell *matCellDef="let row;let i = index"> {{pageSize*currentPage + i + 1}}</td>
     </ng-container>
     <!-- ID Column -->
     <ng-container matColumnDef="jrss">
@@ -76,11 +76,11 @@
   </table>
 </div>
   <div class="mat-elevation-z8" *ngIf="this.accounts.length > 1">
-    <table mat-table [dataSource]="dataSource" matSort class="mat-elevation-z8">
+    <table mat-table [dataSource]="dataSource" matSort class="fixedTable">
       <!-- ID Column -->
       <ng-container matColumnDef="Action">
-        <th mat-header-cell *matHeaderCellDef> No. </th>
-        <td mat-cell *matCellDef="let row;let i = index"> {{pageSize*currentPage + i + 1}}</td>
+        <th style="width:90px" mat-header-cell *matHeaderCellDef> No. </th>
+        <td style="width:90px" mat-cell *matCellDef="let row;let i = index"> {{pageSize*currentPage + i + 1}}</td>
       </ng-container>
       <!-- ID Column -->
       <ng-container matColumnDef="jrss">

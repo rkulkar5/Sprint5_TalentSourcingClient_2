@@ -81,12 +81,13 @@ export class ResultPageComponent implements OnInit {
 
         //Sprint2: Save the quiz results for the user into 'Results' collection
         // Read the candidate JRSS by username
-        this.apiService.getCandidateJrss(this.username).subscribe((res) => {
-          this.jrss = res['JRSS'];
-          this.candidateAccount = res['account'];
+        this.apiService.getCandidateJrss(this.username).subscribe((candRes) => {
+          this.jrss = candRes['JRSS'];
+          this.candidateAccount = candRes['account'];
           // Read the work flow details by reading jrss record by jrss name.
-          this.apiService.getJrss(this.jrss).subscribe((res) => {
+          this.apiService.getJrssByAccountAndJrssName(this.jrss, this.candidateAccount).subscribe((res) => {
             let data;
+            
             this.testconfigService.findTestConfigByJRSS(this.jrss,this.candidateAccount).subscribe(
               (data) => {
                 this.passingScore = data['passingScore']

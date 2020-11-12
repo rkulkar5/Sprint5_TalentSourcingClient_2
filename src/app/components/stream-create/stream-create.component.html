@@ -95,11 +95,11 @@
 	<p *ngIf="JRSS.length <= 0" class="no-data text-center">There is no Technology Stream List added yet!</p>
 		<!-- Technology Stream list -->  
 <div class="mat-elevation-z8" *ngIf="this.accounts.length <= 1">
-	<table mat-table [dataSource]="dataSource" matSort class="mat-elevation-z8">
+	<table mat-table [dataSource]="dataSource" matSort class="fixedTable">
     <!-- ID Column -->
 	<ng-container matColumnDef="Action">
-		<th mat-header-cell *matHeaderCellDef> Select </th>
-			<td mat-cell *matCellDef="let row"> <mat-radio-button (change)="onSelectionChange(row[0],row[1])"></mat-radio-button></td>
+		<th style="width:90px" mat-header-cell *matHeaderCellDef> Select </th>
+			<td style="width:60px" mat-cell *matCellDef="let row"> <mat-radio-button (change)="onSelectionChange(row[0],row[1])"></mat-radio-button></td>
     </ng-container>
    <!-- ID Column -->
     <ng-container matColumnDef="jrss">
@@ -118,11 +118,11 @@
 	</div>
 
 	<div class="mat-elevation-z8" *ngIf="this.accounts.length > 1">
-		<table mat-table [dataSource]="dataSource" matSort class="mat-elevation-z8">
+		<table mat-table [dataSource]="dataSource" matSort class="fixedTable">
 		<!-- ID Column -->
 		<ng-container matColumnDef="Action">
-			<th mat-header-cell *matHeaderCellDef> Select </th>
-				<td mat-cell *matCellDef="let row"> <mat-radio-button (change)="onSelectionChange(row[0],row[1])"></mat-radio-button></td>
+			<th style="width:90px" mat-header-cell *matHeaderCellDef> Select </th>
+				<td style="width:60px" mat-cell *matCellDef="let row"> <mat-radio-button (change)="onSelectionChange(row[0],row[1])"></mat-radio-button></td>
 		</ng-container>
 	   <!-- ID Column -->
 		<ng-container matColumnDef="jrss">

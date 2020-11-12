@@ -62,6 +62,7 @@ export class PartnerInterviewInitiateComponent implements OnInit {
   rateCardLocation='';
   rateCardComplexityLevel='';
   rateCardRole='';
+  employeeType='';
   displayPositionDetails=false;
   displayPositionDropDown=false;
 
@@ -153,6 +154,7 @@ export class PartnerInterviewInitiateComponent implements OnInit {
       this.candidateAccount = this.partnerInterviewDetails[0].result_users[0].account;
       this.positionName = this.partnerInterviewDetails[0].result_users[0].openPositionName;
       this.positionID = this.partnerInterviewDetails[0].result_users[0].positionID;
+      this.employeeType = this.partnerInterviewDetails[0].result_users[0].employeeType;
       this.oldCandidateLocation = this.candidateLocation;
       this.getSelectedPositionDetails(this.positionID);
       this.listAllOpenPositions();
@@ -292,6 +294,7 @@ export class PartnerInterviewInitiateComponent implements OnInit {
        }
      }
      calculateGP() {
+     if (this.employeeType != 'Contractor') {
          if ((this.candidateLocation == null || this.candidateLocation == '' || this.positionName == null || this.positionName == '')
           && this.onLoad==false){
             window.alert("Please select Open Position/Candidate Position Location");
@@ -329,12 +332,14 @@ export class PartnerInterviewInitiateComponent implements OnInit {
                  this.oldCandidateLocation = this.candidateLocation;
                  this.grossProfit = Math.round(((rateCardValue-costCardValue)/costCardValue)*100);
                  if (isNaN(this.grossProfit)) {
+                   window.alert("Gross profit is not calculated as no value available for this combination.");
                    this.grossProfit = '';
                  }
               }
               this.onLoad = false;
            })
         })
+        }
      }
 
     // Get all PositionLocation

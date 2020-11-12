@@ -121,6 +121,7 @@ get myForm(){
       }
 
       //Sprint8 start
+      this.employeeType =  this.operationsProjectDetails[0].result_users[0].employeeType;
       this.candidateLocation = this.operationsProjectDetails[0].result_users[0].userPositionLocation;
       this.grossProfit = this.operationsProjectDetails[0].result_users[0].grossProfit;
       this.candidateLOB = this.operationsProjectDetails[0].result_users[0].userLOB;
@@ -270,6 +271,7 @@ positionID;
 candidatePositionID;
 positionStatus='Close';
 openPositionsList:any = [];
+employeeType ='';
 
 pageChange:any;
 jrssSelected=false;
@@ -350,7 +352,7 @@ getSelectedPositionDetails(positionID) {
 
 
      calculateGP() {
-
+      if (this.employeeType != 'Contractor') {
       if ((this.rateCardLocation == null || this.rateCardLocation == '' ) && this.onLoad==false) {
          window.alert("Please select Open Position/Candidate Position Location");
          return false;
@@ -374,12 +376,11 @@ getSelectedPositionDetails(positionID) {
          
         this.openPositionService.readCostCardsByCostCardCode(costCardCode).subscribe((data) => {
            costCardValue = data['costCardValue'];
-
            if ((rateCardValue == null || rateCardValue == undefined) && this.onLoad == false) {
               window.alert("No rate card value available for this rate code: ''"+rateCardCode+"' , choose a different position.");
               this.candidateLocation = this.oldCandidateLocation;
               return false;
-           } else if ((costCardValue == null || costCardValue == undefined) && this.onLoad == false) {
+           } if ((costCardValue == null || costCardValue == undefined) && this.onLoad == false) {
               window.alert("No cost card value available for this cost code: ''"+costCardCode+"' , choose a different candidate location.");
               this.candidateLocation = this.oldCandidateLocation;
               return false;
@@ -387,12 +388,14 @@ getSelectedPositionDetails(positionID) {
               this.oldCandidateLocation = this.candidateLocation;
               this.grossProfit = Math.round(((rateCardValue-costCardValue)/costCardValue)*100);
               if (isNaN(this.grossProfit)) {
+                window.alert("Gross profit is not calculated as no value available for this combination.");
                 this.grossProfit = '';
               }
            }
            this.onLoad = false;
         })
      })
+     }
   }
 
 }

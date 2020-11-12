@@ -53,7 +53,14 @@
           </tr>
           <tr *ngIf="displayTechInterviewFields">
             <td style="width:25%"><mat-label>Technical Interview Score:</mat-label></td>
-            <td style="width:25%">{{this.operationsProjectDetails[0].avgTechScore}}/10</td>
+            <td style="width:25%">
+              <div *ngIf="this.operationsProjectDetails[0].avgTechScore != null">
+                {{this.operationsProjectDetails[0].avgTechScore}}/10
+              </div>
+              <div *ngIf="this.operationsProjectDetails[0].avgTechScore == null">
+                N/A
+              </div>
+            </td>
             <td style="width:25%"><mat-label>Technical Interview Result:</mat-label></td>
             <td style="width:25%">{{this.operationsProjectDetails[0].smeResult}}</td>
           </tr>
@@ -73,7 +80,7 @@
             <td style="width:25%"><mat-label>Account:</mat-label></td>
             <td style="width:25%">{{this.operationsProjectDetails[0].result_users[0].account}}</td>
           </tr>
-          
+
           </tbody>
         </table>
       </mat-card-content>
@@ -83,8 +90,11 @@
 
 <div id="positionListModal" class="card" >
   <br>
-  <div class="card-header" style="background-color:#2554C7;color:white;font-size:10pt">
+  <div class="card-header" style="background-color:#2554C7;color:white;font-size:10pt" *ngIf="employeeType == 'Regular'">
     Open Position and Gross Profit Details
+  </div>
+  <div class="card-header" style="background-color:#2554C7;color:white;font-size:10pt" *ngIf="employeeType == 'Contractor'">
+    Open Position Details
   </div>
   <div class="card-body"  >
       <mat-card class="login-card">
@@ -123,17 +133,17 @@
           <td style="width:25%"><mat-label>Competency Level:</mat-label></td>
           <td style="width:25%">{{positionDetails.competencyLevel}}</td>
         </tr>
-         <tr>
+         <tr *ngIf="employeeType == 'Regular'">
           <td colspan="4" style="width:100%"><hr class="class-1"></td>
         </tr>
-        <tr>
+        <tr *ngIf="employeeType == 'Regular'">
           <td style="width:25%"><mat-label>Candidate Line Of Business:</mat-label></td>
           <td style="width:25%">{{this.candidateLOB}}</td>
           <td style="width:25%"><mat-label>Band:</mat-label></td>
           <td style="width:25%">{{this.candidateBand}}</td>
         </tr>
         <br/>
-        <tr >
+        <tr *ngIf="employeeType == 'Regular'">
           <td style="width:25%">
             <mat-form-field class="open-full-width">
               <mat-select placeholder="Candidate Location:" id="candidateLocation"  name= "candidateLocation"
