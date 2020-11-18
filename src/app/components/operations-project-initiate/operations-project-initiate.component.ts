@@ -19,6 +19,7 @@ declare var $: any;
 export class OperationsProjectInitiateComponent implements OnInit {
   public browserRefresh: boolean;
   userName: String = "";
+  name: String="";
   operationsProjectDetails : any = []; 
   ProjectLocation: any=['Onshore','Offshore'];
   ClientProject: any=['DWP','HMRC','SG'];
@@ -39,7 +40,7 @@ export class OperationsProjectInitiateComponent implements OnInit {
   emailSubject: String = "";
   emailMessage: String = "";
   toAddress: String = "";
-
+  
  constructor(private cv:TechnicalInterviewListComponent,
   public fb: FormBuilder, 
   private actRoute: ActivatedRoute, 
@@ -54,7 +55,8 @@ export class OperationsProjectInitiateComponent implements OnInit {
        this.positionID = this.router.getCurrentNavigation().extras.state.positionID;
        let id = this.actRoute.snapshot.paramMap.get('id');
        this.readOperationsProjectDetails(id); 
-       this.mainForm();     
+       this.mainForm(); 
+       this.getCandidate();    
    }
 
    ngOnInit() {
@@ -83,6 +85,14 @@ export class OperationsProjectInitiateComponent implements OnInit {
       managementComments: ['', [Validators.required]]
     })
 }
+
+  //get user's name based on email id
+  getCandidate(){
+   this.apiService.getNameFromUsername(this.userName).subscribe( (res) => {
+   this.name = res.name;        
+   });
+  }
+
 
 get myForm(){
   return this.operationsProjectForm.controls;

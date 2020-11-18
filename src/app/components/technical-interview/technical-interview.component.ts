@@ -93,8 +93,10 @@ export class TechnicalInterviewComponent implements OnInit {
     this.apiService.readTechInterviewDetails(id,quizId).subscribe(data => {
     
     this.candidateInterviewDetails=data;
+
+    this.averageScore = this.candidateInterviewDetails[0].avgTechScore;
+
     this.getTechnicalStreamFromJRSS();
-    
 
   }, (error) => {
       console.log(error);
@@ -385,6 +387,8 @@ export class TechnicalInterviewComponent implements OnInit {
       let updateId=this.candidateInterviewDetails[0]._id;
       if (this.techskillForm.value.finalResult === 'Recommended' || this.techskillForm.value.finalResult === 'Strongly Recommended') {
           this.stage3_status = 'Completed';
+      } else if(this.techskillForm.value.finalResult === 'Not Suitable') {
+        this.stage3_status = 'Not Suitable';
       } else {
           this.stage3_status = 'Not Started';
       }
