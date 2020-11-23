@@ -855,6 +855,17 @@ createAccount(data): Observable<any> {
     )
 }
 
+// Get Scheduled meeting events by candidate email 
+getMeetingEventsByCandidate(candidateEmail) {
+  let url = `${appConfig.baseUri}/scheduleMeeting/getMeetingEventsByCandidate/${candidateEmail}`; 
+  return this.http.get(url, {headers: this.headers}).pipe(
+    map((res: Response) => {
+    return res || {}
+    }),
+    catchError(this.errorMgmt)
+  )
+}
+
 // Get all questions based on account
 viewQuizQuestions(userName,account) {
   let url = `${this.baseQuestionUri}/${userName}/${account}`;

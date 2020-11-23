@@ -40,6 +40,7 @@ export class ReportComponent implements OnInit {
 
   @ViewChild(MatPaginator) paginator: MatPaginator;
   @ViewChild(MatSort) sort: MatSort;
+  accountSearch: string;
 
   constructor(
     private router: Router,
@@ -66,6 +67,31 @@ export class ReportComponent implements OnInit {
   }
   get jrss(): string {
     return this.searchJrss;
+  }
+
+  get accounts():string{
+    return this.accountSearch;
+  }
+
+  set accounts(account : string){
+    //alert("Account" +account);
+    //this.searchJrss = account;
+      this.searchFilter();
+  if(account){
+  let reportDataByAccount: any = [];
+      this.reportData.forEach((item) => {
+        console.log("item:" +item[1][1]);
+      
+        if (item[1][1].toLowerCase().startsWith(account.toLowerCase())) {
+        //  this.filterObj['key'].toLowerCase().includes(this.filterObj['value']);
+          reportDataByAccount.push(item);
+        }
+      });
+     
+      this.reportData = reportDataByAccount;
+     // console.log("reportData:" +this.reportData[0]);
+      this.dataSource.data = this.reportData as ReportStats[];
+}
   }
 
   set fromDate(fromDate: Date) {
@@ -237,7 +263,7 @@ loadReportData() {
           value: filterValue.trim().toLowerCase(),
           key: key
     }
-    this.dataSource.filter = filterValue.trim().toLowerCase();
+   this.dataSource.filter = filterValue.trim().toLowerCase();
   }
 
 }

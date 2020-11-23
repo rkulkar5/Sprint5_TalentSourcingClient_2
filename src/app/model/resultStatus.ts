@@ -9,9 +9,11 @@ export class ResultStatus {
 		public stage4_status: any;
 		public managementResult: any;
 		public stage5_status: any;
+    public exceptionalApprovalComments: any;
 
-
-		constructor(userName,quizNumber,userScore,stage1_status,stage2_status,stage3_status,smeResult,stage4_status,managementResult,stage5_status) {
+		constructor(userName,quizNumber,userScore,stage1_status,stage2_status,
+		            stage3_status,smeResult,stage4_status,managementResult,stage5_status,
+		            exceptionalApprovalComments) {
 		    this.userName = userName;
 		    this.quizNumber = quizNumber;
 		    this.userScore = userScore;
@@ -22,6 +24,7 @@ export class ResultStatus {
 		    this.stage4_status = stage4_status;
 		    this.managementResult = managementResult;
 		    this.stage5_status = stage5_status;
+		    this.exceptionalApprovalComments = exceptionalApprovalComments;
 		}
 
 }
