@@ -34,7 +34,7 @@ export class ViewQuestionComponent implements OnInit {
   accountArr:any = [];
   finalArr:any = [];
 
-  //accountFilter: string;
+  accountFilter: string;
   questionFilter:string;
   techStreamFilter: string;
   filterObj = {};
@@ -225,7 +225,7 @@ removeQuestion(){
     
     clearFilters() {
       this.dataSource.filter = '';
-     // this.accountFilter = '';
+      this.accountFilter = '';
       this.questionFilter = '';
       this.techStreamFilter = '';
 
