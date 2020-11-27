@@ -15,6 +15,9 @@ import {MatPaginator} from '@angular/material/paginator';
   styleUrls: ['./view-question.component.css']
 })
 export class ViewQuestionComponent implements OnInit {
+  searchFilter() {
+    throw new Error('Method not implemented.');
+  }
   public browserRefresh: boolean;
 
   userName: String = "";
@@ -51,6 +54,8 @@ export class ViewQuestionComponent implements OnInit {
   displayAnswer = false;
   isEditQuestion = 'N';
   loginAccounts:any = [];
+  accountFilter: any;
+  searchAccount:string;
  
 
   constructor(public fb: FormBuilder,private router: Router, private apiService: ApiService,private route: ActivatedRoute) {
@@ -69,7 +74,9 @@ export class ViewQuestionComponent implements OnInit {
     route.queryParams.subscribe(
       params => this.config.currentPage= params['page']?params['page']:1 );
       this.readQuestion();
+      this.readAccount();
   }
+
 
   ngOnInit() {
     this.browserRefresh = browserRefresh;
@@ -154,7 +161,8 @@ export class ViewQuestionComponent implements OnInit {
          }
       }
           this.dataSource.data=this.filteredQuestion as Question[];
-          console.log("datasource length" +this.dataSource.data.length);
+          //console.log("Filtered question:"+this.filteredQuestion);
+         // console.log("datasource length" +this.dataSource.data.length);
     })
   }
 
@@ -206,23 +214,6 @@ removeQuestion(){
   }
 }
 
-    accountFilter(account){
-      console.log("Inside account filter:"+account);
-      console.log("filterObj:" +this.filterObj['key']);
-      this.dataSource.filterPredicate = (data, filter) => {
-        if (this.filterObj['key'] == 'Account'){
-          data[this.filterObj['key']] = data[1];
-        } 
-        if(data[this.filterObj['key']] && this.filterObj['key']) {
-          if (data[this.filterObj['key']].toLowerCase().startsWith(this.filterObj['value'])) {
-             return data[this.filterObj['key']].toLowerCase().includes(this.filterObj['value']);
-          }
-      }
-      return false;
-
-    }
-  }
-
     onSelectionChange(questionsID,accounts,i,qID){
       this.questionID=questionsID;
       this.accounts=accounts;
@@ -240,14 +231,32 @@ removeQuestion(){
 
    }
 
-   applyFilter(filterValue: string,key: string) {
-    this.filterObj = {
-          value: filterValue.trim().toLowerCase(),
-          key: key
+  
+    readAccount(){
+    let smeAccount:any = [];
+    this.loginAccounts = [];
+    if(this.account.toLowerCase().trim() !== 'sector') {
+      this.loginAccounts = this.account.split(",");   
+    } else {
+      this.apiService.getAccounts().subscribe((data) => {
+      smeAccount = data;     
+      for (var account of smeAccount){             
+        this.loginAccounts.push(account.account);
+        console.log("account details:" +this.loginAccounts);
+      }​
+        })
+      }
     }
-    console.log("Filter obj :" +JSON.stringify(this.filterObj));
-    this.dataSource.filter = filterValue.trim().toLowerCase();
-    console.log("filter data:" +this.dataSource.filter);
-  }
+
+   
+
+    applyFilter(filterValue: string,key: string) {
+       this.filterObj = {
+             value: filterValue.trim().toLowerCase(),
+             key: key
+       }
+       this.dataSource.filter = filterValue.trim().toLowerCase();
+     }
 
 }
+

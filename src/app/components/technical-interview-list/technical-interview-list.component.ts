@@ -310,7 +310,7 @@ export class TechnicalInterviewListComponent implements OnInit {
     if(this.account.toLocaleLowerCase() !=='sector'){
       this.apiService.getTechnicalInterviewAccountList(this.account).subscribe((data) => {
         this.TechnicalInterviewList = data;
-
+        console.log("data:"+this.TechnicalInterviewList);
         this.TechnicalInterviewList.forEach((item)=> {
         if (item.meeting.length <= 0) {item.meeting[0]=`{startDate: ""}`;}
         if ( this.emailSelected == item.meeting[0].candidateEmail) {
@@ -324,7 +324,7 @@ export class TechnicalInterviewListComponent implements OnInit {
     else{
     this.apiService.getTechnicalInterviewList().subscribe((data) => {
       this.TechnicalInterviewList = data;
-      
+      console.log("Sector data:"+this.TechnicalInterviewList);
       this.TechnicalInterviewList.forEach((item)=> {
         if (item.meeting.length <= 0) {item.meeting[0]=`{startDate: ""}`;}
         if ( this.emailSelected == item.meeting[0].candidateEmail) {
