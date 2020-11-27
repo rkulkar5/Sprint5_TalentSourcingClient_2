@@ -54,7 +54,7 @@ export class ViewQuestionComponent implements OnInit {
   displayAnswer = false;
   isEditQuestion = 'N';
   loginAccounts:any = [];
-  accountFilter: any;
+  //accountFilter: any;
   searchAccount:string;
  
 
