@@ -193,18 +193,16 @@ loadReportData() {
     } else {
       fromDate = Date.parse(this.from_Date);
     }
-        console.log("fromDate filter",fromDate);
     if (!this.to_Date) {
       toDate = Date.parse("9999-01-01");
     } else {
       toDate = Date.parse(this.to_Date);
     }
-            console.log("toDate filter",toDate);
-    //this.datepipe.transform(new Date("9999-01-01"),'yyyy-MM-dd');
+
 
     this.reportResponse.forEach((item) => {
 
-      let registeredDate = Date.parse(item.createdDate);
+      let registeredDate = Date.parse(item.createdDate.split('T')[0]);
 
       if (registeredDate >= fromDate && registeredDate <= toDate) {
         if (this.reportObj[item.JRSS]) {
