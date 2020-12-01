@@ -36,6 +36,7 @@ export class TechnicalInterviewListComponent implements OnInit {
   userName: String = "";
   accessLevel: String = "";
   TechnicalInterviewList: any = [];
+  meetingEventsByCandidate:any = [];
   config: any;
   emailSelected = "";
   interviewDate = "";
@@ -227,28 +228,56 @@ export class TechnicalInterviewListComponent implements OnInit {
   //submit
   onSubmit() {
     this.submitted = true;
-    this.apiService.updateExceptionalApproval(this.emailSelected, this.quizNumber,  this.smeFeedbackForm.value.smeFeedback).subscribe(res => {
-      window.alert('Successfully moved candidate to next stage');
-      this.showModal = false;
-      this.getTechnicalInterviewList();
-      $("#myExceptionModal").modal("hide");
-    }, (error) => {
-      console.log(error);
-    })
+   this.formReset = false;
+   if (!this.smeFeedbackForm.valid) {
+        return false;
+   } else {
+      if (window.confirm("Are you sure you want to provide exception approval?")) {
+        this.apiService.updateExceptionalApproval(this.emailSelected, this.quizNumber,  this.smeFeedbackForm.value.smeFeedback).subscribe(res => {
+          window.alert('Successfully moved candidate to next stage');
+          this.showModal = false;
+          this.getTechnicalInterviewList();
+          $("#myExceptionModal").modal("hide");
+        }, (error) => {
+          console.log(error);
+        })
+      }
+    }
+  }
+
+  resetForm() {
+    this.formReset = true;
+    this.smeFeedbackForm.reset();
   }
 
   exceptionalApproval() {
     if (this.emailSelected == "") {
       alert("Please select the candidate");
       return false;
-    }
-    else {
-      if (window.confirm("Are you sure you want to provide exception approval?")) {
-        this.showModal = true;
-        this.content.open();
-      } else {
-        this.showModal = false;
-      }
+    } else {
+      this.showModal = true;
+      this.resetForm();
+      this.apiService.getMeetingEventsByCandidate(this.emailSelected).subscribe((res) => {
+          this.meetingEventsByCandidate = res;
+          if (this.meetingEventsByCandidate.length > 0) {
+            if(this.meetingEventsByCandidate[0].user == this.userName){
+             $("#myExceptionModal").modal("show");
+              return false;
+            } else {
+              this.showModal = false;
+              $('#myExceptionModal  .close').click();
+              alert('You are not allowed to do Exception Approval as Schedule Interview is done by ' +this.meetingEventsByCandidate[0].user);
+              return false;
+            }
+          } else {
+            if(this.interviewDate == ""  || this.interviewDate == undefined){
+              $("#myExceptionModal").modal("show");
+               return false;
+            }
+          }
+       }, (error) => {
+          console.log("Error occurred while reading meeting events table - ",error);
+     });
     }
   }
 
@@ -282,7 +311,8 @@ export class TechnicalInterviewListComponent implements OnInit {
 
   initiateInterview() {
     if (this.emailSelected == "") {
-      alert("Please select the candidate")
+      alert("Please select the candidate");
+      return false;
     }
     else {
       if(this.interviewDate == ""  || this.interviewDate == undefined){
