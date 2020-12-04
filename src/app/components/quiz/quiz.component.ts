@@ -9,6 +9,8 @@ import { FormGroup, FormControl } from "@angular/forms";
 import { environment } from './../../../environments/environment';
 import { TestConfigService } from './../../service/testconfig.service';
 import { browserRefresh } from '../../app.component';
+import { UserResultWorkFlow } from 'src/app/model/userResultWorkFlow';
+import { ResultPageService } from '../result-page/result-page.service';
 
 @Component({
   selector: 'app-quiz',
@@ -16,6 +18,7 @@ import { browserRefresh } from '../../app.component';
   styleUrls: ['./quiz.component.css']
 })
 export class QuizComponent implements OnInit {
+  
   public browserRefresh: boolean;
   answered:boolean=false;
   userName ="";
@@ -68,7 +71,8 @@ export class QuizComponent implements OnInit {
     private ngZone: NgZone,
     private quizService: QuizService,
     private testconfigService: TestConfigService,
-    private apiService: ApiService
+    private apiService: ApiService,
+    private resultPageService: ResultPageService
   ) {
     this.browserRefresh = browserRefresh;
     if (!this.browserRefresh) {
@@ -178,6 +182,7 @@ ngOnInit() {
         console.log("Band int value is " +this.bandInt);
           if(this.bandInt >=7 ){
            this.testconfigService.findTestConfigByJRSS(this.jrss,this.candidateAccount).subscribe((data) => {
+              this.passingScore = data['passingScore']
               this.noOfQuestions = data['noOfQuestions'];
               console.log('No of question' +this.noOfQuestions);
               this.configDuration = data['testDuration']*60;
@@ -192,6 +197,7 @@ ngOnInit() {
           });
         } else {
           this.testconfigService.findTestConfigByJRSS(this.jrss,this.candidateAccount).subscribe((data) => {
+            this.passingScore = data['passingScore']
              this.noOfQuestions = data['noOfQuestions'];
              this.configDuration = data['testDuration']*60;
              this.temp=this.noOfQuestions;
@@ -249,6 +255,7 @@ ngOnInit() {
       this.questionObj = {};
       this.complexityLevel = "Complex";
          this.testconfigService.findTestConfigByJRSS(this.jrss,this.candidateAccount).subscribe((data) => {
+            this.passingScore = data['passingScore']
             this.noOfQuestions = data['noOfQuestions'];
             this.configDuration = data['testDuration']*60;
             this.quizService.getQuizQuestions(this.noOfQuestions, this.userName,this.technologyStream,this.complexityLevel,this.candidateAccount).subscribe(res => {
@@ -390,7 +397,22 @@ ngOnInit() {
 		  }
    }
 
-  submitAnswers(warning: boolean) {
+
+   submitAnswers(warning: boolean) {
+    this.submitAnswers1(warning).then((data) => {
+
+                  this.ngZone.run(() => this.router.navigateByUrl('/result-page',
+                  {state:{username:this.userName,quizNumber:this.quizNumber,mode:this.mode, candidateAccount:this.candidateAccount}}))
+                 
+  
+                  })
+   }
+
+   
+  submitAnswers1(warning: boolean) {
+
+    return new Promise((resolve, reject) => {
+
   let userAnswer = new UserAnswer(null,null,null,null,null);
   this.questions.forEach((question) => {  
 	this.questionID = question.questionID;
@@ -412,22 +434,29 @@ ngOnInit() {
 	this.userAnswerID = (this.userAnswerID.length && this.userAnswerID[0] == ',') ? this.userAnswerID.slice(1) : this.userAnswerID;
 	userAnswer.userAnswerID = this.userAnswerID ;
   userAnswer = new UserAnswer(this.userName,this.quizNumber, this.questionID, this.userAnswerID, question.flagged );
-	let data = JSON.stringify( userAnswer );
+  let data = JSON.stringify( userAnswer );
+  
 		 this.quizService.saveAnswer(data).subscribe(
         (res) => {
           document.removeEventListener('visibilitychange',this.handler,true);
           console.log('Answer successfully saved!');    
 		      if(this.diff < this.configDuration && warning) {
 		        this.mode = 'quiz';
-		      } else {            
-            this.ngZone.run(() => this.router.navigateByUrl('/result-page',{state:{username:this.userName,quizNumber:this.quizNumber,mode:this.mode}}))
-          } }, (error) => {
+          } 
+          else { 
+          resolve(`adfds`)
+          } 
+        
+        }, (error) => {
           console.log(error);
         });
-
   });
+
+      
+    })
    
   }
+
   
   
  /** 
@@ -457,4 +486,123 @@ ngOnInit() {
    }
  }
   
+
+/**
+ * This method will calculate the percentage
+ */
+ passingScore;
+ stage2_status;
+ stage1;
+ stage2;
+ stage3;
+ stage4;
+ stage5;
+ userResult;
+ displayMsg: string = '';
+  numberOfCorrectAns: number = 0;
+  scorePercentage: string = '';
+
+ saveResult() {    
+   
+  this.quizService.getUserResults(this.userName, this.quizNumber).subscribe(
+
+   
+    (res) => {
+
+      if (this.mode == 'quiz') {
+        this.mode = 'Sorry,You have run out of time.'
+      }
+      else {
+        this.mode = "";
+      }
+      this.userAnswers = res;
+      this.userAnswers.forEach((userAns) => {
+        if (userAns.userAnswerID == userAns.answerID) {
+          this.numberOfCorrectAns = this.numberOfCorrectAns + 1;
+        }
+      }, (error) => {
+        console.log(error);
+      });
+     
+      this.scorePercentage = (Math.round(this.numberOfCorrectAns * 100) / this.noOfQuestions).toFixed(2);
+      this.numberOfCorrectAns = Math.round(this.numberOfCorrectAns * 100) / this.noOfQuestions;
+
+      
+      if (this.numberOfCorrectAns >= this.passingScore) {
+        this.displayMsg = "Congratulations on completing the exam."
+      } else {
+        this.displayMsg = "Thank you for completing the online assessment test, account hiring manager will come back to you shortly."
+      }
+
+      //Sprint2: Save the quiz results for the user into 'Results' collection
+      // Read the candidate JRSS by username
+     
+        // Read the work flow details by reading jrss record by jrss name.
+        this.apiService.getJrssByAccountAndJrssName(this.jrss, this.candidateAccount).subscribe((res) => {
+          
+          if (res['stage1_OnlineTechAssessment'] && this.numberOfCorrectAns >=this.passingScore) {
+            this.stage1 = "Completed";
+          } else if(res['stage1_OnlineTechAssessment'] && this.numberOfCorrectAns <this.passingScore){
+            this.stage1 = "Not Started";
+          } else {
+            this.stage1 = "Skipped";
+          }
+          if (res['stage2_PreTechAssessment']) {
+            this.stage2_status = "Not Started"
+            this.stage2 = "Not Started";
+          } else {
+            this.stage2 = "Skipped";
+            this.stage2_status = "Skipped"
+          }
+          if (res['stage3_TechAssessment']) {
+            this.stage3 = "Not Started";
+          } else {
+            this.stage3 = "Skipped";
+          }
+          if (res['stage4_ManagementInterview']) {
+            this.stage4 = "Not Started";
+          } else {
+            this.stage4 = "Skipped";
+          }
+          if (res['stage5_ProjectAllocation']) {
+            this.stage5 = "Not Started";
+          } else {
+            this.stage5 = "Skipped";
+          }
+
+          if (this.numberOfCorrectAns >= this.passingScore) {
+            this.userResult = "Pass";
+          } else {
+            this.userResult = "Fail";
+          }
+           let userResultWokFlow = new UserResultWorkFlow(this.userName, Number(this.scorePercentage), this.userResult,
+              this.quizNumber, this.stage1, this.stage2, this.stage3, this.stage4, this.stage5);
+              var data = JSON.stringify(userResultWokFlow);
+             
+
+              this.resultPageService.saveResult(data).subscribe(
+                (res) => {
+                  console.log('Quiz results for the user have been successfully saved!');
+                }, (error) => {
+                  console.log(error);
+                });
+            
+            }, (error) => {
+              console.log(error);
+            })
+          
+      //Update user loggedin status to false
+      this.apiService.updateUserLoggedinStatus(this.userName, 'false').subscribe(
+        (res) => {
+          console.log('Status column updated successfully in Users table');
+        }, (error) => {
+          console.log("Error found while updating status column of Users table - " + error);
+        });
+
+    });
+}
+
+
+
+
 }

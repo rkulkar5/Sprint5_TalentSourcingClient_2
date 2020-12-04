@@ -46,6 +46,11 @@ export class ResultPageComponent implements OnInit {
       this.username = this.router.getCurrentNavigation().extras.state.username;
       this.quizNumber = this.router.getCurrentNavigation().extras.state.quizNumber;
       this.mode = this.router.getCurrentNavigation().extras.state.mode;
+      // this.passingScore = this.router.getCurrentNavigation().extras.state.passingScore;
+      // this.numberOfCorrectAns = this.router.getCurrentNavigation().extras.state.numberOfCorrectAns;
+      // this.stage2_status = this.router.getCurrentNavigation().extras.state.stage2_status;
+      // this.candidateAccount = this.router.getCurrentNavigation().extras.state.candidateAccount;
+      
     }
   }
 
@@ -60,7 +65,7 @@ export class ResultPageComponent implements OnInit {
     this.showResult();
   }
 
-  showResult() {    
+  showResult() {  
     this.quizService.getUserResults(this.username, this.quizNumber).subscribe(
       (res) => {
         if (this.mode == 'quiz') {
@@ -77,7 +82,6 @@ export class ResultPageComponent implements OnInit {
         }, (error) => {
           console.log(error);
         });
-       
 
         //Sprint2: Save the quiz results for the user into 'Results' collection
         // Read the candidate JRSS by username
