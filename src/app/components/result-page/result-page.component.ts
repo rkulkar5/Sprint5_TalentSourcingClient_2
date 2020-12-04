@@ -7,7 +7,6 @@ import { browserRefresh } from '../../app.component';
 import { ResultPageService } from './../../components/result-page/result-page.service';
 import { Router, ActivatedRoute, NavigationExtras } from '@angular/router';
 import { TestConfigService } from './../../service/testconfig.service';
-import { log } from 'console';
 
 @Component({
   selector: 'app-result-page',
