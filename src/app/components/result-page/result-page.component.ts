@@ -75,7 +75,7 @@ export class ResultPageComponent implements OnInit {
           this.mode = "";
         }
         this.userAnswers = res;
-        console.log(`****** BEFORE for each loop *******`);
+        console.log(`****** BEFORE for each loop *******` + this.userAnswers.length);
         this.userAnswers.forEach((userAns) => {
           if (userAns.userAnswerID == userAns.answerID) {
             this.numberOfCorrectAns = this.numberOfCorrectAns + 1;

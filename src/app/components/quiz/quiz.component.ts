@@ -399,7 +399,7 @@ ngOnInit() {
 
 
    submitAnswers(warning: boolean) {
-    this.submitAnswers1(warning).then((data) => {
+    this.submitAnswers1(warning).then(() => {
 
                   this.ngZone.run(() => this.router.navigateByUrl('/result-page',
                   {state:{username:this.userName,quizNumber:this.quizNumber,mode:this.mode, candidateAccount:this.candidateAccount}}))
@@ -444,7 +444,7 @@ ngOnInit() {
 		        this.mode = 'quiz';
           } 
           else { 
-          resolve(`adfds`)
+          //resolve(`adfds`)
           } 
         
         }, (error) => {
