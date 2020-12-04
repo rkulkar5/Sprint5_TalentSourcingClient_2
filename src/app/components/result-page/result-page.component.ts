@@ -7,6 +7,7 @@ import { browserRefresh } from '../../app.component';
 import { ResultPageService } from './../../components/result-page/result-page.service';
 import { Router, ActivatedRoute, NavigationExtras } from '@angular/router';
 import { TestConfigService } from './../../service/testconfig.service';
+import { log } from 'console';
 
 @Component({
   selector: 'app-result-page',
@@ -75,13 +76,16 @@ export class ResultPageComponent implements OnInit {
           this.mode = "";
         }
         this.userAnswers = res;
+        console.log(`****** BEFORE for each loop *******`);
         this.userAnswers.forEach((userAns) => {
           if (userAns.userAnswerID == userAns.answerID) {
             this.numberOfCorrectAns = this.numberOfCorrectAns + 1;
+            console.log(`****** INSIDE numberOfCorrectAns ******* `, this.numberOfCorrectAns );
           }
         }, (error) => {
           console.log(error);
         });
+console.log(`****** After for each loop *******`);
 
         //Sprint2: Save the quiz results for the user into 'Results' collection
         // Read the candidate JRSS by username
