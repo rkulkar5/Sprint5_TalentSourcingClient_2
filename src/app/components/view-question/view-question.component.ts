@@ -89,7 +89,7 @@ export class ViewQuestionComponent implements OnInit {
         data[this.filterObj['key']] = data[3];
       }
      if(data[this.filterObj['key']] && this.filterObj['key']) {
-          if (data[this.filterObj['key']].toLowerCase().startsWith(this.filterObj['value']) || data[this.filterObj['key']] == this.filterObj['value'] || data[this.filterObj['key']].toLowerCase().includes(this.filterObj['value'])) {
+          if (data[this.filterObj['key']].toLowerCase().startsWith(this.filterObj['value'])) {
              return data[this.filterObj['key']].toLowerCase().includes(this.filterObj['value']);
           }
       }
