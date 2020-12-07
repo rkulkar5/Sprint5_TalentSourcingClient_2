@@ -409,28 +409,24 @@ ngOnInit() {
     question.flagged = false;
   }  
   
-	this.array = this.userAnswerID.split(',')
+	//this.array = this.userAnswerID.split(',')
 	this.userAnswerID = (this.userAnswerID.length && this.userAnswerID[0] == ',') ? this.userAnswerID.slice(1) : this.userAnswerID;
-	userAnswer.userAnswerID = this.userAnswerID ;
   userAnswer = new UserAnswer(this.userName,this.quizNumber, this.questionID, this.userAnswerID, question.flagged );
  
   data.push( userAnswer );
   
 });
-console.log("Answers length - " + data.length);
-    this.quizService.saveAnswer(data).subscribe(
+    this.quizService.saveAnswer(data).subscribe (
       (res) => {
         document.removeEventListener('visibilitychange',this.handler,true);
         console.log('Answer successfully saved!');    
         if(this.diff < this.configDuration && warning) {
           this.mode = 'quiz';
-        } else {            
+        } else  {    
           this.ngZone.run(() => this.router.navigateByUrl('/result-page',{state:{username:this.userName,quizNumber:this.quizNumber,mode:this.mode}}))
         } }, (error) => {
         console.log(error);
       });
-
-  
    
   }
   
